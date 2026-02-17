@@ -181,11 +181,11 @@ function formatMarkdown(text: string): string {
     )
     // Wrap adjacent list items so numbering/bullets render correctly per message
     .replace(
-      /((?:<li data-list="ol"[^>]*>.*?<\/li>\s*)+)/gs,
+      /((?:<li data-list="ol"[^>]*>[\s\S]*?<\/li>\s*)+)/g,
       '<ol style="margin:0.35rem 0 0.45rem 1.25rem;list-style-type:decimal;">$1</ol>'
     )
     .replace(
-      /((?:<li data-list="ul"[^>]*>.*?<\/li>\s*)+)/gs,
+      /((?:<li data-list="ul"[^>]*>[\s\S]*?<\/li>\s*)+)/g,
       '<ul style="margin:0.35rem 0 0.45rem 1.25rem;list-style-type:disc;">$1</ul>'
     )
     .replace(/\sdata-list="(?:ol|ul)"/g, "")
