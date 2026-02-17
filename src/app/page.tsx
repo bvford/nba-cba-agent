@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { ChatMessage } from "@/components/ChatMessage";
 import { ChatInput } from "@/components/ChatInput";
 import { Sidebar } from "@/components/Sidebar";
@@ -405,6 +406,13 @@ export default function Home() {
               className="flex items-center gap-2.5 hover:opacity-85 transition-opacity"
               title="Home (new chat)"
             >
+              <Image
+                src="/chatcba-logo.png"
+                alt="ChatCBA logo"
+                width={28}
+                height={28}
+                className="rounded-full border border-[--color-border-light] shadow-[0_4px_14px_rgba(8,10,15,0.4)]"
+              />
               <div className="text-left">
                 <h1 className="text-sm font-semibold tracking-tight text-[--color-text-primary] leading-tight">
                   ChatCBA
@@ -455,13 +463,15 @@ export default function Home() {
               <div className="flex flex-col min-h-[calc(100vh-12rem)] w-full">
                 {/* Hero */}
                 <section className="text-center pt-8 md:pt-14 mb-10 md:mb-12">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[linear-gradient(145deg,rgba(77,111,240,0.28),rgba(79,210,184,0.18))] border border-[--color-border-light] mb-5 shadow-[0_16px_45px_rgba(8,10,15,0.55)]">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[--color-nba-red]">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                      <circle cx="10" cy="10" r="1" />
-                      <circle cx="14" cy="10" r="1" />
-                      <circle cx="18" cy="10" r="1" />
-                    </svg>
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[linear-gradient(145deg,rgba(77,111,240,0.22),rgba(79,210,184,0.12))] border border-[--color-border-light] mb-5 shadow-[0_16px_45px_rgba(8,10,15,0.55)] p-1.5">
+                    <Image
+                      src="/chatcba-logo.png"
+                      alt="ChatCBA logo"
+                      width={70}
+                      height={70}
+                      className="rounded-full"
+                      priority
+                    />
                   </div>
                   <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[--color-text-primary] mb-3">
                     Your AI Salary Cap Expert

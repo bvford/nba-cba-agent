@@ -312,6 +312,8 @@ function mergePlayers(
     const salary = salaryMap.get(normalizeName(stat.name));
     merged.push({
       ...stat,
+      // Prefer salary-source team when available; stats feeds can lag post-trade.
+      team: salary?.team || stat.team,
       salaries: salary?.salaries || {},
     });
   }
