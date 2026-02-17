@@ -385,7 +385,7 @@ export default function Home() {
       />
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 w-full">
+      <div className="flex-1 flex flex-col min-w-0 w-full lg:pl-72">
         {/* Header */}
         <header className="border-b border-[--color-border] bg-[--color-surface-raised]/75 backdrop-blur-xl sticky top-0 z-10">
           <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
@@ -545,7 +545,7 @@ export default function Home() {
                   Tip: press <span className="text-[--color-text-secondary] font-medium">Cmd/Ctrl + Shift + K</span> to start a new chat
                 </div>
 
-                <footer className="mt-auto pt-10 pb-2 border-t border-[--color-border]/80">
+                <footer className="mt-10 md:mt-12 pt-10 pb-2 border-t border-[--color-border]/80">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[--color-text-muted]">
                     <p>© {new Date().getFullYear()} ChatCBA. All rights reserved.</p>
                     <div className="flex items-center gap-3">
