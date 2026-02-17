@@ -449,7 +449,7 @@ export default function Home() {
         </header>
 
         {/* Messages area */}
-        <main className="flex-1 overflow-y-auto">
+        <main id="chat" className="flex-1 overflow-y-auto">
           <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
             {isLanding ? (
               <div className="flex flex-col min-h-[calc(100vh-12rem)]">
@@ -464,10 +464,10 @@ export default function Home() {
                     </svg>
                   </div>
                   <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[--color-text-primary] mb-3">
-                    Front-Office Grade NBA CBA Intelligence
+                    Your AI Salary Cap Expert
                   </h2>
                   <p className="text-[--color-text-secondary] max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
-                    Ask sharp questions about cap mechanics, contract structure, and roster-building strategy.
+                    Ask questions about cap mechanics, contract structure, and roster-building strategy.
                     Get concise answers grounded in the 2023 CBA and updated salary/stat context.
                   </p>
                   <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
@@ -501,7 +501,7 @@ export default function Home() {
                   </div>
                 </section>
 
-                <div className="w-full max-w-2xl mb-4">
+                <div className="w-full max-w-2xl mx-auto mb-4">
                   <p className="text-xs font-semibold text-[--color-text-muted] uppercase tracking-[0.18em] mb-2 text-center">
                     Starter modes
                   </p>
@@ -519,7 +519,7 @@ export default function Home() {
                 </div>
 
                 {/* Example questions */}
-                <div className="w-full max-w-2xl">
+                <div className="w-full max-w-2xl mx-auto">
                   <p className="text-xs font-semibold text-[--color-text-muted] uppercase tracking-[0.18em] mb-3 text-center">
                     Try asking
                   </p>
