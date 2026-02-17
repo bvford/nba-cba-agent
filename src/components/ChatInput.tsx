@@ -85,7 +85,7 @@ export function ChatInput({
           disabled={disabled}
           rows={1}
           className="flex-1 resize-none rounded-xl bg-[--color-surface] border border-[--color-border] px-4 py-2.5
-            text-sm text-[--color-text-primary] placeholder-[--color-text-muted]
+            text-base md:text-sm text-[--color-text-primary] placeholder-[--color-text-muted]
             focus:outline-none focus:border-[--color-accent] focus:ring-1 focus:ring-[--color-accent]/50
             disabled:opacity-50 disabled:cursor-not-allowed
             transition-colors duration-150"
