@@ -32,10 +32,26 @@ const EXAMPLE_QUESTIONS = [
 ];
 
 const STARTER_MODES = [
-  { label: "Contracts", prompt: "Explain this player's contract structure in plain English." },
-  { label: "Trades", prompt: "Is this trade legal under current CBA apron and salary matching rules?" },
-  { label: "Free Agency", prompt: "What free agency options does this team have this offseason?" },
-  { label: "Cap Exceptions", prompt: "Which cap exceptions are available here and why?" },
+  {
+    label: "Contracts",
+    prompt:
+      "Break down this player's contract in plain English. Player: [name]. Include years, salary by season, guarantees, options, bonuses, and extension eligibility.",
+  },
+  {
+    label: "Trades",
+    prompt:
+      "Evaluate whether this trade is legal and smart under the current CBA. Team A sends: [players/picks], Team B sends: [players/picks]. Explain salary matching, apron constraints, and long-term cap impact.",
+  },
+  {
+    label: "Free Agency",
+    prompt:
+      "Map this team's offseason options under the current CBA. Team: [name]. Include cap room estimate, key free agents, exceptions available, and realistic move paths.",
+  },
+  {
+    label: "Cap Exceptions",
+    prompt:
+      "Identify which cap exceptions this team can use right now and rank them by usefulness. Team: [name]. Explain eligibility, spending limits, and apron-related restrictions.",
+  },
 ];
 
 export default function Home() {
