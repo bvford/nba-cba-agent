@@ -8,8 +8,10 @@ const anthropic = new Anthropic({
 
 // Simple in-memory rate limiter: max requests per IP per window
 const RATE_LIMIT = 20; // requests per window
-const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const RATE_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours
 const ipRequests = new Map<string, { count: number; resetAt: number }>();
+const RESPONSE_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const responseCache = new Map<string, { text: string; sources: string[]; createdAt: number }>();
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
@@ -21,6 +23,56 @@ function checkRateLimit(ip: string): boolean {
   if (entry.count >= RATE_LIMIT) return false;
   entry.count++;
   return true;
+}
+
+function buildCacheKey(messages: Array<{ role: string; content: string }>): string {
+  const recent = messages.slice(-6).map((m) => `${m.role}:${m.content.trim().toLowerCase()}`);
+  return recent.join("||");
+}
+
+function getRetrievalProfile(query: string): {
+  maxChars: number;
+  maxGuideSections: number;
+  maxCbaArticles: number;
+  maxSectionsPerArticle: number;
+  maxOutputTokens: number;
+} {
+  const q = query.toLowerCase();
+  const isDeepRules = /(trade|sign-and-trade|apron|exception|bird|matching|aggregate|base year|hard cap|cba article|section|clause)/.test(q);
+  const isQuickDefinition = /(what is|explain|define|how does)/.test(q) && q.length < 120;
+
+  if (isDeepRules) {
+    return {
+      maxChars: 18000,
+      maxGuideSections: 4,
+      maxCbaArticles: 5,
+      maxSectionsPerArticle: 3,
+      maxOutputTokens: 1400,
+    };
+  }
+
+  if (isQuickDefinition) {
+    return {
+      maxChars: 9000,
+      maxGuideSections: 3,
+      maxCbaArticles: 3,
+      maxSectionsPerArticle: 2,
+      maxOutputTokens: 900,
+    };
+  }
+
+  return {
+    maxChars: 12000,
+    maxGuideSections: 4,
+    maxCbaArticles: 4,
+    maxSectionsPerArticle: 2,
+    maxOutputTokens: 1100,
+  };
+}
+
+function trimMessagesForModel(messages: Array<{ role: string; content: string }>) {
+  // Keep only the most recent turns to reduce token usage.
+  return messages.slice(-8);
 }
 
 const SYSTEM_PROMPT = `You are ChatCBA, an NBA CBA + roster strategy assistant.
@@ -65,7 +117,7 @@ export async function POST(req: NextRequest) {
     const ip = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";
     if (!checkRateLimit(ip)) {
       return Response.json(
-        { error: "Rate limit exceeded. Please try again later." },
+        { error: "Daily request limit reached (20/day). Please try again tomorrow." },
         { status: 429 }
       );
     }
@@ -88,8 +140,37 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const retrievalProfile = getRetrievalProfile(latestUserMessage.content);
+    const cacheKey = buildCacheKey(messages);
+    const cached = responseCache.get(cacheKey);
+    if (cached && Date.now() - cached.createdAt <= RESPONSE_CACHE_TTL_MS) {
+      const encoder = new TextEncoder();
+      const readable = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: cached.text })}\n\n`));
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ sources: cached.sources })}\n\n`)
+          );
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.close();
+        },
+      });
+      return new Response(readable, {
+        headers: {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          Connection: "keep-alive",
+        },
+      });
+    }
+
     // Search the CBA for relevant content and player data
-    const cbaResult = searchCBAWithMeta(latestUserMessage.content);
+    const cbaResult = searchCBAWithMeta(latestUserMessage.content, {
+      maxChars: retrievalProfile.maxChars,
+      maxGuideSections: retrievalProfile.maxGuideSections,
+      maxCbaArticles: retrievalProfile.maxCbaArticles,
+      maxSectionsPerArticle: retrievalProfile.maxSectionsPerArticle,
+    });
     const cbaContext = cbaResult.context;
     const playerContext = searchPlayers(latestUserMessage.content);
     const responseSources = [
@@ -103,9 +184,10 @@ export async function POST(req: NextRequest) {
     ];
 
     // Build the messages array with CBA context injected
-    const augmentedMessages = messages.map(
+    const trimmedMessages = trimMessagesForModel(messages);
+    const augmentedMessages = trimmedMessages.map(
       (m: { role: string; content: string }, i: number) => {
-        if (i === messages.length - 1 && m.role === "user") {
+        if (i === trimmedMessages.length - 1 && m.role === "user") {
           return {
             role: "user" as const,
             content: `${m.content}\n\n---\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${cbaContext}${playerContext}`,
@@ -118,13 +200,14 @@ export async function POST(req: NextRequest) {
     // Stream the response
     const stream = await anthropic.messages.stream({
       model: "claude-sonnet-4-5-20250929",
-      max_tokens: 4096,
+      max_tokens: retrievalProfile.maxOutputTokens,
       system: SYSTEM_PROMPT,
       messages: augmentedMessages,
     });
 
     // Convert to a ReadableStream for the frontend
     const encoder = new TextEncoder();
+    let fullResponseText = "";
     const readable = new ReadableStream({
       async start(controller) {
         try {
@@ -133,6 +216,7 @@ export async function POST(req: NextRequest) {
               event.type === "content_block_delta" &&
               event.delta.type === "text_delta"
             ) {
+              fullResponseText += event.delta.text;
               controller.enqueue(
                 encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`)
               );
@@ -143,6 +227,11 @@ export async function POST(req: NextRequest) {
               `data: ${JSON.stringify({ sources: Array.from(new Set(responseSources)).slice(0, 5) })}\n\n`
             )
           );
+          responseCache.set(cacheKey, {
+            text: fullResponseText,
+            sources: Array.from(new Set(responseSources)).slice(0, 5),
+            createdAt: Date.now(),
+          });
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
         } catch (err) {

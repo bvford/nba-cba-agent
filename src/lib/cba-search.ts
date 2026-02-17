@@ -13,6 +13,13 @@ export interface SearchResultMeta {
   sources: string[];
 }
 
+interface SearchOptions {
+  maxChars?: number;
+  maxGuideSections?: number;
+  maxCbaArticles?: number;
+  maxSectionsPerArticle?: number;
+}
+
 interface PlayerData {
   name: string;
   team: string;
@@ -157,8 +164,12 @@ function scoreDocument(
 
 export function searchCBAWithMeta(
   query: string,
-  maxChars: number = 80000
+  options: SearchOptions = {}
 ): SearchResultMeta {
+  const maxChars = options.maxChars ?? 12000;
+  const maxGuideSections = options.maxGuideSections ?? 4;
+  const maxCbaArticles = options.maxCbaArticles ?? 4;
+  const maxSectionsPerArticle = options.maxSectionsPerArticle ?? 3;
   const queryTokens = tokenize(query).filter((t) => !STOP_WORDS.has(t));
   const queryLower = query.toLowerCase();
 
@@ -196,7 +207,7 @@ export function searchCBAWithMeta(
 
   // Add top guide sections first (up to 40% of budget)
   const guideBudget = maxChars * 0.4;
-  for (const section of scoredGuide) {
+  for (const section of scoredGuide.slice(0, maxGuideSections)) {
     const text = `\n\n--- CBA GUIDE: ${section.title} ---\n\n${section.content}`;
     if (charsUsed + text.length > guideBudget) break;
     context += text;
@@ -205,13 +216,12 @@ export function searchCBAWithMeta(
   }
 
   // Fill the rest with raw CBA articles
-  for (const article of scoredCBA) {
-    let articleText: string;
-    if (article.content.length < 15000) {
-      articleText = `\n\n--- CBA ARTICLE: ${article.title} ---\n\n${article.content}`;
-    } else {
-      articleText = `\n\n--- CBA ARTICLE: ${article.title} (relevant sections) ---\n\n${article.relevantSections.join("\n\n")}`;
-    }
+  for (const article of scoredCBA.slice(0, maxCbaArticles)) {
+    const chosenSections = article.relevantSections.slice(0, maxSectionsPerArticle);
+    const articleBody = chosenSections.length > 0
+      ? chosenSections.join("\n\n")
+      : article.content.slice(0, 2000);
+    const articleText = `\n\n--- CBA ARTICLE: ${article.title} (targeted sections) ---\n\n${articleBody}`;
 
     if (charsUsed + articleText.length > maxChars) break;
     context += articleText;
@@ -226,7 +236,7 @@ export function searchCBAWithMeta(
 }
 
 export function searchCBA(query: string, maxChars: number = 80000): string {
-  return searchCBAWithMeta(query, maxChars).context;
+  return searchCBAWithMeta(query, { maxChars }).context;
 }
 
 // ---- Player search ----
