@@ -1,4 +1,5 @@
 import cbaArticles from "../../data/cba-articles.json";
+import cbaGuide from "../../data/cba-guide.json";
 import playerData from "../../data/players.json";
 
 export interface CBAArticle {
@@ -35,6 +36,7 @@ interface ScoredArticle extends CBAArticle {
 }
 
 const articles: CBAArticle[] = cbaArticles as CBAArticle[];
+const guideSections: CBAArticle[] = cbaGuide as CBAArticle[];
 
 // Break each article into sections (split on ## headings)
 function getSections(article: CBAArticle): { heading: string; text: string }[] {
@@ -105,6 +107,49 @@ const TOPIC_MAP: Record<string, string[]> = {
   "second apron": ["apron", "second apron", "salary cap"],
 };
 
+// Score a single document (article or guide section) against the query
+function scoreDocument(
+  doc: CBAArticle,
+  queryTokens: string[],
+  queryLower: string,
+  boostedTerms: string[]
+): ScoredArticle {
+  let score = 0;
+  const sections = getSections(doc);
+  const relevantSections: string[] = [];
+
+  const titleLower = doc.title.toLowerCase();
+  for (const token of queryTokens) {
+    if (titleLower.includes(token)) score += 10;
+  }
+  for (const term of boostedTerms) {
+    if (titleLower.includes(term)) score += 15;
+  }
+
+  for (const section of sections) {
+    const sectionLower = (section.heading + " " + section.text).toLowerCase();
+    let sectionScore = 0;
+
+    for (const token of queryTokens) {
+      const regex = new RegExp(token, "gi");
+      const matches = sectionLower.match(regex);
+      if (matches) sectionScore += matches.length;
+    }
+    for (const term of boostedTerms) {
+      if (sectionLower.includes(term)) sectionScore += 5;
+    }
+
+    if (sectionLower.includes(queryLower)) sectionScore += 20;
+
+    if (sectionScore > 0) {
+      score += sectionScore;
+      relevantSections.push(`### ${section.heading}\n${section.text}`);
+    }
+  }
+
+  return { ...doc, score, relevantSections };
+}
+
 export function searchCBA(query: string, maxChars: number = 80000): string {
   const queryTokens = tokenize(query).filter((t) => !STOP_WORDS.has(t));
   const queryLower = query.toLowerCase();
@@ -116,7 +161,6 @@ export function searchCBA(query: string, maxChars: number = 80000): string {
       boostedTerms.push(...terms);
     }
   }
-  // Also check individual query words against topic keys
   for (const token of queryTokens) {
     for (const [topic, terms] of Object.entries(TOPIC_MAP)) {
       if (topic.includes(token)) {
@@ -125,73 +169,43 @@ export function searchCBA(query: string, maxChars: number = 80000): string {
     }
   }
 
-  const scored: ScoredArticle[] = articles.map((article) => {
-    let score = 0;
-    const sections = getSections(article);
-    const relevantSections: string[] = [];
+  // Score the plain-English guide sections (prioritized - these explain things clearly)
+  const scoredGuide = guideSections
+    .map((s) => ({ ...scoreDocument(s, queryTokens, queryLower, boostedTerms), source: "guide" as const }))
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score);
 
-    // Score the article title
-    const titleLower = article.title.toLowerCase();
-    for (const token of queryTokens) {
-      if (titleLower.includes(token)) score += 10;
-    }
-    for (const term of boostedTerms) {
-      if (titleLower.includes(term)) score += 15;
-    }
+  // Score the raw CBA articles
+  const scoredCBA = articles
+    .map((a) => ({ ...scoreDocument(a, queryTokens, queryLower, boostedTerms), source: "cba" as const }))
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score);
 
-    // Score each section
-    for (const section of sections) {
-      const sectionLower = (section.heading + " " + section.text).toLowerCase();
-      let sectionScore = 0;
-
-      for (const token of queryTokens) {
-        const regex = new RegExp(token, "gi");
-        const matches = sectionLower.match(regex);
-        if (matches) sectionScore += matches.length;
-      }
-      for (const term of boostedTerms) {
-        if (sectionLower.includes(term)) sectionScore += 5;
-      }
-
-      // Bonus for exact phrase matches
-      if (sectionLower.includes(queryLower)) sectionScore += 20;
-
-      if (sectionScore > 0) {
-        score += sectionScore;
-        relevantSections.push(
-          `### ${section.heading}\n${section.text}`
-        );
-      }
-    }
-
-    return { ...article, score, relevantSections };
-  });
-
-  // Sort by score, take the best matches
-  scored.sort((a, b) => b.score - a.score);
-
-  // Build context from top-scoring articles, respecting char limit
+  // Build context: guide first (plain English), then CBA (official text)
   let context = "";
-  let articlesIncluded = 0;
+  let charsUsed = 0;
 
-  for (const article of scored) {
-    if (article.score === 0) break;
+  // Add top guide sections first (up to 40% of budget)
+  const guideBudget = maxChars * 0.4;
+  for (const section of scoredGuide) {
+    const text = `\n\n--- CBA GUIDE: ${section.title} ---\n\n${section.content}`;
+    if (charsUsed + text.length > guideBudget) break;
+    context += text;
+    charsUsed += text.length;
+  }
 
-    // If article is small enough, include the whole thing
+  // Fill the rest with raw CBA articles
+  for (const article of scoredCBA) {
     let articleText: string;
     if (article.content.length < 15000) {
-      articleText = `\n\n--- ARTICLE: ${article.title} ---\n\n${article.content}`;
+      articleText = `\n\n--- CBA ARTICLE: ${article.title} ---\n\n${article.content}`;
     } else {
-      // Include only the relevant sections
-      articleText = `\n\n--- ARTICLE: ${article.title} (relevant sections) ---\n\n${article.relevantSections.join("\n\n")}`;
+      articleText = `\n\n--- CBA ARTICLE: ${article.title} (relevant sections) ---\n\n${article.relevantSections.join("\n\n")}`;
     }
 
-    if (context.length + articleText.length > maxChars && articlesIncluded > 0) {
-      break;
-    }
-
+    if (charsUsed + articleText.length > maxChars) break;
     context += articleText;
-    articlesIncluded++;
+    charsUsed += articleText.length;
   }
 
   return context || "No relevant CBA sections found for this query.";
