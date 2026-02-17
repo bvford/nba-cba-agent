@@ -32,11 +32,40 @@ export default function AboutPage() {
           </ul>
         </section>
 
-        <section>
+        <section className="mb-6">
           <h2 className="text-lg font-medium text-[--color-text-primary] mb-2">Limitations</h2>
           <p className="text-sm text-[--color-text-secondary] leading-relaxed">
             Not legal or financial advice. If data conflicts or appears incomplete, verify with primary sources.
           </p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-medium text-[--color-text-primary] mb-2">Contact</h2>
+          <p className="text-sm text-[--color-text-secondary] leading-relaxed mb-2">
+            Contact the creator of this website:
+          </p>
+          <ul className="text-sm text-[--color-text-secondary] space-y-1">
+            <li>
+              Email:{" "}
+              <a
+                className="hover:text-[--color-text-primary]"
+                href="mailto:mikehmargolis@gmail.com"
+              >
+                mikehmargolis@gmail.com
+              </a>
+            </li>
+            <li>
+              LinkedIn:{" "}
+              <a
+                className="hover:text-[--color-text-primary]"
+                href="https://www.linkedin.com/in/margolismichael/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Michael Margolis
+              </a>
+            </li>
+          </ul>
         </section>
       </div>
     </main>
