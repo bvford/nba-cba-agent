@@ -409,8 +409,8 @@ export default function Home() {
               <Image
                 src="/chatcba-logo.png"
                 alt="ChatCBA logo"
-                width={28}
-                height={28}
+                width={40}
+                height={40}
                 className="rounded-full border border-[--color-border-light] shadow-[0_4px_14px_rgba(8,10,15,0.4)]"
               />
               <div className="text-left">
@@ -463,12 +463,12 @@ export default function Home() {
               <div className="flex flex-col min-h-[calc(100vh-12rem)] w-full">
                 {/* Hero */}
                 <section className="text-center pt-8 md:pt-14 mb-10 md:mb-12">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[linear-gradient(145deg,rgba(77,111,240,0.22),rgba(79,210,184,0.12))] border border-[--color-border-light] mb-5 shadow-[0_16px_45px_rgba(8,10,15,0.55)] p-1.5">
+                  <div className="inline-flex items-center justify-center w-28 h-28 md:w-32 md:h-32 rounded-full bg-[linear-gradient(145deg,rgba(77,111,240,0.22),rgba(79,210,184,0.12))] border border-[--color-border-light] mb-5 shadow-[0_16px_45px_rgba(8,10,15,0.55)] p-1.5">
                     <Image
                       src="/chatcba-logo.png"
                       alt="ChatCBA logo"
-                      width={70}
-                      height={70}
+                      width={118}
+                      height={118}
                       className="rounded-full"
                       priority
                     />
