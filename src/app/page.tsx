@@ -463,13 +463,13 @@ export default function Home() {
               <div className="flex flex-col min-h-[calc(100vh-12rem)] w-full">
                 {/* Hero */}
                 <section className="text-center pt-8 md:pt-14 mb-10 md:mb-12">
-                  <div className="inline-flex items-center justify-center w-28 h-28 md:w-32 md:h-32 rounded-full bg-[linear-gradient(145deg,rgba(77,111,240,0.22),rgba(79,210,184,0.12))] border border-[--color-border-light] mb-5 shadow-[0_16px_45px_rgba(8,10,15,0.55)] p-1.5">
+                  <div className="mb-5">
                     <Image
                       src="/chatcba-logo.png"
                       alt="ChatCBA logo"
-                      width={118}
-                      height={118}
-                      className="rounded-full"
+                      width={220}
+                      height={220}
+                      className="w-36 h-36 md:w-44 md:h-44 rounded-full mx-auto drop-shadow-[0_18px_38px_rgba(8,10,15,0.58)]"
                       priority
                     />
                   </div>
