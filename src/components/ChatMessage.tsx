@@ -60,8 +60,38 @@ export function ChatMessage({
         </div>
 
         {!isUser && sources && sources.length > 0 && (
-          <div className="mt-1.5 ml-1 text-[10px] text-[--color-text-muted]">
-            <span className="text-[--color-text-secondary]">Sources:</span> {sources.join(" · ")}
+          <div className="mt-2 ml-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[10px] text-[--color-text-secondary]">Sources:</span>
+              {sources.map((rawSource, idx) => {
+                const source = normalizeSource(rawSource);
+                const key = `${source.label}-${idx}`;
+                if (source.href) {
+                  return (
+                    <a
+                      key={key}
+                      href={source.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[10px] px-2 py-0.5 rounded-full border border-[--color-border] bg-[--color-surface]/65 text-[--color-text-secondary] hover:text-[--color-text-primary] hover:border-[--color-border-light] hover:bg-[--color-surface-hover] transition-colors"
+                      title={rawSource}
+                    >
+                      {source.label}
+                    </a>
+                  );
+                }
+
+                return (
+                  <span
+                    key={key}
+                    className="text-[10px] px-2 py-0.5 rounded-full border border-[--color-border] bg-[--color-surface]/65 text-[--color-text-muted]"
+                    title={rawSource}
+                  >
+                    {source.label}
+                  </span>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -154,4 +184,60 @@ function formatMarkdown(text: string): string {
     .replace(/\n/g, "<br>");
 
   return `<p style="margin:0;">${html}</p>`;
+}
+
+function normalizeSource(source: string): { label: string; href?: string } {
+  const lower = source.toLowerCase();
+
+  if (lower.includes("cbaguide.com") || lower.startsWith("cba guide")) {
+    return {
+      label: "CBA Guide",
+      href: "https://cbaguide.com/#top",
+    };
+  }
+
+  if (lower.includes("nbpa.com/cba") || lower.startsWith("2023 cba")) {
+    const section = source.replace(/^2023 CBA:\s*/i, "").trim();
+    return {
+      label: section ? `CBA: ${truncate(section, 26)}` : "2023 CBA",
+      href: "https://nbpa.com/cba",
+    };
+  }
+
+  if (lower.includes("capsheets")) {
+    return {
+      label: "Capsheets",
+      href: "https://www.capsheets.com/",
+    };
+  }
+
+  if (lower.includes("hoopshype")) {
+    return {
+      label: "HoopsHype Salaries",
+      href: "https://hoopshype.com/salaries/players/",
+    };
+  }
+
+  if (lower.includes("nba stats") || lower.includes("nba.com/stats") || lower.includes("stats feed")) {
+    return {
+      label: "NBA Stats",
+      href: "https://www.nba.com/stats/players/traditional",
+    };
+  }
+
+  const directUrl = source.match(/https?:\/\/[^\s)]+/i)?.[0];
+  if (directUrl) {
+    const clean = source.replace(/\s*\(https?:\/\/[^\s)]+\)\s*/i, "").trim();
+    return {
+      label: truncate(clean || directUrl.replace(/^https?:\/\//, ""), 28),
+      href: directUrl,
+    };
+  }
+
+  return { label: truncate(source, 28) };
+}
+
+function truncate(value: string, max: number): string {
+  if (value.length <= max) return value;
+  return `${value.slice(0, max - 1)}…`;
 }

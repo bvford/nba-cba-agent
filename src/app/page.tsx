@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { ChatMessage } from "@/components/ChatMessage";
 import { ChatInput } from "@/components/ChatInput";
 import { Sidebar } from "@/components/Sidebar";
+import { trackEvent } from "@/lib/analytics";
 import {
   Chat,
   loadChats,
@@ -70,12 +71,13 @@ export default function Home() {
   );
 
   const startNewChat = useCallback(() => {
+    trackEvent("new_chat_clicked", { had_messages: messages.length > 0 });
     setActiveChatId(null);
     setMessages([]);
     setDraft("");
     setEditingIndex(null);
     setSidebarOpen(false);
-  }, []);
+  }, [messages.length]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -91,6 +93,7 @@ export default function Home() {
   const selectChat = (id: string) => {
     const chat = chats.find((c) => c.id === id);
     if (chat) {
+      trackEvent("chat_selected", { title_length: chat.title.length });
       setActiveChatId(chat.id);
       setMessages(chat.messages as Message[]);
       setEditingIndex(null);
@@ -106,6 +109,7 @@ export default function Home() {
     );
     if (!confirmed) return;
 
+    trackEvent("chat_deleted");
     deleteChatFromStore(id);
     setChats(loadChats());
     if (activeChatId === id) {
@@ -210,6 +214,7 @@ export default function Home() {
   };
 
   const sendMessage = async (content: string) => {
+    trackEvent("message_sent", { chars: content.length, source: "new" });
     const userMessage: Message = { role: "user", content };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
@@ -229,6 +234,7 @@ export default function Home() {
   };
 
   const sendEditedMessage = async (content: string, index: number) => {
+    trackEvent("message_sent", { chars: content.length, source: "edit_resend" });
     const rewritten: Message = { role: "user", content };
     const baseMessages = [...messages.slice(0, index), rewritten];
     setMessages(baseMessages);
@@ -261,6 +267,7 @@ export default function Home() {
 
   const regenerateLast = async () => {
     if (isLoading || messages.length === 0) return;
+    trackEvent("regenerate_clicked");
 
     const baseMessages = messages[messages.length - 1].role === "assistant"
       ? messages.slice(0, -1)
@@ -293,10 +300,12 @@ export default function Home() {
     ].join("\n");
 
     await navigator.clipboard.writeText(markdown);
+    trackEvent("export_chat_clicked", { message_count: messages.length });
     window.alert("Chat copied to clipboard as markdown.");
   };
 
   const handleFeedback = (index: number, feedback: FeedbackValue) => {
+    trackEvent("answer_feedback", { feedback, index });
     setMessages((prev) => {
       const updated = [...prev];
       updated[index] = { ...updated[index], feedback };
