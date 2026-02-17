@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ChatCBA | NBA Salary Cap Intelligence",
+  title: "ChatCBA",
   description:
     "Ask questions about NBA contracts, trades, free agency, salary cap rules, and more. Powered by the 2023 CBA with updated player data and live stats context.",
 };
