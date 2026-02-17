@@ -1,1 +1,58 @@
 @import "tailwindcss";
+
+@theme {
+  --color-nba-blue: #1d428a;
+  --color-nba-red: #c8102e;
+  --color-nba-blue-light: #2558b5;
+  --color-nba-blue-dark: #0f2249;
+  --color-surface: #0c1220;
+  --color-surface-raised: #131d30;
+  --color-surface-hover: #1a2740;
+  --color-border: #1e3050;
+  --color-border-light: #2a4060;
+  --color-text-primary: #e8edf5;
+  --color-text-secondary: #8899b4;
+  --color-text-muted: #5a6d8a;
+  --color-accent: #4a8eff;
+  --color-accent-glow: rgba(74, 142, 255, 0.15);
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-light);
+}
+
+/* Typing animation */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.cursor-blink::after {
+  content: "\25AE";
+  animation: blink 1s infinite;
+  margin-left: 2px;
+  color: var(--color-accent);
+}
+
+/* Subtle gradient background */
+.bg-gradient-page {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(29, 66, 138, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(200, 16, 46, 0.08) 0%, transparent 50%),
+    var(--color-surface);
+}

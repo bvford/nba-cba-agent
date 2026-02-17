@@ -181,7 +181,7 @@ async function fetchStats(): Promise<PlayerStats[]> {
   const pageSize = 100;
 
   while (true) {
-    const url = `https://api.server.nbaapi.com/api/playertotals?season=2025&isPlayoff=false&page=${page}&pageSize=${pageSize}`;
+    const url = `https://api.server.nbaapi.com/api/playertotals?season=2026&isPlayoff=false&page=${page}&pageSize=${pageSize}`;
     const res = await fetch(url);
 
     if (!res.ok) {
@@ -212,7 +212,7 @@ async function fetchStats(): Promise<PlayerStats[]> {
         fieldPercent: p.fieldPercent || 0,
         threePercent: p.threePercent || 0,
         ftPercent: p.ftPercent || 0,
-        minutesPerGame: Math.round((p.minutesPlayed || 0) / gp * 10) / 10,
+        minutesPerGame: Math.round((p.minutesPg || p.minutesPlayed || 0) / gp * 10) / 10,
       });
     }
 

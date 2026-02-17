@@ -10,12 +10,30 @@ interface Message {
 }
 
 const EXAMPLE_QUESTIONS = [
-  "What is LeBron James eligible for in free agency?",
-  "How do Bird rights work?",
-  "Explain the second apron and its restrictions",
-  "What kind of contract can the Lakers offer Austin Reaves?",
-  "What is the mid-level exception?",
-  "How does restricted free agency work?",
+  {
+    label: "What is LeBron James eligible for in free agency?",
+    icon: "👑",
+  },
+  {
+    label: "How do Bird rights work?",
+    icon: "🦅",
+  },
+  {
+    label: "Explain the second apron and its restrictions",
+    icon: "📊",
+  },
+  {
+    label: "What kind of extension can the Thunder offer SGA?",
+    icon: "📝",
+  },
+  {
+    label: "What is the mid-level exception?",
+    icon: "💰",
+  },
+  {
+    label: "How does restricted free agency work?",
+    icon: "🔒",
+  },
 ];
 
 export default function Home() {
@@ -55,7 +73,6 @@ export default function Home() {
       const decoder = new TextDecoder();
       let assistantContent = "";
 
-      // Add empty assistant message that we'll stream into
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
       while (true) {
@@ -106,14 +123,19 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
-      <header className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4">
-          <h1 className="text-xl font-bold text-white">
-            NBA CBA Expert
-          </h1>
-          <p className="text-sm text-gray-400">
-            Your AI guide to the NBA Collective Bargaining Agreement
-          </p>
+      <header className="border-b border-[--color-border] bg-[--color-surface-raised]/80 backdrop-blur-md sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[--color-nba-blue] flex items-center justify-center text-white font-bold text-sm shrink-0">
+            CBA
+          </div>
+          <div>
+            <h1 className="text-base font-semibold text-[--color-text-primary] leading-tight">
+              NBA CBA Expert
+            </h1>
+            <p className="text-xs text-[--color-text-muted]">
+              2023 CBA &middot; Live 2025-26 Stats &middot; Player Contracts
+            </p>
+          </div>
         </div>
       </header>
 
@@ -121,28 +143,74 @@ export default function Home() {
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-3xl mx-auto px-4 py-6">
           {messages.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-5xl mb-4">🏀</div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                Ask me anything about the NBA CBA
-              </h2>
-              <p className="text-gray-400 mb-8 max-w-lg mx-auto">
-                I&apos;ve read the entire 2023 Collective Bargaining Agreement.
-                Ask about salary cap rules, free agency, trades, contracts,
-                exceptions, and more.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-lg mx-auto">
-                {EXAMPLE_QUESTIONS.map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => sendMessage(q)}
-                    className="text-left text-sm px-4 py-3 rounded-xl
-                      bg-gray-800 border border-gray-700
-                      hover:bg-gray-750 hover:border-gray-600 transition-colors
-                      text-gray-300"
+            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)]">
+              {/* Hero */}
+              <div className="text-center mb-10">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[--color-nba-blue]/20 border border-[--color-nba-blue]/30 mb-5">
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-[--color-accent]"
                   >
-                    {q}
-                  </button>
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-[--color-text-primary] mb-2">
+                  Your AI Salary Cap Expert
+                </h2>
+                <p className="text-[--color-text-secondary] max-w-md mx-auto text-sm leading-relaxed">
+                  Ask about CBA rules, player contracts, trade legality,
+                  free agency, cap exceptions, and more. Backed by the full
+                  2023 CBA text with live player data.
+                </p>
+              </div>
+
+              {/* Example questions */}
+              <div className="w-full max-w-lg">
+                <p className="text-xs font-medium text-[--color-text-muted] uppercase tracking-wider mb-3 text-center">
+                  Try asking
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {EXAMPLE_QUESTIONS.map((q) => (
+                    <button
+                      key={q.label}
+                      onClick={() => sendMessage(q.label)}
+                      className="group text-left text-sm px-3.5 py-2.5 rounded-xl
+                        bg-[--color-surface-raised] border border-[--color-border]
+                        hover:bg-[--color-surface-hover] hover:border-[--color-border-light]
+                        transition-all duration-150
+                        text-[--color-text-secondary] hover:text-[--color-text-primary]"
+                    >
+                      <span className="mr-2">{q.icon}</span>
+                      {q.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Data badges */}
+              <div className="flex flex-wrap gap-2 mt-8 justify-center">
+                {[
+                  "Full 2023 CBA",
+                  "Plain-English Guide",
+                  "700+ Player Stats",
+                  "Live 2025-26 Season",
+                ].map((badge) => (
+                  <span
+                    key={badge}
+                    className="text-xs px-2.5 py-1 rounded-full
+                      bg-[--color-accent-glow] text-[--color-accent]
+                      border border-[--color-accent]/20"
+                  >
+                    {badge}
+                  </span>
                 ))}
               </div>
             </div>

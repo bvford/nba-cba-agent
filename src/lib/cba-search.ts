@@ -242,7 +242,7 @@ function formatPlayerInfo(p: PlayerData): string {
   info += "\n";
 
   if (p.games > 0) {
-    info += `Stats (2024-25): ${p.games} GP, ${ppg} PPG, ${rpg} RPG, ${apg} APG, ${spg} SPG, ${bpg} BPG`;
+    info += `Stats (2025-26): ${p.games} GP, ${ppg} PPG, ${rpg} RPG, ${apg} APG, ${spg} SPG, ${bpg} BPG`;
     info += `, ${(p.fieldPercent * 100).toFixed(1)}% FG, ${(p.threePercent * 100).toFixed(1)}% 3PT, ${(p.ftPercent * 100).toFixed(1)}% FT`;
     info += `, ${p.minutesPerGame} MPG\n`;
   }
