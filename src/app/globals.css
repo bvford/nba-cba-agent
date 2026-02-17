@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-nba-blue: #ff6b3d;
-  --color-nba-red: #f6bf62;
-  --color-nba-blue-light: #ff9b7c;
-  --color-nba-blue-dark: #6b2a19;
+  --color-nba-blue: #2d4bd6;
+  --color-nba-red: #7fe2cc;
+  --color-nba-blue-light: #4d6ff0;
+  --color-nba-blue-dark: #1d2f8a;
   --color-surface: #0b0c10;
   --color-surface-raised: #141721;
   --color-surface-hover: #1e2433;
@@ -78,7 +78,7 @@ body::after {
 /* Layered atmospheric background */
 .bg-gradient-page {
   background:
-    radial-gradient(ellipse at 8% 0%, rgba(255, 107, 61, 0.24) 0%, transparent 46%),
+    radial-gradient(ellipse at 8% 0%, rgba(77, 111, 240, 0.24) 0%, transparent 46%),
     radial-gradient(ellipse at 92% 2%, rgba(79, 210, 184, 0.2) 0%, transparent 40%),
     radial-gradient(ellipse at 50% 100%, rgba(246, 191, 98, 0.12) 0%, transparent 56%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 30%),
