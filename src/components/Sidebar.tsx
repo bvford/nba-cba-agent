@@ -76,7 +76,7 @@ export function Sidebar({
 
       {/* Sidebar panel */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-[--color-surface-raised] border-r border-[--color-border]
+        className={`fixed top-0 left-0 h-full w-72 bg-[--color-surface-raised]/88 backdrop-blur-xl border-r border-[--color-border]
           z-40 flex flex-col transition-transform duration-200 ease-out shadow-2xl lg:shadow-none
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0 lg:static lg:z-auto`}
@@ -86,8 +86,8 @@ export function Sidebar({
           <button
             onClick={onNewChat}
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg
-              bg-[linear-gradient(135deg,var(--color-nba-blue),var(--color-nba-blue-light))] text-white text-sm font-medium
-              transition-colors duration-150 shadow-[0_8px_22px_rgba(255,107,61,0.35)]"
+              bg-[linear-gradient(135deg,var(--color-nba-blue),var(--color-nba-blue-light))] text-white text-sm font-semibold
+              transition-colors duration-150 shadow-[0_12px_28px_rgba(255,107,61,0.26)]"
             title="New chat (Cmd/Ctrl+Shift+K)"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -126,7 +126,7 @@ export function Sidebar({
                 className={`group relative flex items-center rounded-lg px-3 py-2.5 mb-1 cursor-pointer transition-colors duration-100 border
                   ${
                     chat.id === activeChatId
-                      ? "bg-[--color-surface-hover] text-[--color-text-primary] border-[--color-border-light] shadow-[0_6px_16px_rgba(61,214,197,0.12)]"
+                      ? "bg-[--color-surface-hover] text-[--color-text-primary] border-[--color-border-light] shadow-[0_8px_20px_rgba(7,10,16,0.45)]"
                       : "text-[--color-text-secondary] border-transparent hover:bg-[--color-surface-hover]/60"
                   }`}
                 onClick={() => onSelectChat(chat.id)}
@@ -159,7 +159,7 @@ export function Sidebar({
         </div>
 
         {/* Sources */}
-        <div className="p-3 border-t border-[--color-border] bg-gradient-to-b from-transparent to-[rgba(61,214,197,0.08)]">
+        <div className="p-3 border-t border-[--color-border] bg-gradient-to-b from-transparent to-[rgba(79,210,184,0.08)]">
           <p className="px-1 pb-2 text-[10px] uppercase tracking-[0.16em] text-[--color-text-muted]">
             Sources
           </p>
@@ -170,7 +170,7 @@ export function Sidebar({
                 href={link.href}
                 target={link.href.startsWith("http") ? "_blank" : undefined}
                 rel={link.href.startsWith("http") ? "noreferrer" : undefined}
-                className="block rounded-lg border border-[--color-border] hover:border-[--color-border-light] bg-[--color-surface]/40 hover:bg-[--color-surface-hover]/70 px-2.5 py-2 transition-colors"
+                className="block rounded-xl border border-[--color-border] hover:border-[--color-border-light] bg-[--color-surface]/45 hover:bg-[--color-surface-hover]/75 px-2.5 py-2 transition-colors"
               >
                 <p className="text-xs text-[--color-text-primary] leading-tight font-medium">
                   {link.label}

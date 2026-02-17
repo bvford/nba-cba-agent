@@ -2,36 +2,62 @@
 
 @theme {
   --color-nba-blue: #ff6b3d;
-  --color-nba-red: #ffd166;
-  --color-nba-blue-light: #ff8b66;
-  --color-nba-blue-dark: #7a2f1b;
-  --color-surface: #0f1115;
-  --color-surface-raised: #171b23;
-  --color-surface-hover: #202736;
-  --color-border: #293244;
-  --color-border-light: #3b4961;
-  --color-text-primary: #f4f7fb;
-  --color-text-secondary: #b2bfd4;
-  --color-text-muted: #7e8ca6;
-  --color-accent: #3dd6c5;
-  --color-accent-glow: rgba(61, 214, 197, 0.18);
+  --color-nba-red: #f6bf62;
+  --color-nba-blue-light: #ff9b7c;
+  --color-nba-blue-dark: #6b2a19;
+  --color-surface: #0b0c10;
+  --color-surface-raised: #141721;
+  --color-surface-hover: #1e2433;
+  --color-border: #2b3348;
+  --color-border-light: #3b4a67;
+  --color-text-primary: #f4f6fc;
+  --color-text-secondary: #bdc7db;
+  --color-text-muted: #8996b1;
+  --color-accent: #4fd2b8;
+  --color-accent-glow: rgba(79, 210, 184, 0.2);
 }
 
 body {
   background: var(--color-surface);
   color: var(--color-text-primary);
+  min-height: 100vh;
+  letter-spacing: 0.005em;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.34;
+  background-image:
+    linear-gradient(to right, rgba(130, 148, 187, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(130, 148, 187, 0.05) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.16;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.35) 0.55px, transparent 0.55px);
+  background-size: 3px 3px;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 3px;
+  background: linear-gradient(180deg, #3c4a69 0%, #2b3348 100%);
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-border-light);
@@ -49,11 +75,25 @@ body {
   color: var(--color-accent);
 }
 
-/* Subtle gradient background */
+/* Layered atmospheric background */
 .bg-gradient-page {
   background:
-    radial-gradient(ellipse at 10% 0%, rgba(255, 107, 61, 0.18) 0%, transparent 52%),
-    radial-gradient(ellipse at 90% 0%, rgba(61, 214, 197, 0.14) 0%, transparent 45%),
-    radial-gradient(ellipse at 50% 110%, rgba(255, 209, 102, 0.1) 0%, transparent 55%),
+    radial-gradient(ellipse at 8% 0%, rgba(255, 107, 61, 0.24) 0%, transparent 46%),
+    radial-gradient(ellipse at 92% 2%, rgba(79, 210, 184, 0.2) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 100%, rgba(246, 191, 98, 0.12) 0%, transparent 56%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 30%),
     var(--color-surface);
+}
+
+h1, h2, h3 {
+  font-family: "Space Grotesk", "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+button, input, textarea {
+  letter-spacing: 0.01em;
+}
+
+main, aside, header, footer {
+  position: relative;
+  z-index: 1;
 }

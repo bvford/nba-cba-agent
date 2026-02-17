@@ -338,7 +338,7 @@ export default function Home() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="border-b border-[--color-border] bg-[--color-surface-raised]/90 backdrop-blur-md sticky top-0 z-10">
+        <header className="border-b border-[--color-border] bg-[--color-surface-raised]/75 backdrop-blur-xl sticky top-0 z-10">
           <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
             {/* Hamburger / sidebar toggle */}
             <button
@@ -369,7 +369,7 @@ export default function Home() {
             {messages.length > 0 && (
               <button
                 onClick={exportChat}
-                className="ml-auto text-xs px-2.5 py-1.5 rounded-lg border border-[--color-border] text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors"
+                className="ml-auto text-xs px-3 py-1.5 rounded-full border border-[--color-border] text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] hover:border-[--color-border-light] transition-colors"
                 title="Copy chat as markdown"
               >
                 Export Chat
@@ -385,7 +385,7 @@ export default function Home() {
               <div className="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)]">
                 {/* Hero */}
                 <div className="text-center mb-10">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[--color-nba-red]/15 border border-[--color-nba-red]/35 mb-5 shadow-[0_0_40px_rgba(255,209,102,0.28)]">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[linear-gradient(145deg,rgba(255,107,61,0.2),rgba(79,210,184,0.12))] border border-[--color-border-light] mb-5 shadow-[0_16px_45px_rgba(8,10,15,0.55)]">
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[--color-nba-red]">
                       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                       <circle cx="10" cy="10" r="1" />
@@ -411,7 +411,7 @@ export default function Home() {
                       <button
                         key={mode.label}
                         onClick={() => sendMessage(mode.prompt)}
-                        className="text-xs px-2.5 py-1.5 rounded-full border border-[--color-border] bg-[--color-surface-raised] text-[--color-text-secondary] hover:text-[--color-text-primary] hover:border-[--color-border-light] hover:bg-[--color-surface-hover] transition-colors"
+                        className="text-xs px-3 py-1.5 rounded-full border border-[--color-border] bg-[--color-surface-raised]/85 text-[--color-text-secondary] hover:text-[--color-text-primary] hover:border-[--color-border-light] hover:bg-[--color-surface-hover] transition-colors"
                       >
                         {mode.label}
                       </button>
@@ -430,10 +430,10 @@ export default function Home() {
                         key={q.label}
                         onClick={() => sendMessage(q.label)}
                         className="group text-left text-sm px-3.5 py-2.5 rounded-xl
-                          bg-[--color-surface-raised] border border-[--color-border]
+                          bg-[--color-surface-raised]/92 border border-[--color-border]
                           hover:bg-[--color-surface-hover] hover:border-[--color-border-light] hover:-translate-y-0.5
                           transition-all duration-150 shadow-sm
-                          text-[--color-text-secondary] hover:text-[--color-text-primary] hover:shadow-[0_8px_24px_rgba(61,214,197,0.12)]"
+                          text-[--color-text-secondary] hover:text-[--color-text-primary] hover:shadow-[0_14px_30px_rgba(8,11,18,0.5)]"
                       >
                         <span className="mr-2">{q.icon}</span>
                         {q.label}
