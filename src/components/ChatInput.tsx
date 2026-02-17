@@ -1,14 +1,28 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 
 interface ChatInputProps {
+  value: string;
+  onValueChange: (value: string) => void;
   onSend: (message: string) => void;
   disabled: boolean;
+  isEditing: boolean;
+  onCancelEdit: () => void;
+  onRegenerate: () => void;
+  canRegenerate: boolean;
 }
 
-export function ChatInput({ onSend, disabled }: ChatInputProps) {
-  const [input, setInput] = useState("");
+export function ChatInput({
+  value,
+  onValueChange,
+  onSend,
+  disabled,
+  isEditing,
+  onCancelEdit,
+  onRegenerate,
+  canRegenerate,
+}: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -17,13 +31,13 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
       textarea.style.height = "auto";
       textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px";
     }
-  }, [input]);
+  }, [value]);
 
   const handleSubmit = () => {
-    const trimmed = input.trim();
+    const trimmed = value.trim();
     if (!trimmed || disabled) return;
     onSend(trimmed);
-    setInput("");
+    onValueChange("");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -35,11 +49,37 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
 
   return (
     <div className="border-t border-[--color-border] bg-[--color-surface-raised]/80 backdrop-blur-md p-3 sm:p-4">
+      <div className="max-w-3xl mx-auto flex gap-2 items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          {canRegenerate && (
+            <button
+              onClick={onRegenerate}
+              disabled={disabled}
+              className="text-[11px] px-2 py-1 rounded-md border border-[--color-border] text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors disabled:opacity-40"
+            >
+              Regenerate
+            </button>
+          )}
+          {isEditing && (
+            <button
+              onClick={onCancelEdit}
+              disabled={disabled}
+              className="text-[11px] px-2 py-1 rounded-md border border-[--color-border] text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors disabled:opacity-40"
+            >
+              Cancel Edit
+            </button>
+          )}
+        </div>
+        {isEditing && (
+          <p className="text-[10px] text-[--color-accent]">Editing a previous user message</p>
+        )}
+      </div>
+
       <div className="max-w-3xl mx-auto flex gap-2.5 items-end">
         <textarea
           ref={textareaRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
+          value={value}
+          onChange={(e) => onValueChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ask about the NBA CBA, a player, or a trade..."
           disabled={disabled}
@@ -52,7 +92,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         />
         <button
           onClick={handleSubmit}
-          disabled={disabled || !input.trim()}
+          disabled={disabled || !value.trim()}
           className="rounded-xl bg-[linear-gradient(135deg,var(--color-nba-blue),var(--color-nba-blue-light))] px-4 py-2.5 font-medium text-white text-sm
             transition-all duration-150 shadow-[0_8px_20px_rgba(255,107,61,0.35)] hover:brightness-110
             disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[--color-nba-blue]"

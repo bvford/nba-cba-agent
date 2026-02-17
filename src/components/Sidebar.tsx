@@ -33,6 +33,11 @@ const SOURCE_LINKS = [
     href: "https://www.nba.com/stats/players/traditional",
     note: "Official player stat tables",
   },
+  {
+    label: "About & Method",
+    href: "/about",
+    note: "How this app works",
+  },
 ];
 
 function timeAgo(timestamp: number): string {
@@ -163,8 +168,8 @@ export function Sidebar({
               <a
                 key={link.href}
                 href={link.href}
-                target="_blank"
-                rel="noreferrer"
+                target={link.href.startsWith("http") ? "_blank" : undefined}
+                rel={link.href.startsWith("http") ? "noreferrer" : undefined}
                 className="block rounded-lg border border-[--color-border] hover:border-[--color-border-light] bg-[--color-surface]/40 hover:bg-[--color-surface-hover]/70 px-2.5 py-2 transition-colors"
               >
                 <p className="text-xs text-[--color-text-primary] leading-tight font-medium">

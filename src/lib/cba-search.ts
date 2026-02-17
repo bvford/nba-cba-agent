@@ -8,6 +8,11 @@ export interface CBAArticle {
   content: string;
 }
 
+export interface SearchResultMeta {
+  context: string;
+  sources: string[];
+}
+
 interface PlayerData {
   name: string;
   team: string;
@@ -150,7 +155,10 @@ function scoreDocument(
   return { ...doc, score, relevantSections };
 }
 
-export function searchCBA(query: string, maxChars: number = 80000): string {
+export function searchCBAWithMeta(
+  query: string,
+  maxChars: number = 80000
+): SearchResultMeta {
   const queryTokens = tokenize(query).filter((t) => !STOP_WORDS.has(t));
   const queryLower = query.toLowerCase();
 
@@ -184,6 +192,7 @@ export function searchCBA(query: string, maxChars: number = 80000): string {
   // Build context: guide first (plain English), then CBA (official text)
   let context = "";
   let charsUsed = 0;
+  const sources: string[] = [];
 
   // Add top guide sections first (up to 40% of budget)
   const guideBudget = maxChars * 0.4;
@@ -192,6 +201,7 @@ export function searchCBA(query: string, maxChars: number = 80000): string {
     if (charsUsed + text.length > guideBudget) break;
     context += text;
     charsUsed += text.length;
+    sources.push(`CBA Guide: ${section.title}`);
   }
 
   // Fill the rest with raw CBA articles
@@ -206,9 +216,17 @@ export function searchCBA(query: string, maxChars: number = 80000): string {
     if (charsUsed + articleText.length > maxChars) break;
     context += articleText;
     charsUsed += articleText.length;
+    sources.push(`2023 CBA: ${article.title}`);
   }
 
-  return context || "No relevant CBA sections found for this query.";
+  return {
+    context: context || "No relevant CBA sections found for this query.",
+    sources: Array.from(new Set(sources)).slice(0, 4),
+  };
+}
+
+export function searchCBA(query: string, maxChars: number = 80000): string {
+  return searchCBAWithMeta(query, maxChars).context;
 }
 
 // ---- Player search ----

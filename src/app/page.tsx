@@ -12,9 +12,13 @@ import {
   createChat,
 } from "@/lib/chat-store";
 
+type FeedbackValue = "up" | "down";
+
 interface Message {
   role: "user" | "assistant";
   content: string;
+  sources?: string[];
+  feedback?: FeedbackValue;
 }
 
 const EXAMPLE_QUESTIONS = [
@@ -26,12 +30,21 @@ const EXAMPLE_QUESTIONS = [
   { label: "How does restricted free agency work?", icon: "🔒" },
 ];
 
+const STARTER_MODES = [
+  { label: "Contracts", prompt: "Explain this player's contract structure in plain English." },
+  { label: "Trades", prompt: "Is this trade legal under current CBA apron and salary matching rules?" },
+  { label: "Free Agency", prompt: "What free agency options does this team have this offseason?" },
+  { label: "Cap Exceptions", prompt: "Which cap exceptions are available here and why?" },
+];
+
 export default function Home() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load chats from localStorage on mount
@@ -59,6 +72,8 @@ export default function Home() {
   const startNewChat = useCallback(() => {
     setActiveChatId(null);
     setMessages([]);
+    setDraft("");
+    setEditingIndex(null);
     setSidebarOpen(false);
   }, []);
 
@@ -77,7 +92,9 @@ export default function Home() {
     const chat = chats.find((c) => c.id === id);
     if (chat) {
       setActiveChatId(chat.id);
-      setMessages(chat.messages);
+      setMessages(chat.messages as Message[]);
+      setEditingIndex(null);
+      setDraft("");
     }
     setSidebarOpen(false);
   };
@@ -97,30 +114,17 @@ export default function Home() {
     }
   };
 
-  const sendMessage = async (content: string) => {
-    const userMessage: Message = { role: "user", content };
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+  const streamAssistantResponse = async (baseMessages: Message[], chatId: string | null) => {
     setIsLoading(true);
-
-    // Create or update chat
-    let chatId = activeChatId;
-    if (!chatId) {
-      const newChat = createChat(content);
-      chatId = newChat.id;
-      setActiveChatId(chatId);
-      saveChat({ ...newChat, messages: newMessages });
-      setChats(loadChats());
-    } else {
-      persistChat(chatId, newMessages);
-    }
+    let assistantContent = "";
+    let assistantSources: string[] = [];
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: newMessages.map((m) => ({
+          messages: baseMessages.map((m) => ({
             role: m.role,
             content: m.content,
           })),
@@ -133,7 +137,6 @@ export default function Home() {
       if (!reader) throw new Error("No reader");
 
       const decoder = new TextDecoder();
-      let assistantContent = "";
 
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
@@ -145,42 +148,57 @@ export default function Home() {
         const lines = chunk.split("\n");
 
         for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const data = line.slice(6);
-            if (data === "[DONE]") break;
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.text) {
-                assistantContent += parsed.text;
-                setMessages((prev) => {
-                  const updated = [...prev];
-                  updated[updated.length - 1] = {
-                    role: "assistant",
-                    content: assistantContent,
-                  };
-                  return updated;
-                });
-              }
-            } catch {
-              // skip
+          if (!line.startsWith("data: ")) continue;
+
+          const data = line.slice(6);
+          if (data === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.text) {
+              assistantContent += parsed.text;
+              setMessages((prev) => {
+                const updated = [...prev];
+                updated[updated.length - 1] = {
+                  role: "assistant",
+                  content: assistantContent,
+                  sources: assistantSources,
+                };
+                return updated;
+              });
             }
+            if (Array.isArray(parsed.sources)) {
+              assistantSources = parsed.sources;
+              setMessages((prev) => {
+                const updated = [...prev];
+                const last = updated[updated.length - 1];
+                updated[updated.length - 1] = {
+                  ...last,
+                  role: "assistant",
+                  content: assistantContent,
+                  sources: assistantSources,
+                };
+                return updated;
+              });
+            }
+          } catch {
+            // skip malformed chunks
           }
         }
       }
 
-      // Save final messages with assistant response
-      const finalMessages = [
-        ...newMessages,
-        { role: "assistant" as const, content: assistantContent },
+      const finalMessages: Message[] = [
+        ...baseMessages,
+        { role: "assistant", content: assistantContent, sources: assistantSources },
       ];
       setMessages(finalMessages);
       if (chatId) persistChat(chatId, finalMessages);
     } catch (error) {
       console.error("Error:", error);
-      const errorMessages = [
-        ...newMessages,
+      const errorMessages: Message[] = [
+        ...baseMessages,
         {
-          role: "assistant" as const,
+          role: "assistant",
           content: "Sorry, I encountered an error. Please check your API key and try again.",
         },
       ];
@@ -191,6 +209,108 @@ export default function Home() {
     }
   };
 
+  const sendMessage = async (content: string) => {
+    const userMessage: Message = { role: "user", content };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+
+    let chatId = activeChatId;
+    if (!chatId) {
+      const newChat = createChat(content);
+      chatId = newChat.id;
+      setActiveChatId(chatId);
+      saveChat({ ...newChat, messages: newMessages });
+      setChats(loadChats());
+    } else {
+      persistChat(chatId, newMessages);
+    }
+
+    await streamAssistantResponse(newMessages, chatId);
+  };
+
+  const sendEditedMessage = async (content: string, index: number) => {
+    const rewritten: Message = { role: "user", content };
+    const baseMessages = [...messages.slice(0, index), rewritten];
+    setMessages(baseMessages);
+
+    let chatId = activeChatId;
+    if (!chatId) {
+      const newChat = createChat(content);
+      chatId = newChat.id;
+      setActiveChatId(chatId);
+      saveChat({ ...newChat, messages: baseMessages });
+      setChats(loadChats());
+    } else {
+      persistChat(chatId, baseMessages);
+    }
+
+    await streamAssistantResponse(baseMessages, chatId);
+  };
+
+  const handleInputSend = async (content: string) => {
+    if (editingIndex !== null) {
+      const target = editingIndex;
+      setEditingIndex(null);
+      setDraft("");
+      await sendEditedMessage(content, target);
+      return;
+    }
+    setDraft("");
+    await sendMessage(content);
+  };
+
+  const regenerateLast = async () => {
+    if (isLoading || messages.length === 0) return;
+
+    const baseMessages = messages[messages.length - 1].role === "assistant"
+      ? messages.slice(0, -1)
+      : messages;
+
+    if (baseMessages.length === 0) return;
+
+    setMessages(baseMessages);
+    if (activeChatId) persistChat(activeChatId, baseMessages);
+    await streamAssistantResponse(baseMessages, activeChatId);
+  };
+
+  const exportChat = async () => {
+    if (messages.length === 0) return;
+    const timestamp = new Date().toLocaleString();
+    const markdown = [
+      `# NBA CBA Chat Export`,
+      ``,
+      `Exported: ${timestamp}`,
+      ``,
+      ...messages.flatMap((m) => [
+        `## ${m.role === "user" ? "User" : "Assistant"}`,
+        "",
+        m.content,
+        "",
+        ...(m.sources && m.sources.length > 0
+          ? [`Sources: ${m.sources.join("; ")}`, ""]
+          : []),
+      ]),
+    ].join("\n");
+
+    await navigator.clipboard.writeText(markdown);
+    window.alert("Chat copied to clipboard as markdown.");
+  };
+
+  const handleFeedback = (index: number, feedback: FeedbackValue) => {
+    setMessages((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], feedback };
+      return updated;
+    });
+  };
+
+  const beginEditUserMessage = (index: number) => {
+    if (messages[index]?.role !== "user") return;
+    setEditingIndex(index);
+    setDraft(messages[index].content);
+  };
+
+  const canRegenerate = !isLoading && messages.some((m) => m.role === "assistant");
   const isLanding = messages.length === 0;
 
   return (
@@ -236,6 +356,16 @@ export default function Home() {
                 </p>
               </div>
             </button>
+
+            {messages.length > 0 && (
+              <button
+                onClick={exportChat}
+                className="ml-auto text-xs px-2.5 py-1.5 rounded-lg border border-[--color-border] text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors"
+                title="Copy chat as markdown"
+              >
+                Export Chat
+              </button>
+            )}
           </div>
         </header>
 
@@ -261,6 +391,23 @@ export default function Home() {
                     Ask about CBA rules, player contracts, trade legality,
                     free agency, cap exceptions, and more.
                   </p>
+                </div>
+
+                <div className="w-full max-w-2xl mb-4">
+                  <p className="text-xs font-semibold text-[--color-text-muted] uppercase tracking-[0.18em] mb-2 text-center">
+                    Starter modes
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {STARTER_MODES.map((mode) => (
+                      <button
+                        key={mode.label}
+                        onClick={() => sendMessage(mode.prompt)}
+                        className="text-xs px-2.5 py-1.5 rounded-full border border-[--color-border] bg-[--color-surface-raised] text-[--color-text-secondary] hover:text-[--color-text-primary] hover:border-[--color-border-light] hover:bg-[--color-surface-hover] transition-colors"
+                      >
+                        {mode.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Example questions */}
@@ -293,7 +440,15 @@ export default function Home() {
             ) : (
               <div className="max-w-3xl mx-auto w-full">
                 {messages.map((msg, i) => (
-                  <ChatMessage key={i} role={msg.role} content={msg.content} />
+                  <ChatMessage
+                    key={i}
+                    role={msg.role}
+                    content={msg.content}
+                    sources={msg.sources}
+                    feedback={msg.feedback}
+                    onFeedback={(value) => handleFeedback(i, value)}
+                    onEditResend={msg.role === "user" ? () => beginEditUserMessage(i) : undefined}
+                  />
                 ))}
               </div>
             )}
@@ -302,7 +457,19 @@ export default function Home() {
         </main>
 
         {/* Input */}
-        <ChatInput onSend={sendMessage} disabled={isLoading} />
+        <ChatInput
+          value={draft}
+          onValueChange={setDraft}
+          onSend={handleInputSend}
+          disabled={isLoading}
+          isEditing={editingIndex !== null}
+          onCancelEdit={() => {
+            setEditingIndex(null);
+            setDraft("");
+          }}
+          onRegenerate={regenerateLast}
+          canRegenerate={canRegenerate}
+        />
       </div>
     </div>
   );

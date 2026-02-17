@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchCBA, searchPlayers } from "@/lib/cba-search";
+import { searchCBAWithMeta, searchPlayers } from "@/lib/cba-search";
 import { NextRequest } from "next/server";
 
 const anthropic = new Anthropic({
@@ -30,8 +30,11 @@ Rules for your responses:
 2. PLAIN ENGLISH FIRST: Explain the rule simply, like you're talking to a smart friend who doesn't know CBA jargon. Skip the legalese unless the user asks for it.
 3. CITE BRIEFLY: Reference the Article/Section (e.g., "per Art. VII, Sec. 7(a)") but don't quote long blocks of CBA text unless asked.
 4. BE ACCURATE: Base answers on the CBA text provided. If unsure, say so.
-5. PLAYER/CONTRACT DATA: You may also receive current player and contract data. Use it to give specific, real-world answers when relevant. If data seems outdated, note that.
-6. KNOW YOUR LIMITS: If you don't have enough information to answer fully, say what you do know and what you'd need to give a complete answer.
+5. PLAYER/CONTRACT DATA: You may also receive current player and contract data. Use it to give specific, real-world answers when relevant.
+6. DATE-CORRECTNESS (INTERNAL): For player/team/contract facts, verify your answer against the provided player data context for this chat before finalizing. If the context is missing or conflicting, avoid guessing and ask a short clarifying follow-up or state uncertainty.
+7. NO TIMESTAMP CLUTTER: Do not add routine timestamp/disclaimer lines in normal answers. Mention recency/date caveats only when the user asks, or when uncertainty/conflict materially affects correctness.
+8. CITATION STYLE: Keep citations short and integrated naturally; avoid long "sources dump" paragraphs in the answer body.
+9. KNOW YOUR LIMITS: If you don't have enough information to answer fully, say what you do know and what you'd need to give a complete answer.
 
 Use bullet points for lists. Only use headers if the answer covers multiple distinct topics.`;
 
@@ -65,8 +68,18 @@ export async function POST(req: NextRequest) {
     }
 
     // Search the CBA for relevant content and player data
-    const cbaContext = searchCBA(latestUserMessage.content);
+    const cbaResult = searchCBAWithMeta(latestUserMessage.content);
+    const cbaContext = cbaResult.context;
     const playerContext = searchPlayers(latestUserMessage.content);
+    const responseSources = [
+      ...cbaResult.sources,
+      "CBA Guide (https://cbaguide.com/#top)",
+      "Official 2023 CBA (https://nbpa.com/cba)",
+      ...(playerContext ? [
+        "Player salaries: HoopsHype team salary pages",
+        "Player stats: NBA stats feed (2025-26)",
+      ] : []),
+    ];
 
     // Build the messages array with CBA context injected
     const augmentedMessages = messages.map(
@@ -104,6 +117,11 @@ export async function POST(req: NextRequest) {
               );
             }
           }
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({ sources: Array.from(new Set(responseSources)).slice(0, 5) })}\n\n`
+            )
+          );
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
         } catch (err) {

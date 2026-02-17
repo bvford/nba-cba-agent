@@ -2,12 +2,25 @@
 
 import { useState } from "react";
 
+type FeedbackValue = "up" | "down";
+
 interface ChatMessageProps {
   role: "user" | "assistant";
   content: string;
+  sources?: string[];
+  feedback?: FeedbackValue;
+  onFeedback?: (value: FeedbackValue) => void;
+  onEditResend?: () => void;
 }
 
-export function ChatMessage({ role, content }: ChatMessageProps) {
+export function ChatMessage({
+  role,
+  content,
+  sources,
+  feedback,
+  onFeedback,
+  onEditResend,
+}: ChatMessageProps) {
   const isUser = role === "user";
   const [copied, setCopied] = useState(false);
 
@@ -45,31 +58,50 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
             />
           )}
         </div>
-        {/* Copy button for assistant messages */}
-        {!isUser && content && (
-          <div className="flex mt-1 ml-1 opacity-30 group-hover:opacity-100 transition-opacity duration-150">
-            <button
-              onClick={handleCopy}
-              className="flex items-center gap-1 text-[10px] text-[--color-text-muted] hover:text-[--color-text-secondary] transition-colors px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover]"
-            >
-              {copied ? (
-                <>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Copied
-                </>
-              ) : (
-                <>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                  </svg>
-                  Copy
-                </>
-              )}
-            </button>
+
+        {!isUser && sources && sources.length > 0 && (
+          <div className="mt-1.5 ml-1 text-[10px] text-[--color-text-muted]">
+            <span className="text-[--color-text-secondary]">Sources:</span> {sources.join(" · ")}
           </div>
         )}
+
+        <div className="flex mt-1 ml-1 opacity-30 group-hover:opacity-100 transition-opacity duration-150 gap-1.5">
+          {!isUser && content && (
+            <>
+              <button
+                onClick={handleCopy}
+                className="flex items-center gap-1 text-[10px] text-[--color-text-muted] hover:text-[--color-text-secondary] transition-colors px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover]"
+              >
+                {copied ? "Copied" : "Copy"}
+              </button>
+              {onFeedback && (
+                <>
+                  <button
+                    onClick={() => onFeedback("up")}
+                    className={`text-[10px] px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover] ${feedback === "up" ? "text-[--color-accent]" : "text-[--color-text-muted]"}`}
+                  >
+                    Helpful
+                  </button>
+                  <button
+                    onClick={() => onFeedback("down")}
+                    className={`text-[10px] px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover] ${feedback === "down" ? "text-[--color-nba-red]" : "text-[--color-text-muted]"}`}
+                  >
+                    Not helpful
+                  </button>
+                </>
+              )}
+            </>
+          )}
+
+          {isUser && onEditResend && (
+            <button
+              onClick={onEditResend}
+              className="text-[10px] px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover] text-[--color-text-muted] hover:text-[--color-text-secondary]"
+            >
+              Edit & resend
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
