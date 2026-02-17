@@ -116,7 +116,7 @@ export function ChatInput({
           )}
         </button>
       </div>
-      <p className="text-center text-[10px] text-[--color-text-muted] mt-2">
+      <p className="hidden sm:block text-center text-[10px] text-[--color-text-muted] mt-2">
         Enter to send &middot; Shift+Enter for new line &middot; Cmd/Ctrl+Shift+K for new chat
       </p>
       <p className="text-center text-[10px] text-[--color-text-muted] mt-1">
