@@ -227,29 +227,14 @@ export default function Home() {
               className="flex items-center gap-2.5 hover:opacity-85 transition-opacity"
               title="Home (new chat)"
             >
-              <div className="w-8 h-8 rounded-lg bg-[--color-nba-blue] flex items-center justify-center text-white font-bold text-xs shrink-0">
-                CBA
-              </div>
               <div className="text-left">
                 <h1 className="text-sm font-semibold tracking-tight text-[--color-text-primary] leading-tight">
-                  NBA CBA Expert
+                  NBA CBA Chat Bot
                 </h1>
                 <p className="text-[10px] text-[--color-text-muted] hidden sm:block">
                   2023 CBA &middot; Live 2025-26 Stats
                 </p>
               </div>
-            </button>
-
-            {/* New chat button (header) */}
-            <button
-              onClick={startNewChat}
-              className="ml-auto inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[--color-border] bg-[--color-surface]/50 hover:bg-[--color-surface-hover] text-[--color-text-muted] hover:text-[--color-text-primary] transition-colors"
-              title="New chat (Cmd/Ctrl+Shift+K)"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-              </svg>
-              <span className="text-xs font-medium hidden sm:inline">New</span>
             </button>
           </div>
         </header>
@@ -261,9 +246,12 @@ export default function Home() {
               <div className="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)]">
                 {/* Hero */}
                 <div className="text-center mb-10">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[--color-nba-blue]/20 border border-[--color-nba-blue]/30 mb-5 shadow-[0_0_40px_rgba(74,142,255,0.2)]">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[--color-accent]">
-                      <circle cx="12" cy="12" r="10" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[--color-nba-red]/15 border border-[--color-nba-red]/35 mb-5 shadow-[0_0_40px_rgba(200,16,46,0.28)]">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[--color-nba-red]">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                      <circle cx="10" cy="10" r="1" />
+                      <circle cx="14" cy="10" r="1" />
+                      <circle cx="18" cy="10" r="1" />
                     </svg>
                   </div>
                   <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-[--color-text-primary] mb-3">
@@ -296,25 +284,6 @@ export default function Home() {
                       </button>
                     ))}
                   </div>
-                </div>
-
-                {/* Data badges */}
-                <div className="flex flex-wrap gap-2 mt-8 justify-center">
-                  {[
-                    "Full 2023 CBA",
-                    "Plain-English Guide",
-                    "700+ Player Stats",
-                    "Live 2025-26 Season",
-                  ].map((badge) => (
-                    <span
-                      key={badge}
-                      className="text-xs px-2.5 py-1 rounded-full
-                        bg-[--color-accent-glow] text-[--color-accent]
-                        border border-[--color-accent]/20"
-                    >
-                      {badge}
-                    </span>
-                  ))}
                 </div>
 
                 <div className="mt-7 text-center text-xs text-[--color-text-muted]">

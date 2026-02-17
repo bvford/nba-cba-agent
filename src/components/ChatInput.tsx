@@ -80,7 +80,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         Enter to send &middot; Shift+Enter for new line &middot; Cmd/Ctrl+Shift+K for new chat
       </p>
       <p className="text-center text-[10px] text-[--color-text-muted] mt-1">
-        2023 NBA CBA &middot; Not legal or financial advice &middot; Player data updates periodically
+        2023 NBA CBA &middot; Not legal or financial advice &middot; Player data last updated Feb 17, 2026
       </p>
     </div>
   );

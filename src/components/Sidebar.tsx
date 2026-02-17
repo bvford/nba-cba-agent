@@ -12,6 +12,29 @@ interface SidebarProps {
   onDeleteChat: (id: string) => void;
 }
 
+const SOURCE_LINKS = [
+  {
+    label: "CBA Guide (Plain English)",
+    href: "https://cbaguide.com/#top",
+    note: "Quick rule explanations",
+  },
+  {
+    label: "Official 2023 CBA (NBPA)",
+    href: "https://nbpa.com/cba",
+    note: "Primary agreement text",
+  },
+  {
+    label: "Capsheets",
+    href: "https://www.capsheets.com/",
+    note: "Team cap and salary reference",
+  },
+  {
+    label: "NBA Stats",
+    href: "https://www.nba.com/stats/players/traditional",
+    note: "Official player stat tables",
+  },
+];
+
 function timeAgo(timestamp: number): string {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
   if (seconds < 60) return "Just now";
@@ -130,12 +153,37 @@ export function Sidebar({
           )}
         </div>
 
+        {/* Sources */}
+        <div className="p-3 border-t border-[--color-border] bg-gradient-to-b from-transparent to-[rgba(74,142,255,0.06)]">
+          <p className="px-1 pb-2 text-[10px] uppercase tracking-[0.16em] text-[--color-text-muted]">
+            Sources
+          </p>
+          <div className="space-y-1">
+            {SOURCE_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                className="block rounded-lg border border-[--color-border] hover:border-[--color-border-light] bg-[--color-surface]/40 hover:bg-[--color-surface-hover]/70 px-2.5 py-2 transition-colors"
+              >
+                <p className="text-xs text-[--color-text-primary] leading-tight">
+                  {link.label}
+                </p>
+                <p className="text-[10px] text-[--color-text-muted] mt-0.5">
+                  {link.note}
+                </p>
+              </a>
+            ))}
+          </div>
+        </div>
+
         {/* Sidebar footer */}
         <div className="p-3 border-t border-[--color-border]">
-          <p className="text-[10px] text-[--color-text-muted] text-center">
-            NBA CBA Expert v1.0
+          <p className="text-[11px] text-[--color-text-secondary] text-left font-medium">
+            A Michael Margolis Experiment
           </p>
-          <p className="text-[10px] text-[--color-text-muted] text-center mt-1">
+          <p className="text-[10px] text-[--color-text-muted] text-left mt-1">
             Cmd/Ctrl + Shift + K for New Chat
           </p>
         </div>
