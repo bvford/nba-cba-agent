@@ -172,13 +172,23 @@ function formatMarkdown(text: string): string {
     // Bullet lists
     .replace(
       /^[-•] (.+)$/gm,
-      '<li style="margin-left:1.25rem;list-style-type:disc;margin-bottom:0.2rem;color:var(--color-text-secondary);">$1</li>'
+      '<li data-list="ul" style="margin-bottom:0.2rem;color:var(--color-text-secondary);">$1</li>'
     )
     // Numbered lists
     .replace(
       /^\d+\. (.+)$/gm,
-      '<li style="margin-left:1.25rem;list-style-type:decimal;margin-bottom:0.2rem;color:var(--color-text-secondary);">$1</li>'
+      '<li data-list="ol" style="margin-bottom:0.2rem;color:var(--color-text-secondary);">$1</li>'
     )
+    // Wrap adjacent list items so numbering/bullets render correctly per message
+    .replace(
+      /((?:<li data-list="ol"[^>]*>.*?<\/li>\s*)+)/gs,
+      '<ol style="margin:0.35rem 0 0.45rem 1.25rem;list-style-type:decimal;">$1</ol>'
+    )
+    .replace(
+      /((?:<li data-list="ul"[^>]*>.*?<\/li>\s*)+)/gs,
+      '<ul style="margin:0.35rem 0 0.45rem 1.25rem;list-style-type:disc;">$1</ul>'
+    )
+    .replace(/\sdata-list="(?:ol|ul)"/g, "")
     // Paragraphs
     .replace(/\n\n/g, '</p><p style="margin:0.5rem 0;">')
     .replace(/\n/g, "<br>");
