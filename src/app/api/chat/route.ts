@@ -1,6 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { searchCBAWithMeta, searchPlayers } from "@/lib/cba-search";
+import {
+  getCachedResponse,
+  incrementDailyLimit,
+  setCachedResponse,
+  upstashEnabled,
+} from "@/lib/upstash";
 import { NextRequest } from "next/server";
+import { createHash } from "crypto";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -28,6 +35,14 @@ function checkRateLimit(ip: string): boolean {
 function buildCacheKey(messages: Array<{ role: string; content: string }>): string {
   const recent = messages.slice(-6).map((m) => `${m.role}:${m.content.trim().toLowerCase()}`);
   return recent.join("||");
+}
+
+function makeStableHash(value: string): string {
+  return createHash("sha256").update(value).digest("hex").slice(0, 32);
+}
+
+function dayKeyUTC(): string {
+  return new Date().toISOString().slice(0, 10);
 }
 
 function getRetrievalProfile(query: string): {
@@ -114,8 +129,19 @@ Formatting:
 export async function POST(req: NextRequest) {
   try {
     // Rate limit by IP
-    const ip = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";
-    if (!checkRateLimit(ip)) {
+    const ipHeader = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";
+    const ip = ipHeader.split(",")[0]?.trim() || "unknown";
+    const rateKey = `chatcba:rate:${dayKeyUTC()}:${ip}`;
+    let allowed = false;
+
+    const redisLimit = await incrementDailyLimit(rateKey, RATE_LIMIT);
+    if (redisLimit) {
+      allowed = redisLimit.allowed;
+    } else {
+      allowed = checkRateLimit(ip);
+    }
+
+    if (!allowed) {
       return Response.json(
         { error: "Daily request limit reached (20/day). Please try again tomorrow." },
         { status: 429 }
@@ -141,8 +167,10 @@ export async function POST(req: NextRequest) {
     }
 
     const retrievalProfile = getRetrievalProfile(latestUserMessage.content);
-    const cacheKey = buildCacheKey(messages);
-    const cached = responseCache.get(cacheKey);
+    const cacheKey = `chatcba:resp:${makeStableHash(buildCacheKey(messages))}`;
+    const redisCached = await getCachedResponse<{ text: string; sources: string[]; createdAt: number }>(cacheKey);
+    const inMemoryCached = responseCache.get(cacheKey);
+    const cached = redisCached ?? inMemoryCached ?? null;
     if (cached && Date.now() - cached.createdAt <= RESPONSE_CACHE_TTL_MS) {
       const encoder = new TextEncoder();
       const readable = new ReadableStream({
@@ -227,11 +255,15 @@ export async function POST(req: NextRequest) {
               `data: ${JSON.stringify({ sources: Array.from(new Set(responseSources)).slice(0, 5) })}\n\n`
             )
           );
-          responseCache.set(cacheKey, {
+          const cachedPayload = {
             text: fullResponseText,
             sources: Array.from(new Set(responseSources)).slice(0, 5),
             createdAt: Date.now(),
-          });
+          };
+          responseCache.set(cacheKey, cachedPayload);
+          if (upstashEnabled()) {
+            await setCachedResponse(cacheKey, cachedPayload, Math.floor(RESPONSE_CACHE_TTL_MS / 1000));
+          }
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
         } catch (err) {
