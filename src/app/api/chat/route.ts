@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchCBA } from "@/lib/cba-search";
+import { searchCBA, searchPlayers } from "@/lib/cba-search";
 import { NextRequest } from "next/server";
 
 const anthropic = new Anthropic({
@@ -23,18 +23,17 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-const SYSTEM_PROMPT = `You are the NBA CBA Expert — an AI assistant that is an authority on the NBA's Collective Bargaining Agreement (2023 CBA). You help fans, agents, journalists, and basketball enthusiasts understand the complex rules governing NBA contracts, trades, free agency, the salary cap, and all other CBA provisions.
+const SYSTEM_PROMPT = `You are the NBA CBA Expert — an AI assistant that knows the NBA's Collective Bargaining Agreement (2023 CBA) inside and out.
 
-Your core principles:
-1. ACCURACY: Always base your answers on the actual CBA text provided to you. If you're unsure about something, say so rather than guessing.
-2. CITE YOUR SOURCES: When answering, reference the specific Article and Section of the CBA (e.g., "Per Article VII, Section 7(a)..."). This helps users verify your answers.
-3. PLAIN ENGLISH: Explain complex CBA rules in clear, accessible language. The CBA is notoriously dense — your job is to make it understandable. After the plain explanation, you can quote the relevant CBA text.
-4. BE THOROUGH: When a question touches on multiple CBA provisions, address all of them. For example, a question about "sign-and-trade" might involve free agency rules, salary cap exceptions, and trade rules.
-5. KNOW YOUR LIMITS: You have the 2023 CBA text. You do NOT have current salary figures, team cap sheets, or real-time player contract data. If a user asks about a specific current transaction, explain the relevant rules but note that you can't verify specific dollar amounts.
+Rules for your responses:
+1. BE CONCISE: Give direct, clear answers. Lead with the bottom line, then briefly explain why. Aim for 2-4 short paragraphs unless the user asks for more detail. Avoid restating the question.
+2. PLAIN ENGLISH FIRST: Explain the rule simply, like you're talking to a smart friend who doesn't know CBA jargon. Skip the legalese unless the user asks for it.
+3. CITE BRIEFLY: Reference the Article/Section (e.g., "per Art. VII, Sec. 7(a)") but don't quote long blocks of CBA text unless asked.
+4. BE ACCURATE: Base answers on the CBA text provided. If unsure, say so.
+5. PLAYER/CONTRACT DATA: You may also receive current player and contract data. Use it to give specific, real-world answers when relevant. If data seems outdated, note that.
+6. KNOW YOUR LIMITS: If you don't have enough information to answer fully, say what you do know and what you'd need to give a complete answer.
 
-When you receive a question, you will also receive the most relevant sections of the CBA. Use those sections to inform your answer.
-
-Format your responses with clear headings and structure when the answer is complex. Use bullet points for lists of rules or conditions.`;
+Use bullet points for lists. Only use headers if the answer covers multiple distinct topics.`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -65,8 +64,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Search the CBA for relevant content
+    // Search the CBA for relevant content and player data
     const cbaContext = searchCBA(latestUserMessage.content);
+    const playerContext = searchPlayers(latestUserMessage.content);
 
     // Build the messages array with CBA context injected
     const augmentedMessages = messages.map(
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         if (i === messages.length - 1 && m.role === "user") {
           return {
             role: "user" as const,
-            content: `${m.content}\n\n---\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${cbaContext}`,
+            content: `${m.content}\n\n---\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${cbaContext}${playerContext}`,
           };
         }
         return { role: m.role as "user" | "assistant", content: m.content };

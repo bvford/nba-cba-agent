@@ -10,11 +10,11 @@ interface Message {
 }
 
 const EXAMPLE_QUESTIONS = [
-  "What is the mid-level exception and who can use it?",
+  "What is LeBron James eligible for in free agency?",
   "How do Bird rights work?",
-  "What are the rules for sign-and-trade deals?",
   "Explain the second apron and its restrictions",
-  "What is a Two-Way contract?",
+  "What kind of contract can the Lakers offer Austin Reaves?",
+  "What is the mid-level exception?",
   "How does restricted free agency work?",
 ];
 
