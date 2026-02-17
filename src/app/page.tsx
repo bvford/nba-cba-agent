@@ -385,7 +385,7 @@ export default function Home() {
       />
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 w-full">
+      <div className="flex-1 flex flex-col min-w-0 w-full lg:pl-72">
         {/* Header */}
         <header className="border-b border-[--color-border] bg-[--color-surface-raised]/75 backdrop-blur-xl sticky top-0 z-10">
           <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">

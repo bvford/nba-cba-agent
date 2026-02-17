@@ -79,7 +79,7 @@ export function Sidebar({
         className={`fixed top-0 left-0 h-full w-72 bg-[--color-surface-raised]/88 backdrop-blur-xl border-r border-[--color-border]
           z-40 flex flex-col transition-transform duration-200 ease-out shadow-2xl lg:shadow-none
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0 lg:static lg:z-auto`}
+          lg:translate-x-0`}
       >
         {/* Sidebar header */}
         <div className="p-3 border-b border-[--color-border] flex items-center gap-2">
