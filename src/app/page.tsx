@@ -95,6 +95,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (messages.length === 0) return;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
