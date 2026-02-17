@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-nba-blue: #1d428a;
-  --color-nba-red: #c8102e;
-  --color-nba-blue-light: #2558b5;
-  --color-nba-blue-dark: #0f2249;
-  --color-surface: #0c1220;
-  --color-surface-raised: #131d30;
-  --color-surface-hover: #1a2740;
-  --color-border: #1e3050;
-  --color-border-light: #2a4060;
-  --color-text-primary: #e8edf5;
-  --color-text-secondary: #8899b4;
-  --color-text-muted: #5a6d8a;
-  --color-accent: #4a8eff;
-  --color-accent-glow: rgba(74, 142, 255, 0.15);
+  --color-nba-blue: #ff6b3d;
+  --color-nba-red: #ffd166;
+  --color-nba-blue-light: #ff8b66;
+  --color-nba-blue-dark: #7a2f1b;
+  --color-surface: #0f1115;
+  --color-surface-raised: #171b23;
+  --color-surface-hover: #202736;
+  --color-border: #293244;
+  --color-border-light: #3b4961;
+  --color-text-primary: #f4f7fb;
+  --color-text-secondary: #b2bfd4;
+  --color-text-muted: #7e8ca6;
+  --color-accent: #3dd6c5;
+  --color-accent-glow: rgba(61, 214, 197, 0.18);
 }
 
 body {
@@ -52,7 +52,8 @@ body {
 /* Subtle gradient background */
 .bg-gradient-page {
   background:
-    radial-gradient(ellipse at 20% 0%, rgba(29, 66, 138, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 100%, rgba(200, 16, 46, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 10% 0%, rgba(255, 107, 61, 0.18) 0%, transparent 52%),
+    radial-gradient(ellipse at 90% 0%, rgba(61, 214, 197, 0.14) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 110%, rgba(255, 209, 102, 0.1) 0%, transparent 55%),
     var(--color-surface);
 }

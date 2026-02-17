@@ -53,8 +53,8 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         <button
           onClick={handleSubmit}
           disabled={disabled || !input.trim()}
-          className="rounded-xl bg-[--color-nba-blue] hover:bg-[--color-nba-blue-light] px-4 py-2.5 font-medium text-white text-sm
-            transition-all duration-150 shadow-[0_6px_18px_rgba(29,66,138,0.35)]
+          className="rounded-xl bg-[linear-gradient(135deg,var(--color-nba-blue),var(--color-nba-blue-light))] px-4 py-2.5 font-medium text-white text-sm
+            transition-all duration-150 shadow-[0_8px_20px_rgba(255,107,61,0.35)] hover:brightness-110
             disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[--color-nba-blue]"
         >
           {disabled ? (

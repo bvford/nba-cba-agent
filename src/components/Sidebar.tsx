@@ -81,8 +81,8 @@ export function Sidebar({
           <button
             onClick={onNewChat}
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg
-              bg-[--color-nba-blue] hover:bg-[--color-nba-blue-light] text-white text-sm font-medium
-              transition-colors duration-150 shadow-[0_6px_20px_rgba(29,66,138,0.35)]"
+              bg-[linear-gradient(135deg,var(--color-nba-blue),var(--color-nba-blue-light))] text-white text-sm font-medium
+              transition-colors duration-150 shadow-[0_8px_22px_rgba(255,107,61,0.35)]"
             title="New chat (Cmd/Ctrl+Shift+K)"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -121,7 +121,7 @@ export function Sidebar({
                 className={`group relative flex items-center rounded-lg px-3 py-2.5 mb-1 cursor-pointer transition-colors duration-100 border
                   ${
                     chat.id === activeChatId
-                      ? "bg-[--color-surface-hover] text-[--color-text-primary] border-[--color-border-light]"
+                      ? "bg-[--color-surface-hover] text-[--color-text-primary] border-[--color-border-light] shadow-[0_6px_16px_rgba(61,214,197,0.12)]"
                       : "text-[--color-text-secondary] border-transparent hover:bg-[--color-surface-hover]/60"
                   }`}
                 onClick={() => onSelectChat(chat.id)}
@@ -154,7 +154,7 @@ export function Sidebar({
         </div>
 
         {/* Sources */}
-        <div className="p-3 border-t border-[--color-border] bg-gradient-to-b from-transparent to-[rgba(74,142,255,0.06)]">
+        <div className="p-3 border-t border-[--color-border] bg-gradient-to-b from-transparent to-[rgba(61,214,197,0.08)]">
           <p className="px-1 pb-2 text-[10px] uppercase tracking-[0.16em] text-[--color-text-muted]">
             Sources
           </p>
@@ -167,7 +167,7 @@ export function Sidebar({
                 rel="noreferrer"
                 className="block rounded-lg border border-[--color-border] hover:border-[--color-border-light] bg-[--color-surface]/40 hover:bg-[--color-surface-hover]/70 px-2.5 py-2 transition-colors"
               >
-                <p className="text-xs text-[--color-text-primary] leading-tight">
+                <p className="text-xs text-[--color-text-primary] leading-tight font-medium">
                   {link.label}
                 </p>
                 <p className="text-[10px] text-[--color-text-muted] mt-0.5">
