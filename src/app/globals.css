@@ -99,7 +99,7 @@ button, input, textarea {
   letter-spacing: 0.01em;
 }
 
-main, aside, header, footer {
+main, header, footer {
   position: relative;
   z-index: 1;
 }
