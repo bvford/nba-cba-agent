@@ -54,7 +54,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           onClick={handleSubmit}
           disabled={disabled || !input.trim()}
           className="rounded-xl bg-[--color-nba-blue] hover:bg-[--color-nba-blue-light] px-4 py-2.5 font-medium text-white text-sm
-            transition-all duration-150
+            transition-all duration-150 shadow-[0_6px_18px_rgba(29,66,138,0.35)]
             disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[--color-nba-blue]"
         >
           {disabled ? (
@@ -77,6 +77,9 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         </button>
       </div>
       <p className="text-center text-[10px] text-[--color-text-muted] mt-2">
+        Enter to send &middot; Shift+Enter for new line &middot; Cmd/Ctrl+Shift+K for new chat
+      </p>
+      <p className="text-center text-[10px] text-[--color-text-muted] mt-1">
         2023 NBA CBA &middot; Not legal or financial advice &middot; Player data updates periodically
       </p>
     </div>
