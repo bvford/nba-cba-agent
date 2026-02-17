@@ -46,14 +46,49 @@ interface PlayerData {
   salaries: Record<string, string>;
 }
 
-// NBA team ID to abbreviation map (HoopsHype uses numeric IDs)
+// NBA team ID to abbreviation map (HoopsHype IDs)
 const TEAM_MAP: Record<string, string> = {
   "1": "ATL", "2": "BOS", "3": "BKN", "4": "CHA", "5": "CHI",
   "6": "CLE", "7": "DAL", "8": "DEN", "9": "GSW", "10": "HOU",
   "11": "IND", "12": "LAC", "13": "LAL", "14": "MEM", "15": "MIA",
-  "16": "MIL", "17": "MIN", "18": "NOP", "19": "NYK", "20": "OKC",
-  "21": "ORL", "22": "PHI", "23": "PHX", "24": "POR", "25": "SAC",
-  "26": "SAS", "27": "TOR", "28": "UTA", "29": "WAS", "30": "DET",
+  "16": "MIL", "17": "MIN", "18": "NYK", "19": "ORL", "20": "PHI",
+  "21": "PHX", "22": "POR", "23": "SAC", "24": "SAS", "25": "OKC",
+  "26": "UTA", "27": "WAS", "28": "TOR", "29": "MEM", "30": "DET",
+  // HoopsHype non-canonical IDs seen on team pages
+  "5312": "CHA",
+};
+
+const TEAM_SLUG_TO_ABBR: Record<string, string> = {
+  "atlanta-hawks": "ATL",
+  "boston-celtics": "BOS",
+  "brooklyn-nets": "BKN",
+  "charlotte-hornets": "CHA",
+  "chicago-bulls": "CHI",
+  "cleveland-cavaliers": "CLE",
+  "dallas-mavericks": "DAL",
+  "denver-nuggets": "DEN",
+  "detroit-pistons": "DET",
+  "golden-state-warriors": "GSW",
+  "houston-rockets": "HOU",
+  "indiana-pacers": "IND",
+  "los-angeles-clippers": "LAC",
+  "los-angeles-lakers": "LAL",
+  "memphis-grizzlies": "MEM",
+  "miami-heat": "MIA",
+  "milwaukee-bucks": "MIL",
+  "minnesota-timberwolves": "MIN",
+  "new-orleans-pelicans": "NOP",
+  "new-york-knicks": "NYK",
+  "oklahoma-city-thunder": "OKC",
+  "orlando-magic": "ORL",
+  "philadelphia-76ers": "PHI",
+  "phoenix-suns": "PHX",
+  "portland-trail-blazers": "POR",
+  "sacramento-kings": "SAC",
+  "san-antonio-spurs": "SAS",
+  "toronto-raptors": "TOR",
+  "utah-jazz": "UTA",
+  "washington-wizards": "WAS",
 };
 
 function formatSeason(season: number): string {
@@ -72,104 +107,122 @@ function formatSalary(amount: number, options: { po: boolean; to: boolean; qo: b
   return tags.length > 0 ? `${formatted} (${tags.join(", ")})` : formatted;
 }
 
-// ---- Fetch salary data from GitHub CSV (reliable) + HoopsHype multi-year (bonus) ----
+function extractContractsFromNextData(
+  html: string,
+  season: number,
+  teamId: string
+): Array<{
+  playerName?: string;
+  seasons?: Array<{
+    season?: number;
+    salary?: number;
+    playerOption?: boolean;
+    teamOption?: boolean;
+    qualifyingOffer?: boolean;
+    twoWayContract?: boolean;
+    teamID?: string | number;
+  }>;
+}> {
+  const m = html.match(
+    /<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/
+  );
+  if (!m) return [];
+
+  try {
+    const data = JSON.parse(m[1]);
+    const queries = data?.props?.pageProps?.dehydratedState?.queries || [];
+    const query = queries.find(
+      (q: { queryKey?: unknown[] }) =>
+        Array.isArray(q.queryKey) &&
+        q.queryKey[0] === season &&
+        q.queryKey[1] === 500 &&
+        String(q.queryKey[2]) === teamId
+    );
+    const contracts = query?.state?.data?.contracts?.contracts;
+    return Array.isArray(contracts) ? contracts : [];
+  } catch {
+    return [];
+  }
+}
+
+async function fetchTeamSalaryUrls(): Promise<string[]> {
+  const res = await fetch("https://hoopshype.com/salaries/teams/", {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+    },
+  });
+
+  if (!res.ok) return [];
+
+  const html = await res.text();
+  const matches = html.match(/\/salaries\/teams\/[a-z0-9-]+\/\d+\//g) || [];
+  return Array.from(new Set(matches)).slice(0, 30);
+}
+
+// ---- Fetch salary data from HoopsHype team pages (current + future seasons) ----
 async function fetchSalaries(): Promise<PlayerSalary[]> {
   const salaryMap = new Map<string, PlayerSalary>();
 
-  // Step 1: Get base salary data from GitHub CSV (2024-25 season)
-  console.log("Fetching salary data from GitHub CSV...");
-  try {
-    const csvRes = await fetch(
-      "https://raw.githubusercontent.com/edwinjeon/NBA-Salary-Prediction/main/data/NBA%20Player%20Salaries_2024-25_1.csv"
-    );
-    if (csvRes.ok) {
-      const csv = await csvRes.text();
-      const lines = csv.trim().split("\n").slice(1); // skip header
-      for (const line of lines) {
-        // CSV format: Player,Team,Salary (salary has quotes due to commas)
-        const match = line.match(/^(.+?),([A-Z]{3}),"?\$?([\d,]+)/);
-        if (match) {
-          const name = match[1].trim();
-          const team = match[2].trim();
-          const salary = "$" + match[3].trim();
-          salaryMap.set(normalizeName(name), {
-            name,
-            team,
-            salaries: { "2024-25": salary },
-          });
-        }
-      }
-      console.log(`  CSV: ${salaryMap.size} players loaded`);
-    }
-  } catch (err) {
-    console.error("  CSV fetch failed:", err);
-  }
+  console.log("Fetching salary data from HoopsHype team pages...");
 
-  // Step 2: Enhance with HoopsHype multi-year contract data (top players)
-  console.log("Fetching multi-year contracts from HoopsHype...");
   try {
-    const res = await fetch("https://hoopshype.com/salaries/players/", {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-      },
-    });
+    const teamUrls = await fetchTeamSalaryUrls();
+    console.log(`  Team pages found: ${teamUrls.length}`);
 
-    if (res.ok) {
+    for (const urlPath of teamUrls) {
+      const slugMatch = urlPath.match(/\/salaries\/teams\/([a-z0-9-]+)\/(\d+)\//);
+      const teamSlug = slugMatch?.[1] || "";
+      const teamId = slugMatch?.[2] || "";
+      const fallbackTeam = TEAM_SLUG_TO_ABBR[teamSlug] || "";
+
+      const res = await fetch(`https://hoopshype.com${urlPath}`, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+        },
+      });
+      if (!res.ok) continue;
+
       const html = await res.text();
-      // Find embedded contracts JSON
-      const contractsStart = html.indexOf('"contracts":[{"__typename":"Contracts"');
-      if (contractsStart !== -1) {
-        const arrayStart = html.indexOf("[", contractsStart);
-        let depth = 0;
-        let arrayEnd = arrayStart;
-        for (let i = arrayStart; i < html.length; i++) {
-          if (html[i] === "[") depth++;
-          if (html[i] === "]") depth--;
-          if (depth === 0) {
-            arrayEnd = i + 1;
-            break;
+      const contracts = extractContractsFromNextData(html, 2025, teamId);
+
+      for (const contract of contracts) {
+        const name = contract.playerName || "";
+        if (!name) continue;
+
+        const key = normalizeName(name);
+        const existing = salaryMap.get(key);
+        const salaries: Record<string, string> = existing?.salaries || {};
+        let team = existing?.team || fallbackTeam;
+
+        for (const season of contract.seasons || []) {
+          if (!season.salary || !season.season || season.season < 2025) continue;
+
+          const seasonKey = formatSeason(season.season);
+          salaries[seasonKey] = formatSalary(season.salary, {
+            po: season.playerOption || false,
+            to: season.teamOption || false,
+            qo: season.qualifyingOffer || false,
+            tw: season.twoWayContract || false,
+          });
+
+          if (season.teamID) {
+            team = TEAM_MAP[String(season.teamID)] || team;
           }
         }
 
-        const contracts = JSON.parse(html.slice(arrayStart, arrayEnd));
-        let enhanced = 0;
-        for (const contract of contracts) {
-          const name = contract.playerName || "";
-          if (!name) continue;
-
-          const key = normalizeName(name);
-          const existing = salaryMap.get(key);
-          const salaries: Record<string, string> = existing?.salaries || {};
-          let team = existing?.team || "";
-
-          for (const season of contract.seasons || []) {
-            if (season.salary && season.season >= 2025) {
-              const seasonKey = formatSeason(season.season);
-              salaries[seasonKey] = formatSalary(season.salary, {
-                po: season.playerOption || false,
-                to: season.teamOption || false,
-                qo: season.qualifyingOffer || false,
-                tw: season.twoWayContract || false,
-              });
-              if (season.teamID) {
-                team = TEAM_MAP[season.teamID] || team;
-              }
-            }
-          }
-
-          salaryMap.set(key, { name, team, salaries });
-          enhanced++;
-        }
-        console.log(`  HoopsHype: enhanced ${enhanced} players with multi-year data`);
+        salaryMap.set(key, { name, team: team || fallbackTeam, salaries });
       }
+
+      await new Promise((r) => setTimeout(r, 120));
     }
   } catch (err) {
-    console.error("  HoopsHype fetch failed (non-critical):", err);
+    console.error("  Team salary fetch failed:", err);
   }
 
   const players = Array.from(salaryMap.values());
-  console.log(`  Total: ${players.length} players with salary data`);
+  console.log(`  Total players with salary data: ${players.length}`);
   return players;
 }
 

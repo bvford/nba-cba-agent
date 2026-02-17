@@ -257,19 +257,49 @@ function formatPlayerInfo(p: PlayerData): string {
 
 export function searchPlayers(query: string): string {
   const queryLower = query.toLowerCase();
-  const matched: PlayerData[] = [];
+  const queryWords = queryLower
+    .replace(/[^a-z0-9\s'-]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+  const matched: { player: PlayerData; score: number }[] = [];
 
-  // Check for specific player names
+  // Score specific player matches. Full-name matches are strongly preferred.
   for (const p of players) {
     const nameLower = p.name.toLowerCase();
-    // Check if the query contains the player's full name or last name
     const nameParts = nameLower.split(" ");
+    const firstName = nameParts[0];
     const lastName = nameParts[nameParts.length - 1];
 
-    if (queryLower.includes(nameLower) || (lastName.length > 3 && queryLower.includes(lastName))) {
-      matched.push(p);
+    let score = 0;
+    if (queryLower.includes(nameLower)) {
+      score += 100;
+    }
+
+    // If the query includes both first + last, treat as near-exact.
+    if (
+      queryWords.length >= 2 &&
+      queryWords.includes(firstName) &&
+      queryWords.includes(lastName)
+    ) {
+      score += 70;
+    }
+
+    // Only allow single-name last-name matching when user typed one word.
+    // This avoids "Mark Williams" matching every player named Williams.
+    if (
+      queryWords.length === 1 &&
+      lastName.length > 3 &&
+      queryWords[0] === lastName
+    ) {
+      score += 30;
+    }
+
+    if (score > 0) {
+      matched.push({ player: p, score });
     }
   }
+
+  matched.sort((a, b) => b.score - a.score || b.player.points - a.player.points);
 
   // Check for team mentions (e.g., "Lakers roster", "what can the Celtics do")
   const teamMatches: PlayerData[] = [];
@@ -289,7 +319,7 @@ export function searchPlayers(query: string): string {
   // Combine and deduplicate
   const seen = new Set<string>();
   const results: PlayerData[] = [];
-  for (const p of [...matched, ...teamMatches]) {
+  for (const p of [...matched.map((m) => m.player), ...teamMatches]) {
     if (!seen.has(p.name)) {
       seen.add(p.name);
       results.push(p);
@@ -298,7 +328,7 @@ export function searchPlayers(query: string): string {
 
   if (results.length === 0) return "";
 
-  let context = "\n\n--- PLAYER DATA ---\n\n";
+  let context = "\n\n--- PLAYER DATA (2025-26 snapshot from project dataset) ---\n\n";
   for (const p of results.slice(0, 15)) {
     context += formatPlayerInfo(p) + "\n";
   }
