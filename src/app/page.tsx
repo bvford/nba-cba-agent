@@ -372,7 +372,7 @@ export default function Home() {
   const isLanding = messages.length === 0;
 
   return (
-    <div className="flex h-screen bg-gradient-page">
+    <div className="flex h-screen w-full overflow-x-hidden bg-gradient-page">
       {/* Sidebar */}
       <Sidebar
         chats={chats}
@@ -385,7 +385,7 @@ export default function Home() {
       />
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 w-full">
         {/* Header */}
         <header className="border-b border-[--color-border] bg-[--color-surface-raised]/75 backdrop-blur-xl sticky top-0 z-10">
           <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
@@ -450,9 +450,9 @@ export default function Home() {
 
         {/* Messages area */}
         <main id="chat" className="flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
+          <div className="max-w-4xl mx-auto px-4 py-6 md:py-8 w-full">
             {isLanding ? (
-              <div className="flex flex-col min-h-[calc(100vh-12rem)]">
+              <div className="flex flex-col min-h-[calc(100vh-12rem)] w-full">
                 {/* Hero */}
                 <section className="text-center pt-8 md:pt-14 mb-10 md:mb-12">
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[linear-gradient(145deg,rgba(77,111,240,0.28),rgba(79,210,184,0.18))] border border-[--color-border-light] mb-5 shadow-[0_16px_45px_rgba(8,10,15,0.55)]">
@@ -486,7 +486,7 @@ export default function Home() {
                   </div>
                 </section>
 
-                <section className="mb-8">
+                <section className="mb-8 w-full">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
                     {FEATURE_CARDS.map((card) => (
                       <button
@@ -495,7 +495,7 @@ export default function Home() {
                         className="text-left p-4 rounded-2xl border border-[--color-border] bg-[--color-surface-raised]/88 hover:bg-[--color-surface-hover]/85 hover:border-[--color-border-light] hover:-translate-y-1 transition-all duration-200 shadow-[0_10px_24px_rgba(6,9,16,0.34)]"
                       >
                         <h3 className="text-base font-semibold text-[--color-text-primary] mb-1.5">{card.title}</h3>
-                        <p className="text-xs leading-relaxed text-[--color-text-secondary]">{card.description}</p>
+                        <p className="text-xs leading-relaxed text-[--color-text-secondary] break-words">{card.description}</p>
                       </button>
                     ))}
                   </div>
