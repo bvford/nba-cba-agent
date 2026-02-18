@@ -374,7 +374,13 @@ export default function Home() {
   const isLanding = messages.length === 0;
 
   return (
-    <div className="flex h-screen w-full overflow-x-hidden bg-gradient-page">
+    <div className="relative isolate flex h-screen w-full overflow-x-hidden bg-gradient-page">
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute -top-28 -left-20 h-80 w-80 rounded-full bg-[rgba(23,64,139,0.18)] blur-3xl" />
+        <div className="absolute top-20 -right-16 h-72 w-72 rounded-full bg-[rgba(187,31,58,0.14)] blur-3xl" />
+        <div className="absolute bottom-[-8rem] left-1/2 h-80 w-[44rem] -translate-x-1/2 rounded-[999px] bg-[rgba(227,189,108,0.08)] blur-3xl" />
+      </div>
+
       {/* Sidebar */}
       <Sidebar
         chats={chats}
@@ -389,7 +395,8 @@ export default function Home() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 w-full lg:pl-72">
         {/* Header */}
-        <header className="border-b border-[--color-border] bg-[--color-surface-raised]/75 backdrop-blur-xl sticky top-0 z-10">
+        <header className="border-b border-[--color-border] bg-[--color-surface-raised]/88 backdrop-blur-xl sticky top-0 z-10">
+          <div className="retro-header-stripe h-[3px] w-full" />
           <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
             {/* Hamburger / sidebar toggle */}
             <button
@@ -421,7 +428,7 @@ export default function Home() {
               </div>
             </button>
 
-            <nav className="ml-auto hidden md:flex items-center gap-1 rounded-full border border-[--color-border] bg-[--color-surface]/45 px-1.5 py-1">
+            <nav className="ml-auto hidden md:flex items-center gap-1 rounded-full border border-[--color-border] bg-[--color-surface]/55 px-1.5 py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <button
                 onClick={startNewChat}
                 className="text-xs px-3 py-1.5 rounded-full text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors"
@@ -460,7 +467,10 @@ export default function Home() {
             {isLanding ? (
               <div className="flex flex-col min-h-[calc(100vh-12rem)] w-full">
                 {/* Hero */}
-                <section className="text-center pt-8 md:pt-14 mb-10 md:mb-12">
+                <section className="retro-frame text-center pt-8 md:pt-12 px-4 md:px-8 rounded-3xl mb-8 md:mb-10">
+                  <p className="text-[11px] tracking-[0.12em] uppercase text-[--color-accent] mb-3">
+                    Basketball Operations Assistant
+                  </p>
                   <div className="mb-5">
                     <Image
                       src="/chatcba-logo.png"
@@ -478,7 +488,7 @@ export default function Home() {
                     Ask questions about cap mechanics, contract structure, and roster-building strategy.
                     Get concise answers grounded in the 2023 CBA and updated salary/stat context.
                   </p>
-                  <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
+                  <div className="mt-6 pb-8 flex flex-wrap items-center justify-center gap-2.5">
                     <button
                       onClick={goToChatComposer}
                       className="text-sm px-5 py-2.5 rounded-full bg-[linear-gradient(135deg,var(--color-nba-red),#d24f67)] text-white font-semibold shadow-[0_12px_24px_rgba(187,31,58,0.32)] hover:-translate-y-0.5 transition-all"
@@ -500,7 +510,7 @@ export default function Home() {
                       <button
                         key={card.title}
                         onClick={() => sendMessage(card.prompt)}
-                        className="text-left p-4 rounded-2xl border border-[--color-border] bg-[linear-gradient(165deg,rgba(18,27,43,0.95),rgba(11,17,30,0.95))] hover:bg-[--color-surface-hover]/85 hover:border-[--color-border-light] hover:-translate-y-1 transition-all duration-200 shadow-[0_10px_20px_rgba(4,8,14,0.3)]"
+                        className="text-left p-4 rounded-2xl border border-[--color-border] bg-[linear-gradient(165deg,rgba(18,27,43,0.95),rgba(11,17,30,0.95))] hover:bg-[--color-surface-hover]/85 hover:border-[--color-border-light] hover:-translate-y-1 transition-all duration-200 shadow-[0_8px_18px_rgba(4,8,14,0.28)]"
                       >
                         <h3 className="text-base font-semibold text-[--color-text-primary] mb-1.5">{card.title}</h3>
                         <p className="text-xs leading-relaxed text-[--color-text-secondary] break-words">{card.description}</p>

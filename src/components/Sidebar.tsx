@@ -76,7 +76,7 @@ export function Sidebar({
 
       {/* Sidebar panel */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-[--color-surface-raised]/88 backdrop-blur-xl border-r border-[--color-border]
+        className={`fixed top-0 left-0 h-full w-72 bg-[linear-gradient(180deg,rgba(17,26,43,0.95),rgba(10,16,28,0.95))] backdrop-blur-xl border-r border-[--color-border]
           z-40 flex flex-col transition-transform duration-200 ease-out shadow-2xl lg:shadow-none
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0`}
@@ -87,7 +87,7 @@ export function Sidebar({
             onClick={onNewChat}
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg
               bg-[linear-gradient(135deg,var(--color-nba-red),#d24f67)] text-white text-sm font-semibold
-              transition-colors duration-150 shadow-[0_10px_22px_rgba(187,31,58,0.3)]"
+              transition-colors duration-150 shadow-[0_10px_22px_rgba(187,31,58,0.3)] hover:brightness-110"
             title="New chat (Cmd/Ctrl+Shift+K)"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -126,7 +126,7 @@ export function Sidebar({
                 className={`group relative flex items-center rounded-lg px-3 py-2.5 mb-1 cursor-pointer transition-colors duration-100 border
                   ${
                     chat.id === activeChatId
-                      ? "bg-[--color-surface-hover] text-[--color-text-primary] border-[--color-border-light] shadow-[0_8px_20px_rgba(7,10,16,0.45)]"
+                      ? "bg-[--color-surface-hover] text-[--color-text-primary] border-[--color-border-light] shadow-[0_8px_16px_rgba(7,10,16,0.35)]"
                       : "text-[--color-text-secondary] border-transparent hover:bg-[--color-surface-hover]/60"
                   }`}
                 onClick={() => onSelectChat(chat.id)}
