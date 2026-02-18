@@ -214,6 +214,14 @@ function normalizeSource(source: string): { label: string; href?: string } {
     };
   }
 
+  if (lower.startsWith("cba 101 faq:")) {
+    const section = source.replace(/^CBA 101 FAQ:\s*/i, "").trim();
+    return {
+      label: section ? `CBA 101: ${truncate(section, 22)}` : "CBA 101 FAQ",
+      href: "/about",
+    };
+  }
+
   if (lower.includes("capsheets")) {
     return {
       label: "Capsheets",

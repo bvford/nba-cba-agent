@@ -188,7 +188,7 @@ export function Sidebar({
           <p className="text-[11px] text-[--color-text-secondary] text-left font-medium">
             A Michael Margolis Experiment
           </p>
-          <p className="text-[10px] text-[--color-text-muted] text-left mt-1">
+          <p className="hidden sm:block text-[10px] text-[--color-text-muted] text-left mt-1">
             Cmd/Ctrl + Shift + K for New Chat
           </p>
         </div>

@@ -1,5 +1,6 @@
 import cbaArticles from "../../data/cba-articles.json";
 import cbaGuide from "../../data/cba-guide.json";
+import cba101Data from "../../data/cba101.json";
 import playerData from "../../data/players.json";
 
 export interface CBAArticle {
@@ -49,6 +50,7 @@ interface ScoredArticle extends CBAArticle {
 
 const articles: CBAArticle[] = cbaArticles as CBAArticle[];
 const guideSections: CBAArticle[] = cbaGuide as CBAArticle[];
+const cba101Sections: CBAArticle[] = cba101Data as CBAArticle[];
 
 // Break each article into sections (split on ## headings)
 function getSections(article: CBAArticle): { heading: string; text: string }[] {
@@ -194,25 +196,47 @@ export function searchCBAWithMeta(
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score);
 
+  // Score the CBA 101 sections (practical examples with real transactions)
+  const scored101 = cba101Sections
+    .map((s) => ({ ...scoreDocument(s, queryTokens, queryLower, boostedTerms), source: "cba101" as const }))
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score);
+
   // Score the raw CBA articles
   const scoredCBA = articles
     .map((a) => ({ ...scoreDocument(a, queryTokens, queryLower, boostedTerms), source: "cba" as const }))
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score);
 
-  // Build context: guide first (plain English), then CBA (official text)
+  // Build context: guide first (plain English), then CBA 101 (practical examples), then CBA (official text)
   let context = "";
   let charsUsed = 0;
   const sources: string[] = [];
 
-  // Add top guide sections first (up to 40% of budget)
-  const guideBudget = maxChars * 0.4;
+  // Add top guide sections first (up to 30% of budget)
+  const guideBudget = maxChars * 0.3;
   for (const section of scoredGuide.slice(0, maxGuideSections)) {
     const text = `\n\n--- CBA GUIDE: ${section.title} ---\n\n${section.content}`;
     if (charsUsed + text.length > guideBudget) break;
     context += text;
     charsUsed += text.length;
     sources.push(`CBA Guide: ${section.title}`);
+  }
+
+  // Add CBA 101 sections (up to 30% of budget — practical examples with real deals)
+  const cba101Budget = maxChars * 0.3;
+  let cba101Used = 0;
+  for (const section of scored101.slice(0, 3)) {
+    const trimmedContent = section.content.length > 3500
+      ? `${section.content.slice(0, 3500)}\n\n[truncated for efficiency]`
+      : section.content;
+    const text = `\n\n--- CBA 101 FAQ: ${section.title} ---\n\n${trimmedContent}`;
+    if (cba101Used + text.length > cba101Budget) break;
+    if (charsUsed + text.length > maxChars) break;
+    context += text;
+    charsUsed += text.length;
+    cba101Used += text.length;
+    sources.push(`CBA 101 FAQ: ${section.title}`);
   }
 
   // Fill the rest with raw CBA articles

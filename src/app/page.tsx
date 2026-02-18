@@ -470,7 +470,7 @@ export default function Home() {
                       alt="ChatCBA logo"
                       width={220}
                       height={220}
-                      className="w-36 h-36 md:w-44 md:h-44 rounded-full mx-auto drop-shadow-[0_18px_38px_rgba(8,10,15,0.58)]"
+                      className="w-40 h-40 md:w-48 md:h-48 rounded-full mx-auto drop-shadow-[0_22px_42px_rgba(8,10,15,0.6)]"
                       priority
                     />
                   </div>
@@ -484,7 +484,7 @@ export default function Home() {
                   <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
                     <button
                       onClick={goToChatComposer}
-                      className="text-sm px-4 py-2 rounded-full bg-[linear-gradient(135deg,var(--color-nba-blue),var(--color-nba-blue-light))] text-white font-semibold shadow-[0_12px_30px_rgba(43,90,224,0.32)] hover:-translate-y-0.5 transition-all"
+                      className="text-sm px-5 py-2.5 rounded-full bg-[linear-gradient(135deg,var(--color-nba-blue),var(--color-nba-blue-light))] text-white font-semibold shadow-[0_14px_30px_rgba(24,139,156,0.34)] hover:-translate-y-0.5 transition-all"
                     >
                       Start Chatting
                     </button>
@@ -503,7 +503,7 @@ export default function Home() {
                       <button
                         key={card.title}
                         onClick={() => sendMessage(card.prompt)}
-                        className="text-left p-4 rounded-2xl border border-[--color-border] bg-[--color-surface-raised]/88 hover:bg-[--color-surface-hover]/85 hover:border-[--color-border-light] hover:-translate-y-1 transition-all duration-200 shadow-[0_10px_24px_rgba(6,9,16,0.34)]"
+                        className="text-left p-4 rounded-2xl border border-[--color-border] bg-[linear-gradient(160deg,rgba(16,25,37,0.95),rgba(10,15,24,0.95))] hover:bg-[--color-surface-hover]/85 hover:border-[--color-border-light] hover:-translate-y-1 transition-all duration-200 shadow-[0_10px_24px_rgba(6,9,16,0.34)]"
                       >
                         <h3 className="text-base font-semibold text-[--color-text-primary] mb-1.5">{card.title}</h3>
                         <p className="text-xs leading-relaxed text-[--color-text-secondary] break-words">{card.description}</p>
@@ -552,7 +552,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="mt-7 text-center text-xs text-[--color-text-muted]">
+                <div className="hidden sm:block mt-7 text-center text-xs text-[--color-text-muted]">
                   Tip: press <span className="text-[--color-text-secondary] font-medium">Cmd/Ctrl + Shift + K</span> to start a new chat
                 </div>
 
