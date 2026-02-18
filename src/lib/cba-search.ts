@@ -52,6 +52,12 @@ const articles: CBAArticle[] = cbaArticles as CBAArticle[];
 const guideSections: CBAArticle[] = cbaGuide as CBAArticle[];
 const cba101Sections: CBAArticle[] = cba101Data as CBAArticle[];
 
+const PLAYER_TEAM_OVERRIDES: Record<string, string> = {
+  "james harden": "CLE",
+  "anthony davis": "WAS",
+  "mark williams": "PHX",
+};
+
 // Break each article into sections (split on ## headings)
 function getSections(article: CBAArticle): { heading: string; text: string }[] {
   const parts = article.content.split(/^(#{1,3}\s+.+)$/m);
@@ -282,6 +288,7 @@ const TEAM_NAMES: Record<string, string[]> = {
 };
 
 function formatPlayerInfo(p: PlayerData): string {
+  const team = PLAYER_TEAM_OVERRIDES[p.name.toLowerCase()] || p.team;
   const gp = p.games || 1;
   const ppg = (p.points / gp).toFixed(1);
   const rpg = (p.rebounds / gp).toFixed(1);
@@ -289,7 +296,7 @@ function formatPlayerInfo(p: PlayerData): string {
   const spg = (p.steals / gp).toFixed(1);
   const bpg = (p.blocks / gp).toFixed(1);
 
-  let info = `**${p.name}** (${p.team}, ${p.position || "N/A"})`;
+  let info = `**${p.name}** (${team}, ${p.position || "N/A"})`;
   if (p.age) info += `, Age: ${p.age}`;
   info += "\n";
 
@@ -359,7 +366,10 @@ export function searchPlayers(query: string): string {
     for (const name of names) {
       if (queryLower.includes(name)) {
         const teamPlayers = players
-          .filter((p) => p.team === abbr || p.team === abbr.replace("PHX", "PHO"))
+          .filter((p) => {
+            const effectiveTeam = PLAYER_TEAM_OVERRIDES[p.name.toLowerCase()] || p.team;
+            return effectiveTeam === abbr || effectiveTeam === abbr.replace("PHX", "PHO");
+          })
           .sort((a, b) => b.points - a.points)
           .slice(0, 8); // Top 8 by points
         teamMatches.push(...teamPlayers);

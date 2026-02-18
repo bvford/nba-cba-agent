@@ -46,6 +46,8 @@ interface PlayerData {
   salaries: Record<string, string>;
 }
 
+const CURRENT_SEASON = 2025; // 2025-26 snapshot
+
 // NBA team ID to abbreviation map (HoopsHype IDs)
 const TEAM_MAP: Record<string, string> = {
   "1": "ATL", "2": "BOS", "3": "BKN", "4": "CHA", "5": "CHI",
@@ -89,6 +91,13 @@ const TEAM_SLUG_TO_ABBR: Record<string, string> = {
   "toronto-raptors": "TOR",
   "utah-jazz": "UTA",
   "washington-wizards": "WAS",
+};
+
+// Data-quality overrides for known high-signal roster moves when public feeds conflict.
+const PLAYER_TEAM_OVERRIDES: Record<string, string> = {
+  "james harden": "CLE",
+  "anthony davis": "WAS",
+  "mark williams": "PHX",
 };
 
 function formatSeason(season: number): string {
@@ -196,8 +205,11 @@ async function fetchSalaries(): Promise<PlayerSalary[]> {
         const salaries: Record<string, string> = existing?.salaries || {};
         let team = existing?.team || fallbackTeam;
 
+        let currentSeasonTeam: string | undefined;
+        let fallbackSeasonTeam: string | undefined;
+
         for (const season of contract.seasons || []) {
-          if (!season.salary || !season.season || season.season < 2025) continue;
+          if (!season.salary || !season.season || season.season < CURRENT_SEASON) continue;
 
           const seasonKey = formatSeason(season.season);
           salaries[seasonKey] = formatSalary(season.salary, {
@@ -208,9 +220,16 @@ async function fetchSalaries(): Promise<PlayerSalary[]> {
           });
 
           if (season.teamID) {
-            team = TEAM_MAP[String(season.teamID)] || team;
+            const mapped = TEAM_MAP[String(season.teamID)];
+            if (mapped) {
+              if (!fallbackSeasonTeam) fallbackSeasonTeam = mapped;
+              if (season.season === CURRENT_SEASON) currentSeasonTeam = mapped;
+            }
           }
         }
+
+        // Prefer the current-season team. If missing, use first known team from available seasons.
+        team = currentSeasonTeam || fallbackSeasonTeam || team;
 
         salaryMap.set(key, { name, team: team || fallbackTeam, salaries });
       }
@@ -309,22 +328,24 @@ function mergePlayers(
   const merged: PlayerData[] = [];
 
   for (const stat of stats) {
-    const salary = salaryMap.get(normalizeName(stat.name));
-    merged.push({
-      ...stat,
-      // Prefer salary-source team when available; stats feeds can lag post-trade.
-      team: salary?.team || stat.team,
-      salaries: salary?.salaries || {},
-    });
+      const salary = salaryMap.get(normalizeName(stat.name));
+      const overrideTeam = PLAYER_TEAM_OVERRIDES[normalizeName(stat.name)];
+      merged.push({
+        ...stat,
+        // Prefer salary-source team when available; stats feeds can lag post-trade.
+        team: overrideTeam || salary?.team || stat.team,
+        salaries: salary?.salaries || {},
+      });
   }
 
   // Add salary-only players (might not have stats yet if injured, etc.)
   const statsNames = new Set(stats.map((s) => normalizeName(s.name)));
   for (const sal of salaries) {
     if (!statsNames.has(normalizeName(sal.name))) {
+      const overrideTeam = PLAYER_TEAM_OVERRIDES[normalizeName(sal.name)];
       merged.push({
         name: sal.name,
-        team: sal.team,
+        team: overrideTeam || sal.team,
         position: "",
         age: 0,
         games: 0,
