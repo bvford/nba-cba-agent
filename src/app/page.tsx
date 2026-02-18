@@ -415,12 +415,9 @@ export default function Home() {
                 className="rounded-full border border-[--color-border-light] shadow-[0_4px_14px_rgba(8,10,15,0.4)]"
               />
               <div className="text-left">
-                <h1 className="text-sm font-semibold tracking-tight text-[--color-text-primary] leading-tight">
+                <h1 className="text-lg sm:text-xl font-semibold tracking-[0.06em] text-[--color-text-primary] leading-tight">
                   ChatCBA
                 </h1>
-                <p className="text-[10px] text-[--color-text-muted] hidden sm:block">
-                  2023 CBA &middot; Live 2025-26 Stats
-                </p>
               </div>
             </button>
 

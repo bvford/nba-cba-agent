@@ -27,13 +27,13 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
       <body
         className="antialiased bg-gradient-page"
-        style={{ fontFamily: "'Manrope', system-ui, sans-serif" }}
+        style={{ fontFamily: "'Barlow', system-ui, sans-serif" }}
       >
         {children}
       </body>
