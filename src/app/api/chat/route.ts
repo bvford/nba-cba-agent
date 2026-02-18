@@ -19,6 +19,7 @@ const RATE_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours
 const ipRequests = new Map<string, { count: number; resetAt: number }>();
 const RESPONSE_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 const responseCache = new Map<string, { text: string; sources: string[]; createdAt: number }>();
+const CACHE_SCHEMA_VERSION = "2026-02-18-team-context-v2";
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
@@ -34,7 +35,7 @@ function checkRateLimit(ip: string): boolean {
 
 function buildCacheKey(messages: Array<{ role: string; content: string }>): string {
   const recent = messages.slice(-6).map((m) => `${m.role}:${m.content.trim().toLowerCase()}`);
-  return recent.join("||");
+  return [CACHE_SCHEMA_VERSION, ...recent].join("||");
 }
 
 function makeStableHash(value: string): string {
@@ -55,6 +56,17 @@ function getRetrievalProfile(query: string): {
   const q = query.toLowerCase();
   const isDeepRules = /(trade|sign-and-trade|apron|exception|bird|matching|aggregate|base year|hard cap|cba article|section|clause)/.test(q);
   const isQuickDefinition = /(what is|explain|define|how does)/.test(q) && q.length < 120;
+  const isNegotiation = /(negotia|extension|player option|opt[- ]?in|opt[- ]?out|re-sign|re sign|new deal|leverage|free agenc)/.test(q);
+
+  if (isNegotiation) {
+    return {
+      maxChars: 16000,
+      maxGuideSections: 4,
+      maxCbaArticles: 4,
+      maxSectionsPerArticle: 3,
+      maxOutputTokens: 1300,
+    };
+  }
 
   if (isDeepRules) {
     return {
@@ -118,9 +130,17 @@ Accuracy rules:
 0. FACTS OVER STYLE: If persona tone conflicts with provided CBA/data facts, the facts win every time.
 1. Base CBA answers on provided CBA context.
 2. Use player/contract data context when relevant.
-3. DATE-CORRECTNESS (INTERNAL): verify player/team/contract facts against provided context for this chat before finalizing. If context is missing/conflicting, do not guess; ask a brief follow-up or state uncertainty.
-4. Do not add routine timestamp/disclaimer clutter unless uncertainty materially affects correctness.
-5. If information is insufficient, state what is known and what is needed.
+3. DATE-CORRECTNESS (INTERNAL): treat the injected "Current date context" as authoritative unless the user explicitly sets another date/year. Always align team, contract year, and option timing to that date context.
+4. Before finalizing, verify player/team/contract facts against provided context for this chat. If context is missing/conflicting, do not guess; ask a brief follow-up or state uncertainty.
+5. For negotiation questions, explicitly ground analysis in:
+   - current team + player status,
+   - exact contract structure (including option years),
+   - team cap/apron context,
+   - likely opt-in/opt-out path,
+   - leverage for both sides and a realistic contract range.
+6. Never claim outdated team context when provided player data in this chat shows otherwise.
+7. Do not add routine timestamp/disclaimer clutter unless uncertainty materially affects correctness.
+8. If information is insufficient, state what is known and what is needed.
 
 Formatting:
 - Use bullet points for lists.
@@ -168,6 +188,8 @@ export async function POST(req: NextRequest) {
     }
 
     const retrievalProfile = getRetrievalProfile(latestUserMessage.content);
+    const now = new Date();
+    const currentDateContext = now.toISOString().slice(0, 10);
     const cacheKey = `chatcba:resp:${makeStableHash(buildCacheKey(messages))}`;
     const redisCached = await getCachedResponse<{ text: string; sources: string[]; createdAt: number }>(cacheKey);
     const inMemoryCached = responseCache.get(cacheKey);
@@ -219,7 +241,7 @@ export async function POST(req: NextRequest) {
         if (i === trimmedMessages.length - 1 && m.role === "user") {
           return {
             role: "user" as const,
-            content: `${m.content}\n\n---\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${cbaContext}${playerContext}`,
+            content: `${m.content}\n\n---\n\nCurrent date context: ${currentDateContext}\nCurrent NBA season context in this app: 2025-26\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${cbaContext}${playerContext}`,
           };
         }
         return { role: m.role as "user" | "assistant", content: m.content };
