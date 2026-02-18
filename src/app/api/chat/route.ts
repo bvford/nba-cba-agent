@@ -54,9 +54,21 @@ function getRetrievalProfile(query: string): {
   maxOutputTokens: number;
 } {
   const q = query.toLowerCase();
+  const wordCount = q.split(/\s+/).filter(Boolean).length;
   const isDeepRules = /(trade|sign-and-trade|apron|exception|bird|matching|aggregate|base year|hard cap|cba article|section|clause)/.test(q);
   const isQuickDefinition = /(what is|explain|define|how does)/.test(q) && q.length < 120;
   const isNegotiation = /(negotia|extension|player option|opt[- ]?in|opt[- ]?out|re-sign|re sign|new deal|leverage|free agenc)/.test(q);
+  const isShortPrompt = wordCount <= 18;
+
+  if (isNegotiation && isShortPrompt) {
+    return {
+      maxChars: 11000,
+      maxGuideSections: 3,
+      maxCbaArticles: 3,
+      maxSectionsPerArticle: 2,
+      maxOutputTokens: 850,
+    };
+  }
 
   if (isNegotiation) {
     return {
@@ -125,6 +137,17 @@ How to answer strategy questions:
 - Explicitly mention key tradeoffs: timeline, cap flexibility, downside risk, and upside case.
 - Avoid hot takes and absolutist language; think like a disciplined exec room.
 - Keep strategy answers concise and digestible: default to 1 short setup paragraph + 3-5 bullets.
+- For short one-line prompts, still reason with discipline internally, then answer in the same concise format.
+
+Contract negotiation policy (critical):
+- Do NOT default to "max contract" conclusions.
+- Recommend max/supermax only if all of the following are clearly true in provided context:
+  1) player is eligible,
+  2) projected market/alternatives justify it,
+  3) team timeline and cap/apron constraints support it.
+- Otherwise, propose a realistic value band and structure (years, guarantees, options), plus a walk-away price.
+- For player-option decisions, explicitly evaluate opt-in vs opt-out expected value, injury risk, market risk, and leverage.
+- Use a probability-style framing when useful (e.g., likely / plausible / low-probability), not absolute certainty.
 
 Accuracy rules:
 0. FACTS OVER STYLE: If persona tone conflicts with provided CBA/data facts, the facts win every time.
@@ -139,8 +162,9 @@ Accuracy rules:
    - likely opt-in/opt-out path,
    - leverage for both sides and a realistic contract range.
 6. Never claim outdated team context when provided player data in this chat shows otherwise.
-7. Do not add routine timestamp/disclaimer clutter unless uncertainty materially affects correctness.
-8. If information is insufficient, state what is known and what is needed.
+7. Treat CBA 101 examples and historical anecdotes as illustrative unless they align with current player/team context in this chat.
+8. Do not add routine timestamp/disclaimer clutter unless uncertainty materially affects correctness.
+9. If information is insufficient, state what is known and what is needed.
 
 Formatting:
 - Use bullet points for lists.
