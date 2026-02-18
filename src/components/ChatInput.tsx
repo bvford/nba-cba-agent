@@ -90,13 +90,13 @@ export function ChatInput({
             disabled:opacity-50 disabled:cursor-not-allowed
             transition-colors duration-150"
         />
-        <button
-          onClick={handleSubmit}
-          disabled={disabled || !value.trim()}
-          className="rounded-xl bg-[linear-gradient(135deg,var(--color-nba-blue),var(--color-nba-blue-light))] px-4 py-2.5 font-medium text-white text-sm
-            transition-all duration-150 shadow-[0_8px_20px_rgba(255,107,61,0.35)] hover:brightness-110
+          <button
+            onClick={handleSubmit}
+            disabled={disabled || !value.trim()}
+            className="rounded-xl bg-[linear-gradient(135deg,var(--color-nba-red),#d24f67)] px-4 py-2.5 font-medium text-white text-sm
+            transition-all duration-150 shadow-[0_8px_18px_rgba(187,31,58,0.34)] hover:brightness-110
             disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[--color-nba-blue]"
-        >
+          >
           {disabled ? (
             <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
           ) : (

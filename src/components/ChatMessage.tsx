@@ -33,7 +33,7 @@ export function ChatMessage({
   return (
     <div className={`group flex ${isUser ? "justify-end" : "justify-start"} mb-5`}>
       {!isUser && (
-        <div className="w-7 h-7 rounded-lg bg-[--color-nba-blue] flex items-center justify-center text-white text-xs font-bold mr-2.5 mt-0.5 shrink-0 shadow-[0_4px_16px_rgba(29,66,138,0.35)]">
+        <div className="w-7 h-7 rounded-lg bg-[--color-accent] flex items-center justify-center text-[#1a2234] text-xs font-bold mr-2.5 mt-0.5 shrink-0 shadow-[0_4px_14px_rgba(227,189,108,0.22)]">
           AI
         </div>
       )}
@@ -41,7 +41,7 @@ export function ChatMessage({
         <div
           className={`rounded-2xl px-4 py-3 ${
             isUser
-              ? "bg-[--color-nba-blue] text-white rounded-br-md"
+              ? "bg-[linear-gradient(145deg,var(--color-nba-blue),var(--color-nba-blue-light))] text-white rounded-br-md"
               : "bg-[--color-surface-raised] text-[--color-text-primary] border border-[--color-border] rounded-bl-md shadow-sm"
           }`}
         >

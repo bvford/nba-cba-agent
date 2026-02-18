@@ -86,8 +86,8 @@ export function Sidebar({
           <button
             onClick={onNewChat}
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg
-              bg-[linear-gradient(135deg,var(--color-nba-blue),var(--color-nba-blue-light))] text-white text-sm font-semibold
-              transition-colors duration-150 shadow-[0_12px_28px_rgba(255,107,61,0.26)]"
+              bg-[linear-gradient(135deg,var(--color-nba-red),#d24f67)] text-white text-sm font-semibold
+              transition-colors duration-150 shadow-[0_10px_22px_rgba(187,31,58,0.3)]"
             title="New chat (Cmd/Ctrl+Shift+K)"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -159,7 +159,7 @@ export function Sidebar({
         </div>
 
         {/* Sources */}
-        <div className="p-3 border-t border-[--color-border] bg-gradient-to-b from-transparent to-[rgba(79,210,184,0.08)]">
+        <div className="p-3 border-t border-[--color-border] bg-gradient-to-b from-transparent to-[rgba(23,64,139,0.16)]">
           <p className="px-1 pb-2 text-[10px] uppercase tracking-[0.16em] text-[--color-text-muted]">
             Sources
           </p>

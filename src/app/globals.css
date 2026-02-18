@@ -2,19 +2,19 @@
 
 @theme {
   --color-nba-blue: #17408b;
-  --color-nba-red: #c9082a;
-  --color-nba-blue-light: #2d5eb5;
+  --color-nba-red: #bb1f3a;
+  --color-nba-blue-light: #2a59ab;
   --color-nba-blue-dark: #0e2d66;
   --color-surface: #0a1221;
-  --color-surface-raised: #121d31;
-  --color-surface-hover: #1b2942;
-  --color-border: #2f4266;
-  --color-border-light: #47608f;
+  --color-surface-raised: #111a2b;
+  --color-surface-hover: #18263c;
+  --color-border: #2a3c5e;
+  --color-border-light: #415a85;
   --color-text-primary: #f7f8fc;
-  --color-text-secondary: #d1d8e7;
-  --color-text-muted: #94a4c2;
-  --color-accent: #d8ab4b;
-  --color-accent-glow: rgba(216, 171, 75, 0.25);
+  --color-text-secondary: #ccd6e8;
+  --color-text-muted: #8fa1c1;
+  --color-accent: #e3bd6c;
+  --color-accent-glow: rgba(227, 189, 108, 0.24);
 }
 
 html,
@@ -36,12 +36,11 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.2;
-  background-image:
-    linear-gradient(to right, rgba(205, 215, 238, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(205, 215, 238, 0.025) 1px, transparent 1px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.015) 0 2px, transparent 2px 10px);
-  background-size: 40px 40px, 40px 40px, 100% 100%;
+  opacity: 0.12;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.1) 0%, transparent 30%),
+    radial-gradient(circle at 84% 8%, rgba(255, 255, 255, 0.08) 0%, transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 34%);
 }
 
 body::after {
@@ -85,17 +84,16 @@ body::after {
 /* Layered atmospheric background */
 .bg-gradient-page {
   background:
-    radial-gradient(ellipse at 6% 4%, rgba(23, 64, 139, 0.36) 0%, transparent 42%),
-    radial-gradient(ellipse at 95% 6%, rgba(201, 8, 42, 0.24) 0%, transparent 36%),
-    radial-gradient(ellipse at 50% 100%, rgba(216, 171, 75, 0.12) 0%, transparent 58%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 30%),
+    radial-gradient(ellipse at 8% 6%, rgba(23, 64, 139, 0.34) 0%, transparent 44%),
+    radial-gradient(ellipse at 94% 8%, rgba(187, 31, 58, 0.2) 0%, transparent 34%),
+    radial-gradient(ellipse at 50% 100%, rgba(227, 189, 108, 0.08) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, rgba(255, 255, 255, 0) 32%),
     var(--color-surface);
 }
 
 h1, h2, h3 {
-  font-family: "Barlow Condensed", "Barlow", system-ui, sans-serif;
-  letter-spacing: 0.015em;
-  text-transform: uppercase;
+  font-family: "Archivo", "Public Sans", system-ui, sans-serif;
+  letter-spacing: 0.01em;
 }
 
 button, input, textarea {
