@@ -93,12 +93,12 @@ export function ChatInput({
           <button
             onClick={handleSubmit}
             disabled={disabled || !value.trim()}
-            className="rounded-xl bg-[linear-gradient(135deg,var(--color-nba-red),#d24f67)] px-4 py-2.5 font-medium text-white text-sm
-            transition-all duration-150 shadow-[0_8px_18px_rgba(187,31,58,0.34)] hover:brightness-110
-            disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[--color-nba-blue]"
+            className="rounded-xl bg-[linear-gradient(135deg,#c8a24a,#d4b15e)] px-4 py-2.5 font-medium text-[#0d1117] text-sm
+            transition-all duration-150 shadow-[0_6px_14px_rgba(200,162,74,0.2)] hover:brightness-105
+            disabled:opacity-40 disabled:cursor-not-allowed"
           >
           {disabled ? (
-            <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+            <span className="inline-block w-4 h-4 border-2 border-[#0d1117]/40 border-t-[#0d1117] rounded-full animate-spin" />
           ) : (
             <svg
               width="18"

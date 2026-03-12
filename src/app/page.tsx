@@ -375,12 +375,6 @@ export default function Home() {
 
   return (
     <div className="relative isolate flex h-screen w-full overflow-x-hidden bg-gradient-page">
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <div className="absolute -top-28 -left-20 h-80 w-80 rounded-full bg-[rgba(23,64,139,0.18)] blur-3xl" />
-        <div className="absolute top-20 -right-16 h-72 w-72 rounded-full bg-[rgba(187,31,58,0.14)] blur-3xl" />
-        <div className="absolute bottom-[-8rem] left-1/2 h-80 w-[44rem] -translate-x-1/2 rounded-[999px] bg-[rgba(227,189,108,0.08)] blur-3xl" />
-      </div>
-
       {/* Sidebar */}
       <Sidebar
         chats={chats}
@@ -396,7 +390,7 @@ export default function Home() {
       <div className="flex-1 flex flex-col min-w-0 w-full lg:pl-72">
         {/* Header */}
         <header className="border-b border-[--color-border] bg-[--color-surface-raised]/88 backdrop-blur-xl sticky top-0 z-10">
-          <div className="retro-header-stripe h-[3px] w-full" />
+          <div className="header-accent-line w-full" />
           <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
             {/* Hamburger / sidebar toggle */}
             <button
@@ -467,7 +461,7 @@ export default function Home() {
             {isLanding ? (
               <div className="flex flex-col min-h-[calc(100vh-12rem)] w-full">
                 {/* Hero */}
-                <section className="retro-frame text-center pt-8 md:pt-12 px-4 md:px-8 rounded-3xl mb-8 md:mb-10">
+                <section className="panel-card text-center pt-8 md:pt-12 px-4 md:px-8 rounded-3xl mb-8 md:mb-10">
                   <p className="text-[11px] tracking-[0.12em] uppercase text-[--color-accent] mb-3">
                     Basketball Operations Assistant
                   </p>
@@ -481,7 +475,7 @@ export default function Home() {
                       priority
                     />
                   </div>
-                  <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[--color-text-primary] mb-3">
+                  <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[--color-text-primary] mb-3" style={{ fontFamily: "'Sora', system-ui, sans-serif" }}>
                     Your AI Salary Cap Expert
                   </h2>
                   <p className="text-[--color-text-secondary] max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
@@ -491,7 +485,7 @@ export default function Home() {
                   <div className="mt-6 pb-8 flex flex-wrap items-center justify-center gap-2.5">
                     <button
                       onClick={goToChatComposer}
-                      className="text-sm px-5 py-2.5 rounded-full bg-[linear-gradient(135deg,var(--color-nba-red),#d24f67)] text-white font-semibold shadow-[0_12px_24px_rgba(187,31,58,0.32)] hover:-translate-y-0.5 transition-all"
+                      className="text-sm px-5 py-2.5 rounded-full bg-[linear-gradient(135deg,#c8a24a,#d4b15e)] text-[#0d1117] font-semibold shadow-[0_8px_20px_rgba(200,162,74,0.25)] hover:-translate-y-0.5 transition-all"
                     >
                       Start Chatting
                     </button>
