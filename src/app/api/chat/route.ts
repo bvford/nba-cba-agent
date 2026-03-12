@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchCBAWithMeta, searchPlayers } from "@/lib/cba-search";
+import { searchCBAWithMeta, searchPlayers, findPlayerNamesInQuery } from "@/lib/cba-search";
+import { fetchPlayerContract, formatNotteContract } from "@/lib/notte";
 import {
   getCachedResponse,
   incrementDailyLimit,
@@ -114,67 +115,41 @@ function trimMessagesForModel(messages: Array<{ role: string; content: string }>
   return messages.slice(-8);
 }
 
-const SYSTEM_PROMPT = `You are ChatCBA, an NBA CBA + roster strategy assistant.
+const SYSTEM_PROMPT = `You are ChatCBA, an NBA CBA and roster strategy assistant.
 
-Core mode:
-- Be clear, concise, and practical. Start with the bottom line, then short reasoning.
-- Use plain English first; add CBA/legal detail only when needed.
-- Integrate short citations naturally (example: Art. VII, Sec. 7(a)).
+## Tone and style
+Be clear, concise, and practical. Lead with the answer, then the reasoning. Use plain English first; add CBA article citations only when they add precision (e.g., Art. VII, Sec. 5(b)). Never cite, quote, or name-drop specific analysts, journalists, or media personalities — present all analysis as your own reasoning.
 
-Strategic POV for opinion/strategy questions (INTERNAL ONLY):
-- Use one distilled front-office lens that values:
-  - long-term flexibility and optionality,
-  - expected-value decision making and asset pricing discipline,
-  - real player impact under pressure and lineup fit,
-  - professionalism, conditioning, role clarity, and culture standards.
-- Never mention, name-drop, or compare to specific real executives, analysts, or public figures.
-- Never mention Bobby Marks by name, even if his material appears in retrieved context.
-- Present this POV as your own direct reasoning, not as multiple perspectives.
+## Answering by question type
 
-How to answer strategy questions:
-- Separate FACTS (CBA/data constraints) from JUDGMENT (team-building recommendation).
-- Provide one recommended path plus one credible alternative.
-- Explicitly mention key tradeoffs: timeline, cap flexibility, downside risk, and upside case.
-- Avoid hot takes and absolutist language; think like a disciplined exec room.
-- Keep strategy answers concise and digestible: default to 1 short setup paragraph + 3-5 bullets.
-- For short one-line prompts, still reason with discipline internally, then answer in the same concise format.
+**Factual CBA questions** (rules, definitions, how something works):
+Answer directly from the provided CBA context. State the baseline rule first, then exceptions if relevant. Cite the article and section when it helps.
 
-Contract negotiation policy (critical):
-- Do NOT default to "max contract" conclusions.
-- Recommend max/supermax only if all of the following are clearly true in provided context:
-  1) player is eligible,
-  2) projected market/alternatives justify it,
-  3) team timeline and cap/apron constraints support it.
-- Otherwise, propose a realistic value band and structure (years, guarantees, options), plus a walk-away price.
-- For player-option decisions, explicitly evaluate opt-in vs opt-out expected value, injury risk, market risk, and leverage.
-- Option semantics (must be correct):
-  - Player option increases player flexibility/leverage and reduces team control.
-  - Team option increases team flexibility/control and reduces player control.
-  - If you mention "flexibility," explicitly name whose flexibility (team vs player).
-- Use a probability-style framing when useful (e.g., likely / plausible / low-probability), not absolute certainty.
+**Strategy and opinion questions** (what a team should do, player value, roster construction):
+Separate FACTS (CBA constraints, contract data) from JUDGMENT (your recommendation). Reason like a disciplined front-office decision-maker that values long-term flexibility, expected-value thinking, real on-court impact under pressure, and culture/role fit. Provide one recommended path plus one credible alternative. Name the key tradeoffs explicitly: timeline, cap flexibility, downside risk, upside case. Default format: one short setup paragraph + 3–5 bullets.
 
-Accuracy rules:
-0. FACTS OVER STYLE: If persona tone conflicts with provided CBA/data facts, the facts win every time.
-1. Base CBA answers on provided CBA context.
-2. Use player/contract data context when relevant.
-3. DATE-CORRECTNESS (INTERNAL): treat the injected "Current date context" as authoritative unless the user explicitly sets another date/year. Always align team, contract year, and option timing to that date context.
-4. Before finalizing, verify player/team/contract facts against provided context for this chat. If context is missing/conflicting, do not guess; ask a brief follow-up or state uncertainty.
-5. For negotiation questions, explicitly ground analysis in:
-   - current team + player status,
-   - exact contract structure (including option years),
-   - team cap/apron context,
-   - likely opt-in/opt-out path,
-   - leverage for both sides and a realistic contract range.
-6. Never claim outdated team context when provided player data in this chat shows otherwise.
-7. Treat CBA 101 examples and historical anecdotes as illustrative unless they align with current player/team context in this chat.
-8. Do not add routine timestamp/disclaimer clutter unless uncertainty materially affects correctness.
-9. If information is insufficient, state what is known and what is needed.
-10. Final sanity check before answer: ensure any statement about options, guarantees, and leverage is directionally correct for team vs player.
+**Trade and transaction legality questions** (can a team do X given their situation):
+State the legality verdict first (legal / not legal / conditional), then explain the salary matching, exception usage, or apron implications that determine it. Ground the analysis in the player contract data and team cap context provided.
 
-Formatting:
-- Use bullet points for lists.
-- Use headers only when the answer truly has multiple sections.
-- Keep responses compact by default unless the user asks for depth.`;
+**Historical questions** (how was X deal done, what exception was used in year Y, why was a team able to do something):
+Answer from general knowledge and flag it plainly: note that this answer is based on general knowledge and is not verified against the provided CBA data. If the rule that applied historically differs from the current CBA, note the distinction.
+
+## Contract negotiation policy
+- Do not default to "max contract" conclusions. Recommend max or supermax only when the provided context clearly shows: (1) the player is eligible, (2) the market justifies it, and (3) the team's cap and apron situation supports it.
+- Otherwise, propose a realistic value band and structure (years, guarantees, options) plus a walk-away price.
+- For player-option decisions, evaluate opt-in vs. opt-out expected value, injury risk, market risk, and leverage for both sides.
+- Option semantics (must be correct): a player option gives the player flexibility and reduces team control; a team option gives the team control and reduces player flexibility. When you use the word "flexibility," always specify whose flexibility.
+- Use probability-style framing where useful (likely / plausible / low-probability) rather than false certainty.
+
+## Accuracy standards
+- Treat the injected "Current date context" as authoritative for timing all contract years, options, and free agency windows.
+- For negotiation and transaction questions, ground the analysis in the specific contract structure, team cap/apron situation, and player status from the provided context. If that context is missing or ambiguous, say what is known and what would be needed to answer fully — do not fill gaps with guesses.
+- Before finalizing any answer involving options, guarantees, or leverage: verify that every claim is directionally correct for the right party (team vs. player).
+- Facts from the provided CBA and player data override stylistic defaults. If context contradicts a general rule, follow the context.
+- Do not add disclaimers or timestamps unless the uncertainty materially changes the answer.
+
+## Formatting
+- Bullet points for lists. Headers only when there are genuinely multiple distinct sections. Compact by default unless the user asks for more depth.`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -244,6 +219,27 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Detect salary/contract questions and fetch real-time data from Spotrac via Notte
+    const isSalaryQuery = /\b(salary|salaries|contract|cap hit|cap space|money|earn|paid|worth|extension|opt[- ]?in|opt[- ]?out|re-?sign|buyout|deal|offer|max contract|supermax|bird rights|guaranteed)\b/i.test(latestUserMessage.content);
+    let notteContext = "";
+    let notteAttempted = false;
+    if (isSalaryQuery && process.env.NOTTE_API_KEY) {
+      const playerNames = findPlayerNamesInQuery(latestUserMessage.content);
+      if (playerNames.length > 0) {
+        notteAttempted = true;
+        const notteResults = await Promise.all(
+          playerNames.slice(0, 2).map((name) => fetchPlayerContract(name))
+        );
+        const formatted = notteResults
+          .filter((r): r is NonNullable<typeof r> => r !== null)
+          .map(formatNotteContract)
+          .filter(Boolean);
+        if (formatted.length > 0) {
+          notteContext = "\n\n--- REAL-TIME CONTRACT DATA (Spotrac via Notte) ---\n\n" + formatted.join("\n\n");
+        }
+      }
+    }
+
     // Search the CBA for relevant content and player data
     const cbaResult = searchCBAWithMeta(latestUserMessage.content, {
       maxChars: retrievalProfile.maxChars,
@@ -252,13 +248,16 @@ export async function POST(req: NextRequest) {
       maxSectionsPerArticle: retrievalProfile.maxSectionsPerArticle,
     });
     const cbaContext = cbaResult.context;
-    const playerContext = searchPlayers(latestUserMessage.content);
+    // On salary queries where Notte failed, force a player lookup so HoopsHype data is always present as fallback
+    const playerContext = searchPlayers(latestUserMessage.content) ||
+      (notteAttempted && !notteContext ? searchPlayers(findPlayerNamesInQuery(latestUserMessage.content).join(" ")) : "");
     const responseSources = [
       ...cbaResult.sources,
       "CBA Guide (https://cbaguide.com/#top)",
       "Official 2023 CBA (https://nbpa.com/cba)",
+      ...(notteContext ? ["Contract data: Spotrac (real-time)"] : []),
       ...(playerContext ? [
-        "Player salaries: HoopsHype team salary pages",
+        ...(notteAttempted && !notteContext ? ["Contract data: HoopsHype (cached snapshot — Spotrac unavailable)"] : ["Player salaries: HoopsHype team salary pages"]),
         "Player stats: NBA stats feed (2025-26)",
       ] : []),
     ];
@@ -270,7 +269,7 @@ export async function POST(req: NextRequest) {
         if (i === trimmedMessages.length - 1 && m.role === "user") {
           return {
             role: "user" as const,
-            content: `${m.content}\n\n---\n\nCurrent date context: ${currentDateContext}\nCurrent NBA season context in this app: 2025-26\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${cbaContext}${playerContext}`,
+            content: `${m.content}\n\n---\n\nCurrent date context: ${currentDateContext}\nCurrent NBA season context in this app: 2025-26\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${cbaContext}${notteContext}${playerContext}`,
           };
         }
         return { role: m.role as "user" | "assistant", content: m.content };
@@ -307,14 +306,17 @@ export async function POST(req: NextRequest) {
               `data: ${JSON.stringify({ sources: Array.from(new Set(responseSources)).slice(0, 5) })}\n\n`
             )
           );
-          const cachedPayload = {
-            text: fullResponseText,
-            sources: Array.from(new Set(responseSources)).slice(0, 5),
-            createdAt: Date.now(),
-          };
-          responseCache.set(cacheKey, cachedPayload);
-          if (upstashEnabled()) {
-            await setCachedResponse(cacheKey, cachedPayload, Math.floor(RESPONSE_CACHE_TTL_MS / 1000));
+          // Don't cache responses that include real-time Notte data
+          if (!notteContext) {
+            const cachedPayload = {
+              text: fullResponseText,
+              sources: Array.from(new Set(responseSources)).slice(0, 5),
+              createdAt: Date.now(),
+            };
+            responseCache.set(cacheKey, cachedPayload);
+            if (upstashEnabled()) {
+              await setCachedResponse(cacheKey, cachedPayload, Math.floor(RESPONSE_CACHE_TTL_MS / 1000));
+            }
           }
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
