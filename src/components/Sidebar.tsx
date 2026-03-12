@@ -85,9 +85,9 @@ export function Sidebar({
         <div className="p-3 border-b border-[--color-border] flex items-center gap-2">
           <button
             onClick={onNewChat}
-            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg
-              bg-[linear-gradient(135deg,var(--color-nba-red),#d24f67)] text-white text-sm font-semibold
-              transition-colors duration-150 shadow-[0_10px_22px_rgba(187,31,58,0.3)] hover:brightness-110"
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg
+              bg-[linear-gradient(135deg,#c8a24a,#d4b15e)] text-[#0d1117] text-sm font-semibold
+              transition-all duration-150 shadow-[0_6px_16px_rgba(200,162,74,0.2)] hover:brightness-105"
             title="New chat (Cmd/Ctrl+Shift+K)"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -163,19 +163,19 @@ export function Sidebar({
           <p className="px-1 pb-2 text-[10px] uppercase tracking-[0.16em] text-[--color-text-muted]">
             Sources
           </p>
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {SOURCE_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 target={link.href.startsWith("http") ? "_blank" : undefined}
                 rel={link.href.startsWith("http") ? "noreferrer" : undefined}
-                className="block rounded-xl border border-[--color-border] hover:border-[--color-border-light] bg-[--color-surface]/45 hover:bg-[--color-surface-hover]/75 px-2.5 py-2 transition-colors"
+                className="block rounded-xl border border-[--color-border] hover:border-[--color-accent]/40 bg-[--color-surface]/45 hover:bg-[--color-surface-hover]/75 px-3 py-2.5 transition-colors"
               >
-                <p className="text-xs text-[--color-text-primary] leading-tight font-medium">
+                <p className="text-[13px] text-[--color-text-primary] leading-tight font-medium">
                   {link.label}
                 </p>
-                <p className="text-[10px] text-[--color-text-muted] mt-0.5">
+                <p className="text-xs text-[--color-text-muted] mt-1">
                   {link.note}
                 </p>
               </a>

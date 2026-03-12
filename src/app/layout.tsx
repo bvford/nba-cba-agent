@@ -27,13 +27,13 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Archivo:wght@500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap"
           rel="stylesheet"
         />
       </head>
       <body
         className="antialiased bg-gradient-page"
-        style={{ fontFamily: "'Public Sans', system-ui, sans-serif" }}
+        style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
       >
         {children}
       </body>

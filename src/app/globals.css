@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-nba-blue: #17408b;
-  --color-nba-red: #bb1f3a;
-  --color-nba-blue-light: #2a59ab;
-  --color-nba-blue-dark: #0e2d66;
-  --color-surface: #0a1221;
-  --color-surface-raised: #111a2b;
-  --color-surface-hover: #18263c;
-  --color-border: #2a3c5e;
-  --color-border-light: #415a85;
-  --color-text-primary: #f7f8fc;
-  --color-text-secondary: #ccd6e8;
-  --color-text-muted: #8fa1c1;
-  --color-accent: #e3bd6c;
-  --color-accent-glow: rgba(227, 189, 108, 0.24);
+  --color-nba-blue: #1e4ea6;
+  --color-nba-blue-light: #2c5fc8;
+  --color-nba-blue-dark: #163a80;
+  --color-nba-red: #c0203c;
+  --color-surface: #0d1117;
+  --color-surface-raised: #161c29;
+  --color-surface-hover: #1d2538;
+  --color-border: #1e2840;
+  --color-border-light: #2e3f60;
+  --color-text-primary: #e8eef8;
+  --color-text-secondary: #7e96bb;
+  --color-text-muted: #4a5e7a;
+  --color-accent: #c8a24a;
+  --color-accent-glow: rgba(200, 162, 74, 0.15);
 }
 
 html,
@@ -27,52 +27,22 @@ body {
   background: var(--color-surface);
   color: var(--color-text-primary);
   min-height: 100vh;
-  letter-spacing: 0.004em;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.15;
-  background:
-    radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.1) 0%, transparent 30%),
-    radial-gradient(circle at 84% 8%, rgba(255, 255, 255, 0.08) 0%, transparent 28%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 34%);
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.08;
-  background:
-    repeating-linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.015) 0,
-      rgba(255, 255, 255, 0.015) 1px,
-      transparent 1px,
-      transparent 5px
-    );
+  letter-spacing: 0.01em;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #3c4a69 0%, #2b3348 100%);
+  background: var(--color-border-light);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border-light);
+  background: var(--color-text-muted);
 }
 
 /* Typing animation */
@@ -87,45 +57,33 @@ body::after {
   color: var(--color-accent);
 }
 
-/* Layered atmospheric background */
 .bg-gradient-page {
   background:
-    radial-gradient(ellipse at 8% 6%, rgba(23, 64, 139, 0.34) 0%, transparent 44%),
-    radial-gradient(ellipse at 94% 8%, rgba(187, 31, 58, 0.2) 0%, transparent 34%),
-    radial-gradient(ellipse at 50% 100%, rgba(227, 189, 108, 0.08) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, rgba(255, 255, 255, 0) 32%),
+    radial-gradient(ellipse 90% 55% at 50% -5%, rgba(30, 78, 166, 0.1) 0%, transparent 65%),
     var(--color-surface);
 }
 
-.retro-frame {
-  background:
-    linear-gradient(160deg, rgba(17, 26, 43, 0.9), rgba(10, 17, 30, 0.9));
+/* Subtle panel frame used on landing hero */
+.panel-card {
+  background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 18px 40px rgba(4, 7, 14, 0.45);
+  box-shadow: 0 24px 48px rgba(4, 8, 18, 0.5);
 }
 
-.retro-header-stripe {
-  background:
-    linear-gradient(
-      90deg,
-      var(--color-nba-blue) 0%,
-      var(--color-nba-blue) 45%,
-      var(--color-accent) 45%,
-      var(--color-accent) 55%,
-      var(--color-nba-red) 55%,
-      var(--color-nba-red) 100%
-    );
+/* Single-color accent top border for the header */
+.header-accent-line {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--color-accent) 30%, var(--color-accent) 70%, transparent 100%);
+  opacity: 0.6;
 }
 
 h1, h2, h3 {
-  font-family: "Archivo", "Public Sans", system-ui, sans-serif;
-  letter-spacing: 0.01em;
+  font-family: "Sora", system-ui, sans-serif;
+  letter-spacing: -0.01em;
 }
 
 button, input, textarea {
-  letter-spacing: 0.01em;
+  letter-spacing: 0.005em;
 }
 
 main, header, footer {
