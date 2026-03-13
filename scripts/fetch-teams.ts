@@ -7,7 +7,16 @@ import { writeFileSync } from "fs";
 import { join } from "path";
 import * as cheerio from "cheerio";
 
-const SPOTRAC_URL = "https://www.spotrac.com/nba/cap/_/year/2025";
+// NBA league year starts July 1. The Spotrac URL uses the season's start year:
+// Jan–Jun 2026 → year=2025 (2025-26 season); Jul–Dec 2026 → year=2026 (2026-27 season)
+function currentNBAYear(): { year: number; season: string } {
+  const now = new Date();
+  const year = now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+  return { year, season: `${year}-${String(year + 1).slice(2)}` };
+}
+
+const { year: NBA_YEAR, season: NBA_SEASON } = currentNBAYear();
+const SPOTRAC_URL = `https://www.spotrac.com/nba/cap/_/year/${NBA_YEAR}`;
 
 interface TeamCapEntry {
   abbr: string;
@@ -139,7 +148,7 @@ async function fetchTeams(): Promise<void> {
 
   const output: TeamsData = {
     fetchedAt: new Date().toISOString().slice(0, 10),
-    season: "2025-26",
+    season: NBA_SEASON,
     thresholds,
     exceptions,
     teams: teams.sort((a, b) => a.abbr.localeCompare(b.abbr)),

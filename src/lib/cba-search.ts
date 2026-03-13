@@ -456,7 +456,8 @@ export function searchTeams(query: string): string {
 
   const { thresholds, exceptions } = teams;
   const lines: string[] = [
-    `\n\n--- TEAM CAP DATA (${teams.season} — Spotrac, fetched ${teams.fetchedAt}) ---\n`,
+    `\n\n--- TEAM CAP DATA (${teams.season} — Spotrac, fetched ${teams.fetchedAt}) ---`,
+    `Thresholds: Salary cap ${fmt(thresholds.salaryCap)} | First apron ${fmt(thresholds.firstApron)} | Second apron ${fmt(thresholds.secondApron)}\n`,
   ];
 
   for (const abbr of matchedAbbrs) {
@@ -468,7 +469,6 @@ export function searchTeams(query: string): string {
     const overFirstApron = capAllocations > thresholds.firstApron;
     const overSecondApron = capAllocations > thresholds.secondApron;
 
-    const taxDist = capAllocations - 187930000; // 2025-26 luxury tax ~$187.9M
     const firstApronDist = capAllocations - thresholds.firstApron;
     const secondApronDist = capAllocations - thresholds.secondApron;
 
@@ -482,7 +482,7 @@ export function searchTeams(query: string): string {
     if (overSecondApron) {
       availableExceptions = "No MLE or bi-annual exception (over second apron)";
     } else if (overFirstApron) {
-      availableExceptions = `Taxpayer MLE: ${fmt(exceptions.taxpayerMLE)} (use hard-caps team at second apron)`;
+      availableExceptions = `Taxpayer MLE: ${fmt(exceptions.taxpayerMLE)} (using it hard-caps team at second apron)`;
     } else if (overCap) {
       availableExceptions = `Non-Taxpayer MLE: ${fmt(exceptions.nonTaxpayerMLE)}, Bi-Annual: ${fmt(exceptions.biannual)}`;
     } else {
@@ -493,13 +493,24 @@ export function searchTeams(query: string): string {
     lines.push(`  Total cap allocations: ${fmt(capAllocations)}`);
     lines.push(`  Status: ${apronStatus}`);
     if (overCap) {
-      lines.push(`  Distance over luxury tax (~$187.9M): ${taxDist > 0 ? fmt(taxDist) + " over" : fmt(-taxDist) + " under"}`);
-      lines.push(`  Distance to first apron ($${(thresholds.firstApron / 1e6).toFixed(1)}M): ${firstApronDist > 0 ? fmt(firstApronDist) + " over" : fmt(-firstApronDist) + " under"}`);
-      lines.push(`  Distance to second apron ($${(thresholds.secondApron / 1e6).toFixed(1)}M): ${secondApronDist > 0 ? fmt(secondApronDist) + " over" : fmt(-secondApronDist) + " under"}`);
+      lines.push(`  Distance to first apron: ${firstApronDist > 0 ? fmt(firstApronDist) + " over" : fmt(-firstApronDist) + " under"}`);
+      lines.push(`  Distance to second apron: ${secondApronDist > 0 ? fmt(secondApronDist) + " over" : fmt(-secondApronDist) + " under"}`);
     }
     lines.push(`  Available exception(s): ${availableExceptions}`);
     lines.push("");
   }
+
+  // Spotrac cap accounting notes — critical for correct interpretation
+  lines.push(`**How to read Spotrac "Total Cap Allocations":**`);
+  lines.push(`- This figure INCLUDES cap holds, which are placeholder amounts that may overstate actual committed payroll:`);
+  lines.push(`  - Unsigned draft picks carry a rookie-scale cap hold until signed or renounced`);
+  lines.push(`  - Unsigned free agents with Bird/Early Bird rights carry a qualifying offer hold (or salary-based hold)`);
+  lines.push(`  - Each unfilled roster spot carries a minimum salary hold (~${fmt(600000)})`);
+  lines.push(`- A team can renounce holds to create more cap room — so a team's "real" room may be higher than the cap space figure suggests`);
+  lines.push(`- Option years (player options, team options) count at full option value until the option is exercised or declined`);
+  lines.push(`- Dead cap (waived players with guaranteed money remaining) IS included and cannot be renounced`);
+  lines.push(`- Two-way contracts (~$576K) are NOT included in standard cap allocations`);
+  lines.push(`- The luxury tax line is NOT shown here — use general knowledge or note it's typically ~$30–35M above the salary cap`);
 
   return lines.join("\n");
 }
