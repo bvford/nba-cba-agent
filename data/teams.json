@@ -1,0 +1,167 @@
+{
+  "fetchedAt": "2026-03-13",
+  "season": "2025-26",
+  "thresholds": {
+    "capFloor": 139182000,
+    "salaryCap": 154647000,
+    "firstApron": 195945000,
+    "secondApron": 207824000
+  },
+  "exceptions": {
+    "nonTaxpayerMLE": 14104000,
+    "taxpayerMLE": 5685000,
+    "biannual": 5134000
+  },
+  "teams": [
+    {
+      "abbr": "ATL",
+      "capAllocations": 194436074,
+      "capSpace": 0
+    },
+    {
+      "abbr": "BKN",
+      "capAllocations": 150429217,
+      "capSpace": 4217783
+    },
+    {
+      "abbr": "BOS",
+      "capAllocations": 193898873,
+      "capSpace": 0
+    },
+    {
+      "abbr": "CHA",
+      "capAllocations": 183321954,
+      "capSpace": 0
+    },
+    {
+      "abbr": "CHI",
+      "capAllocations": 187426179,
+      "capSpace": 0
+    },
+    {
+      "abbr": "CLE",
+      "capAllocations": 226181970,
+      "capSpace": 0
+    },
+    {
+      "abbr": "DAL",
+      "capAllocations": 198582307,
+      "capSpace": 0
+    },
+    {
+      "abbr": "DEN",
+      "capAllocations": 200743895,
+      "capSpace": 0
+    },
+    {
+      "abbr": "DET",
+      "capAllocations": 193011869,
+      "capSpace": 0
+    },
+    {
+      "abbr": "GSW",
+      "capAllocations": 233853209,
+      "capSpace": 0
+    },
+    {
+      "abbr": "HOU",
+      "capAllocations": 201330454,
+      "capSpace": 0
+    },
+    {
+      "abbr": "IND",
+      "capAllocations": 191900207,
+      "capSpace": 0
+    },
+    {
+      "abbr": "LAC",
+      "capAllocations": 199054230,
+      "capSpace": 0
+    },
+    {
+      "abbr": "LAL",
+      "capAllocations": 211386300,
+      "capSpace": 0
+    },
+    {
+      "abbr": "MEM",
+      "capAllocations": 156895925,
+      "capSpace": 0
+    },
+    {
+      "abbr": "MIA",
+      "capAllocations": 197928516,
+      "capSpace": 0
+    },
+    {
+      "abbr": "MIL",
+      "capAllocations": 181349997,
+      "capSpace": 0
+    },
+    {
+      "abbr": "MIN",
+      "capAllocations": 228841297,
+      "capSpace": 0
+    },
+    {
+      "abbr": "NOP",
+      "capAllocations": 207342163,
+      "capSpace": 0
+    },
+    {
+      "abbr": "NYK",
+      "capAllocations": 209750538,
+      "capSpace": 0
+    },
+    {
+      "abbr": "OKC",
+      "capAllocations": 188772810,
+      "capSpace": 0
+    },
+    {
+      "abbr": "ORL",
+      "capAllocations": 193735494,
+      "capSpace": 0
+    },
+    {
+      "abbr": "PHI",
+      "capAllocations": 199772500,
+      "capSpace": 0
+    },
+    {
+      "abbr": "PHX",
+      "capAllocations": 206796989,
+      "capSpace": 0
+    },
+    {
+      "abbr": "POR",
+      "capAllocations": 197927822,
+      "capSpace": 0
+    },
+    {
+      "abbr": "SAC",
+      "capAllocations": 213276741,
+      "capSpace": 0
+    },
+    {
+      "abbr": "SAS",
+      "capAllocations": 182990669,
+      "capSpace": 0
+    },
+    {
+      "abbr": "TOR",
+      "capAllocations": 194756449,
+      "capSpace": 0
+    },
+    {
+      "abbr": "UTA",
+      "capAllocations": 172574640,
+      "capSpace": 0
+    },
+    {
+      "abbr": "WAS",
+      "capAllocations": 232033397,
+      "capSpace": 0
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import cbaArticles from "../../data/cba-articles.json";
 import cbaGuide from "../../data/cba-guide.json";
 import cba101Data from "../../data/cba101.json";
 import playerData from "../../data/players.json";
+import teamsData from "../../data/teams.json";
 
 export interface CBAArticle {
   id: string;
@@ -416,6 +417,91 @@ export function findPlayerNamesInQuery(query: string): string[] {
     .sort((a, b) => b.score - a.score || b.player.points - a.player.points)
     .slice(0, 3)
     .map((m) => m.player.name);
+}
+
+interface TeamEntry {
+  abbr: string;
+  capAllocations: number;
+  capSpace: number;
+}
+
+interface TeamsJson {
+  fetchedAt: string;
+  season: string;
+  thresholds: { capFloor: number; salaryCap: number; firstApron: number; secondApron: number };
+  exceptions: { nonTaxpayerMLE: number; taxpayerMLE: number; biannual: number };
+  teams: TeamEntry[];
+}
+
+const teams = teamsData as TeamsJson;
+
+function fmt(n: number): string {
+  return "$" + (n / 1e6).toFixed(1) + "M";
+}
+
+export function searchTeams(query: string): string {
+  const queryLower = query.toLowerCase();
+  const matchedAbbrs = new Set<string>();
+
+  for (const [abbr, names] of Object.entries(TEAM_NAMES)) {
+    for (const name of names) {
+      if (queryLower.includes(name)) {
+        matchedAbbrs.add(abbr);
+        break;
+      }
+    }
+  }
+
+  if (matchedAbbrs.size === 0) return "";
+
+  const { thresholds, exceptions } = teams;
+  const lines: string[] = [
+    `\n\n--- TEAM CAP DATA (${teams.season} — Spotrac, fetched ${teams.fetchedAt}) ---\n`,
+  ];
+
+  for (const abbr of matchedAbbrs) {
+    const t = teams.teams.find((x) => x.abbr === abbr || x.abbr === abbr.replace("PHO", "PHX"));
+    if (!t) continue;
+
+    const { capAllocations, capSpace } = t;
+    const overCap = capAllocations > thresholds.salaryCap;
+    const overFirstApron = capAllocations > thresholds.firstApron;
+    const overSecondApron = capAllocations > thresholds.secondApron;
+
+    const taxDist = capAllocations - 187930000; // 2025-26 luxury tax ~$187.9M
+    const firstApronDist = capAllocations - thresholds.firstApron;
+    const secondApronDist = capAllocations - thresholds.secondApron;
+
+    let apronStatus: string;
+    if (overSecondApron) apronStatus = "Over second apron";
+    else if (overFirstApron) apronStatus = "Over first apron (hard-capped at second apron)";
+    else if (overCap) apronStatus = "Over cap, under first apron";
+    else apronStatus = "Under cap";
+
+    let availableExceptions: string;
+    if (overSecondApron) {
+      availableExceptions = "No MLE or bi-annual exception (over second apron)";
+    } else if (overFirstApron) {
+      availableExceptions = `Taxpayer MLE: ${fmt(exceptions.taxpayerMLE)} (use hard-caps team at second apron)`;
+    } else if (overCap) {
+      availableExceptions = `Non-Taxpayer MLE: ${fmt(exceptions.nonTaxpayerMLE)}, Bi-Annual: ${fmt(exceptions.biannual)}`;
+    } else {
+      availableExceptions = `Cap room: ${fmt(capSpace)} available`;
+    }
+
+    lines.push(`**${abbr}**`);
+    lines.push(`  Total cap allocations: ${fmt(capAllocations)}`);
+    lines.push(`  Status: ${apronStatus}`);
+    if (overCap) {
+      lines.push(`  Distance over luxury tax (~$187.9M): ${taxDist > 0 ? fmt(taxDist) + " over" : fmt(-taxDist) + " under"}`);
+      lines.push(`  Distance to first apron ($${(thresholds.firstApron / 1e6).toFixed(1)}M): ${firstApronDist > 0 ? fmt(firstApronDist) + " over" : fmt(-firstApronDist) + " under"}`);
+      lines.push(`  Distance to second apron ($${(thresholds.secondApron / 1e6).toFixed(1)}M): ${secondApronDist > 0 ? fmt(secondApronDist) + " over" : fmt(-secondApronDist) + " under"}`);
+    }
+    lines.push(`  Available exception(s): ${availableExceptions}`);
+    lines.push("");
+  }
+
+  return lines.join("\n");
 }
 
 // Get a table of contents for the system prompt

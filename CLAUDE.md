@@ -14,10 +14,11 @@ npm run build       # Build for production
 npm start           # Run production server
 
 # Data scripts (run as needed to refresh data)
-npm run fetch-cba                  # Download CBA articles from GitHub
-tsx scripts/fetch-players.ts       # Refresh player stats & salaries
-tsx scripts/process-cba101.ts      # Rebuild educational content
-tsx scripts/process-guide.ts       # Rebuild guide summaries
+npm run fetch-cba                   # Download CBA articles from GitHub
+npx tsx scripts/fetch-players.ts    # Refresh player stats & salaries
+npx tsx scripts/fetch-teams.ts      # Refresh team cap data from Spotrac
+npx tsx scripts/process-cba101.ts   # Rebuild educational content
+npx tsx scripts/process-guide.ts    # Rebuild guide summaries
 ```
 
 There are no lint or test scripts configured.
@@ -61,12 +62,12 @@ Browser (React chat UI)
 | `src/lib/cba-search.ts` | Keyword-based search across CBA data; adaptive retrieval profiles |
 | `src/lib/upstash.ts` | Redis wrapper; gracefully degrades to in-memory if not configured |
 | `src/lib/chat-store.ts` | localStorage chat persistence (client-side only) |
-| `data/*.json` | Static JSON data — CBA articles (1.3 MB), guide, cba101, players |
+| `data/*.json` | Static JSON data — CBA articles (1.3 MB), guide, cba101, players, teams |
 | `scripts/` | One-off data fetch/processing scripts; run manually to update data |
 
 ### Retrieval System
 
-`cba-search.ts` runs keyword matching against four data sources: `cba-articles.json`, `cba-guide.json`, `cba101.json`, and `players.json`. The retrieval profile (how many tokens, which sources) adapts based on query type — rules questions get more article depth than quick definitions.
+`cba-search.ts` runs keyword matching across five data sources: `cba-articles.json`, `cba-guide.json`, `cba101.json`, `players.json`, and `teams.json`. When a team is mentioned, `searchTeams()` injects that team's cap allocations, apron status, distance to each threshold, and available exceptions. The retrieval profile (how many tokens, which sources) adapts based on query type.
 
 The Claude model used is configured in `src/app/api/chat/route.ts` (currently `claude-sonnet-4-5-20250929`).
 
@@ -80,6 +81,10 @@ The `data/` JSON files are committed to the repo and served statically. To updat
 3. **nbaapi.com** — season stats
 
 If BallDontLie hits its rate limit mid-fetch, it stops gracefully after 4 consecutive failures and uses what it collected. Run the script again in a few hours to get full coverage. Do not add hard-coded team overrides — fix data issues by re-running the fetch script instead.
+
+**Team cap data:** `fetch-teams.ts` scrapes Spotrac `/nba/cap/_/year/2025` (server-rendered HTML table) and writes `data/teams.json` with per-team payroll, cap space, league-wide thresholds (cap floor, salary cap, first/second apron), and exception amounts. Run any time to get current Spotrac numbers.
+
+**Automated refresh:** `.github/workflows/refresh-players.yml` runs both `fetch-players.ts` and `fetch-teams.ts` on the 1st of each month at 8am UTC, commits changes, and pushes. Requires `BALLDONTLIE_API_KEY` set as a GitHub repository secret.
 
 ## UI Design
 

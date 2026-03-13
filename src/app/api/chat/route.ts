@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchCBAWithMeta, searchPlayers, findPlayerNamesInQuery } from "@/lib/cba-search";
+import { searchCBAWithMeta, searchPlayers, searchTeams, findPlayerNamesInQuery } from "@/lib/cba-search";
 import { fetchPlayerContract, formatNotteContract } from "@/lib/notte";
 import {
   getCachedResponse,
@@ -251,6 +251,7 @@ export async function POST(req: NextRequest) {
     // On salary queries where Notte failed, force a player lookup so HoopsHype data is always present as fallback
     const playerContext = searchPlayers(latestUserMessage.content) ||
       (notteAttempted && !notteContext ? searchPlayers(findPlayerNamesInQuery(latestUserMessage.content).join(" ")) : "");
+    const teamContext = searchTeams(latestUserMessage.content);
     const responseSources = [
       ...cbaResult.sources,
       "CBA Guide (https://cbaguide.com/#top)",
@@ -260,6 +261,7 @@ export async function POST(req: NextRequest) {
         ...(notteAttempted && !notteContext ? ["Contract data: HoopsHype (cached snapshot — Spotrac unavailable)"] : ["Player salaries: HoopsHype team salary pages"]),
         "Player stats: NBA stats feed (2025-26)",
       ] : []),
+      ...(teamContext ? ["Team cap data: Spotrac (2025-26 snapshot)"] : []),
     ];
 
     // Build the messages array with CBA context injected
@@ -269,7 +271,7 @@ export async function POST(req: NextRequest) {
         if (i === trimmedMessages.length - 1 && m.role === "user") {
           return {
             role: "user" as const,
-            content: `${m.content}\n\n---\n\nCurrent date context: ${currentDateContext}\nCurrent NBA season context in this app: 2025-26\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${cbaContext}${notteContext}${playerContext}`,
+            content: `${m.content}\n\n---\n\nCurrent date context: ${currentDateContext}\nCurrent NBA season context in this app: 2025-26\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${cbaContext}${notteContext}${playerContext}${teamContext}`,
           };
         }
         return { role: m.role as "user" | "assistant", content: m.content };
