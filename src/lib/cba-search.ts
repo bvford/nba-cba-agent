@@ -52,11 +52,6 @@ const articles: CBAArticle[] = cbaArticles as CBAArticle[];
 const guideSections: CBAArticle[] = cbaGuide as CBAArticle[];
 const cba101Sections: CBAArticle[] = cba101Data as CBAArticle[];
 
-const PLAYER_TEAM_OVERRIDES: Record<string, string> = {
-  "james harden": "CLE",
-  "anthony davis": "WAS",
-  "mark williams": "PHX",
-};
 
 // Break each article into sections (split on ## headings)
 function getSections(article: CBAArticle): { heading: string; text: string }[] {
@@ -288,7 +283,7 @@ const TEAM_NAMES: Record<string, string[]> = {
 };
 
 function formatPlayerInfo(p: PlayerData): string {
-  const team = PLAYER_TEAM_OVERRIDES[p.name.toLowerCase()] || p.team;
+  const team = p.team;
   const gp = p.games || 1;
   const ppg = (p.points / gp).toFixed(1);
   const rpg = (p.rebounds / gp).toFixed(1);
@@ -367,7 +362,7 @@ export function searchPlayers(query: string): string {
       if (queryLower.includes(name)) {
         const teamPlayers = players
           .filter((p) => {
-            const effectiveTeam = PLAYER_TEAM_OVERRIDES[p.name.toLowerCase()] || p.team;
+            const effectiveTeam = p.team;
             return effectiveTeam === abbr || effectiveTeam === abbr.replace("PHX", "PHO");
           })
           .sort((a, b) => b.points - a.points)
@@ -390,11 +385,37 @@ export function searchPlayers(query: string): string {
 
   if (results.length === 0) return "";
 
-  let context = "\n\n--- PLAYER DATA (2025-26 snapshot from project dataset) ---\n\n";
+  let context = "\n\n--- PLAYER DATA (2025-26 snapshot — HoopsHype salaries, NBA stats feed) ---\n\n";
   for (const p of results.slice(0, 15)) {
     context += formatPlayerInfo(p) + "\n";
   }
   return context;
+}
+
+// Return the full names of players mentioned in a query (for Notte salary lookups)
+export function findPlayerNamesInQuery(query: string): string[] {
+  const queryLower = query.toLowerCase();
+  const queryWords = queryLower.replace(/[^a-z0-9\s'-]/g, " ").split(/\s+/).filter(Boolean);
+  const matched: { player: PlayerData; score: number }[] = [];
+
+  for (const p of players) {
+    const nameLower = p.name.toLowerCase();
+    const nameParts = nameLower.split(" ");
+    const firstName = nameParts[0];
+    const lastName = nameParts[nameParts.length - 1];
+    let score = 0;
+
+    if (queryLower.includes(nameLower)) score += 100;
+    if (queryWords.length >= 2 && queryWords.includes(firstName) && queryWords.includes(lastName)) score += 70;
+    if (queryWords.length === 1 && lastName.length > 3 && queryWords[0] === lastName) score += 30;
+
+    if (score > 0) matched.push({ player: p, score });
+  }
+
+  return matched
+    .sort((a, b) => b.score - a.score || b.player.points - a.player.points)
+    .slice(0, 3)
+    .map((m) => m.player.name);
 }
 
 // Get a table of contents for the system prompt

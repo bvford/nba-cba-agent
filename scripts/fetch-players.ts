@@ -48,6 +48,8 @@ interface PlayerData {
 
 const CURRENT_SEASON = 2025; // 2025-26 snapshot
 
+const BALLDONTLIE_API_KEY = process.env.BALLDONTLIE_API_KEY;
+
 // NBA team ID to abbreviation map (HoopsHype IDs)
 const TEAM_MAP: Record<string, string> = {
   "1": "ATL", "2": "BOS", "3": "BKN", "4": "CHA", "5": "CHI",
@@ -56,7 +58,6 @@ const TEAM_MAP: Record<string, string> = {
   "16": "MIL", "17": "MIN", "18": "NYK", "19": "ORL", "20": "PHI",
   "21": "PHX", "22": "POR", "23": "SAC", "24": "SAS", "25": "OKC",
   "26": "UTA", "27": "WAS", "28": "TOR", "29": "MEM", "30": "DET",
-  // HoopsHype non-canonical IDs seen on team pages
   "5312": "CHA",
 };
 
@@ -93,15 +94,7 @@ const TEAM_SLUG_TO_ABBR: Record<string, string> = {
   "washington-wizards": "WAS",
 };
 
-// Data-quality overrides for known high-signal roster moves when public feeds conflict.
-const PLAYER_TEAM_OVERRIDES: Record<string, string> = {
-  "james harden": "CLE",
-  "anthony davis": "WAS",
-  "mark williams": "PHX",
-};
-
 function formatSeason(season: number): string {
-  // season=2025 means the 2025-26 season
   const nextYear = (season + 1) % 100;
   return `${season}-${nextYear.toString().padStart(2, "0")}`;
 }
@@ -114,6 +107,87 @@ function formatSalary(amount: number, options: { po: boolean; to: boolean; qo: b
   if (options.qo) tags.push("Qualifying Offer");
   if (options.tw) tags.push("Two-Way");
   return tags.length > 0 ? `${formatted} (${tags.join(", ")})` : formatted;
+}
+
+function normalizeName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[.']/g, "")
+    .replace(/\s+jr$/i, "")
+    .replace(/\s+sr$/i, "")
+    .replace(/\s+iii$/i, "")
+    .replace(/\s+ii$/i, "")
+    .replace(/\s+iv$/i, "")
+    .trim();
+}
+
+// ---- Fetch current rosters from BallDontLie (authoritative team source) ----
+async function fetchRosterFromBallDontLie(): Promise<Map<string, string>> {
+  const rosterMap = new Map<string, string>(); // normalizedName → team abbreviation
+
+  if (!BALLDONTLIE_API_KEY) {
+    console.warn("  BALLDONTLIE_API_KEY not set — skipping roster fetch");
+    return rosterMap;
+  }
+
+  console.log("Fetching current rosters from BallDontLie...");
+
+  let cursor: number | null = null;
+  let page = 0;
+  let totalFetched = 0;
+  let consecutiveRateLimits = 0;
+
+  while (true) {
+    const url: string = cursor
+      ? `https://api.balldontlie.io/v1/players?per_page=100&cursor=${cursor}`
+      : `https://api.balldontlie.io/v1/players?per_page=100`;
+
+    const res: Response = await fetch(url, {
+      headers: { Authorization: BALLDONTLIE_API_KEY },
+    });
+
+    if (!res.ok) {
+      if (res.status === 429) {
+        consecutiveRateLimits++;
+        if (consecutiveRateLimits >= 4) {
+          console.warn(`  BallDontLie rate limit hit ${consecutiveRateLimits} times — stopping early. Collected ${rosterMap.size} teams so far.`);
+          console.warn(`  Tip: the free tier quota may be exhausted. Try running again in a few hours.`);
+          break;
+        }
+        console.log(`  Rate limited (${consecutiveRateLimits}/4) — waiting 15s...`);
+        await new Promise((r) => setTimeout(r, 15000));
+        continue;
+      }
+      console.error(`  BallDontLie returned ${res.status} on page ${page}`);
+      break;
+    }
+    consecutiveRateLimits = 0;
+
+    const json: { data?: Array<{ first_name: string; last_name: string; team: { abbreviation: string } | null }>; meta?: { next_cursor?: number } } = await res.json();
+    const data = json.data || [];
+
+    if (data.length === 0) break;
+
+    for (const player of data) {
+      if (!player.team) continue; // skip players with no current team (retired, etc.)
+      const fullName = `${player.first_name} ${player.last_name}`;
+      const key = normalizeName(fullName);
+      rosterMap.set(key, player.team.abbreviation);
+    }
+
+    totalFetched += data.length;
+    page++;
+
+    const nextCursor: number | undefined = json.meta?.next_cursor;
+    if (!nextCursor) break;
+    cursor = nextCursor;
+
+    // Respect rate limits: 60 req/min on free tier → 2 req/sec to be safe
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+
+  console.log(`  BallDontLie: ${totalFetched} players fetched, ${rosterMap.size} with active teams`);
+  return rosterMap;
 }
 
 function extractContractsFromNextData(
@@ -169,7 +243,6 @@ async function fetchTeamSalaryUrls(): Promise<string[]> {
   return Array.from(new Set(matches)).slice(0, 30);
 }
 
-// ---- Fetch salary data from HoopsHype team pages (current + future seasons) ----
 async function fetchSalaries(): Promise<PlayerSalary[]> {
   const salaryMap = new Map<string, PlayerSalary>();
 
@@ -228,9 +301,7 @@ async function fetchSalaries(): Promise<PlayerSalary[]> {
           }
         }
 
-        // Prefer the current-season team. If missing, use first known team from available seasons.
         team = currentSeasonTeam || fallbackSeasonTeam || team;
-
         salaryMap.set(key, { name, team: team || fallbackTeam, salaries });
       }
 
@@ -245,7 +316,6 @@ async function fetchSalaries(): Promise<PlayerSalary[]> {
   return players;
 }
 
-// ---- Fetch player stats from nbaStats API ----
 async function fetchStats(): Promise<PlayerStats[]> {
   console.log("Fetching player stats from nbaStats API...");
   const allPlayers: PlayerStats[] = [];
@@ -293,7 +363,6 @@ async function fetchStats(): Promise<PlayerStats[]> {
     if (data.length < pageSize) break;
     page++;
 
-    // Small delay to be polite
     await new Promise((r) => setTimeout(r, 200));
   }
 
@@ -301,25 +370,11 @@ async function fetchStats(): Promise<PlayerStats[]> {
   return allPlayers;
 }
 
-// ---- Normalize names for matching ----
-function normalizeName(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[.']/g, "")
-    .replace(/\s+jr$/i, "")
-    .replace(/\s+sr$/i, "")
-    .replace(/\s+iii$/i, "")
-    .replace(/\s+ii$/i, "")
-    .replace(/\s+iv$/i, "")
-    .trim();
-}
-
-// ---- Merge stats and salary data ----
 function mergePlayers(
   stats: PlayerStats[],
-  salaries: PlayerSalary[]
+  salaries: PlayerSalary[],
+  bdlRoster: Map<string, string>
 ): PlayerData[] {
-  // Build a lookup from normalized name to salary
   const salaryMap = new Map<string, PlayerSalary>();
   for (const s of salaries) {
     salaryMap.set(normalizeName(s.name), s);
@@ -328,24 +383,28 @@ function mergePlayers(
   const merged: PlayerData[] = [];
 
   for (const stat of stats) {
-      const salary = salaryMap.get(normalizeName(stat.name));
-      const overrideTeam = PLAYER_TEAM_OVERRIDES[normalizeName(stat.name)];
-      merged.push({
-        ...stat,
-        // Prefer salary-source team when available; stats feeds can lag post-trade.
-        team: overrideTeam || salary?.team || stat.team,
-        salaries: salary?.salaries || {},
-      });
+    const key = normalizeName(stat.name);
+    const salary = salaryMap.get(key);
+
+    // Team priority: BallDontLie (most accurate, live rosters) > HoopsHype salary source > stats source
+    const team = bdlRoster.get(key) || salary?.team || stat.team;
+
+    merged.push({
+      ...stat,
+      team,
+      salaries: salary?.salaries || {},
+    });
   }
 
-  // Add salary-only players (might not have stats yet if injured, etc.)
+  // Add salary-only players (injured, not yet playing, etc.)
   const statsNames = new Set(stats.map((s) => normalizeName(s.name)));
   for (const sal of salaries) {
-    if (!statsNames.has(normalizeName(sal.name))) {
-      const overrideTeam = PLAYER_TEAM_OVERRIDES[normalizeName(sal.name)];
+    const key = normalizeName(sal.name);
+    if (!statsNames.has(key)) {
+      const team = bdlRoster.get(key) || sal.team;
       merged.push({
         name: sal.name,
-        team: overrideTeam || sal.team,
+        team,
         position: "",
         age: 0,
         games: 0,
@@ -370,28 +429,29 @@ function mergePlayers(
 
 async function main() {
   try {
-    const [stats, salaries] = await Promise.all([
+    // Run stats and salary fetches in parallel; BallDontLie is sequential (rate limits)
+    const [stats, salaries, bdlRoster] = await Promise.all([
       fetchStats(),
       fetchSalaries(),
+      fetchRosterFromBallDontLie(),
     ]);
 
-    const players = mergePlayers(stats, salaries);
+    const players = mergePlayers(stats, salaries, bdlRoster);
 
-    // Sort by total points descending
     players.sort((a, b) => b.points - a.points);
 
     const outPath = join(__dirname, "..", "data", "players.json");
     writeFileSync(outPath, JSON.stringify(players, null, 2));
 
-    const withSalary = players.filter(
-      (p) => Object.keys(p.salaries).length > 0
-    );
+    const withSalary = players.filter((p) => Object.keys(p.salaries).length > 0);
     const withStats = players.filter((p) => p.games > 0);
+    const withBdlTeam = players.filter((p) => bdlRoster.has(normalizeName(p.name)));
 
     console.log(`\nDone!`);
     console.log(`  Total players: ${players.length}`);
     console.log(`  With stats: ${withStats.length}`);
     console.log(`  With salary data: ${withSalary.length}`);
+    console.log(`  Team confirmed by BallDontLie: ${withBdlTeam.length}`);
     console.log(`  Output: ${outPath}`);
   } catch (err) {
     console.error("Error:", err);
