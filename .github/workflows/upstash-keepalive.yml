@@ -11,13 +11,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Ping Upstash Redis
+      - name: Write and read keep-alive key
         env:
           UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
           UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
         run: |
+          # SET a key with 48-hour expiry (actual data write, not just PING)
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           curl -s -X POST "$UPSTASH_REDIS_REST_URL" \
             -H "Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '["PING"]'
-          echo "Upstash ping complete"
+            -d "[\"SET\", \"keepalive:last_ping\", \"$TIMESTAMP\", \"EX\", \"172800\"]"
+          echo ""
+          # GET it back to confirm the read path works too
+          curl -s -X POST "$UPSTASH_REDIS_REST_URL" \
+            -H "Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "[\"GET\", \"keepalive:last_ping\"]"
+          echo ""
+          echo "Upstash keep-alive complete: $TIMESTAMP"
