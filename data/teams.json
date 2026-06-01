@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-01",
+  "fetchedAt": "2026-06-01",
   "season": "2025-26",
   "thresholds": {
     "capFloor": 139182000,
@@ -115,7 +115,7 @@
     },
     {
       "abbr": "OKC",
-      "capAllocations": 188772810,
+      "capAllocations": 188272810,
       "capSpace": 0
     },
     {
@@ -145,7 +145,7 @@
     },
     {
       "abbr": "SAS",
-      "capAllocations": 182990669,
+      "capAllocations": 183990669,
       "capSpace": 0
     },
     {
