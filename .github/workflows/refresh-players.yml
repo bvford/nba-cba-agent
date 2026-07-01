@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: monthly-player-data-refresh
+  cancel-in-progress: false
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
@@ -20,20 +24,38 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run player data fetch
+        id: players
+        continue-on-error: true
         env:
           BALLDONTLIE_API_KEY: ${{ secrets.BALLDONTLIE_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: npx tsx scripts/fetch-players.ts
 
+      - name: Keep last good player data if refresh failed
+        if: steps.players.outcome == 'failure'
+        run: |
+          echo "::warning::Player data refresh failed; keeping the existing committed data/players.json"
+          git restore data/players.json
+
       - name: Run team cap data fetch
+        id: teams
+        continue-on-error: true
         run: npx tsx scripts/fetch-teams.ts
+
+      - name: Keep last good team data if refresh failed
+        if: steps.teams.outcome == 'failure'
+        run: |
+          echo "::warning::Team cap refresh failed; keeping the existing committed data/teams.json"
+          git restore data/teams.json
+
+      - name: Validate data files
+        run: npm run validate-data
 
       - name: Commit updated data files
         run: |

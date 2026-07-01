@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "fetch-cba": "tsx scripts/fetch-cba.ts"
+    "fetch-cba": "tsx scripts/fetch-cba.ts",
+    "validate-data": "tsx scripts/validate-refresh-data.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

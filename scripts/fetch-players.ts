@@ -46,7 +46,18 @@ interface PlayerData {
   salaries: Record<string, string>;
 }
 
-const CURRENT_SEASON = 2025; // 2025-26 snapshot
+const MIN_STATS_PLAYERS = 250;
+const MIN_SALARY_PLAYERS = 250;
+const MIN_BALLDONTLIE_PLAYERS = 250;
+const MIN_TOTAL_PLAYERS = 400;
+
+// NBA league year starts July 1. Example: Jul 2026-Jun 2027 is contract season 2026.
+function currentNBAContractSeason(): number {
+  const now = new Date();
+  return now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+}
+
+const CURRENT_SEASON = currentNBAContractSeason();
 
 const BALLDONTLIE_API_KEY = process.env.BALLDONTLIE_API_KEY;
 
@@ -126,8 +137,7 @@ async function fetchRosterFromBallDontLie(): Promise<Map<string, string>> {
   const rosterMap = new Map<string, string>(); // normalizedName → team abbreviation
 
   if (!BALLDONTLIE_API_KEY) {
-    console.warn("  BALLDONTLIE_API_KEY not set — skipping roster fetch");
-    return rosterMap;
+    throw new Error("BALLDONTLIE_API_KEY is required for reliable player team assignments");
   }
 
   console.log("Fetching current rosters from BallDontLie...");
@@ -267,7 +277,7 @@ async function fetchSalaries(): Promise<PlayerSalary[]> {
       if (!res.ok) continue;
 
       const html = await res.text();
-      const contracts = extractContractsFromNextData(html, 2025, teamId);
+      const contracts = extractContractsFromNextData(html, CURRENT_SEASON, teamId);
 
       for (const contract of contracts) {
         const name = contract.playerName || "";
@@ -316,14 +326,14 @@ async function fetchSalaries(): Promise<PlayerSalary[]> {
   return players;
 }
 
-async function fetchStats(): Promise<PlayerStats[]> {
-  console.log("Fetching player stats from nbaStats API...");
+async function fetchStatsForSeason(statsSeason: number): Promise<PlayerStats[]> {
+  console.log(`Fetching player stats from nbaStats API for season ${statsSeason}...`);
   const allPlayers: PlayerStats[] = [];
   let page = 1;
   const pageSize = 100;
 
   while (true) {
-    const url = `https://api.server.nbaapi.com/api/playertotals?season=2026&isPlayoff=false&page=${page}&pageSize=${pageSize}`;
+    const url = `https://api.server.nbaapi.com/api/playertotals?season=${statsSeason}&isPlayoff=false&page=${page}&pageSize=${pageSize}`;
     const res = await fetch(url);
 
     if (!res.ok) {
@@ -331,7 +341,10 @@ async function fetchStats(): Promise<PlayerStats[]> {
       break;
     }
 
-    const json = await res.json();
+    const json: {
+      data?: Array<Record<string, any>>;
+      pagination?: { page?: number; pageSize?: number; pages?: number; total?: number };
+    } = await res.json();
     const data = json.data || [];
 
     if (data.length === 0) break;
@@ -360,14 +373,35 @@ async function fetchStats(): Promise<PlayerStats[]> {
 
     console.log(`  Page ${page}: ${data.length} players (total: ${allPlayers.length})`);
 
-    if (data.length < pageSize) break;
+    const totalPages = json.pagination?.pages;
+    const effectivePageSize = json.pagination?.pageSize || pageSize;
+    if (totalPages && page >= totalPages) break;
+    if (!totalPages && data.length < effectivePageSize) break;
     page++;
 
     await new Promise((r) => setTimeout(r, 200));
   }
 
-  console.log(`  Found ${allPlayers.length} players with stats`);
+  console.log(`  Found ${allPlayers.length} players with stats for season ${statsSeason}`);
   return allPlayers;
+}
+
+async function fetchStats(): Promise<PlayerStats[]> {
+  const candidateSeasons = Array.from(new Set([
+    CURRENT_SEASON + 1,
+    CURRENT_SEASON,
+    CURRENT_SEASON - 1,
+  ]));
+
+  for (const statsSeason of candidateSeasons) {
+    const stats = await fetchStatsForSeason(statsSeason);
+    if (stats.length >= MIN_STATS_PLAYERS) {
+      return stats;
+    }
+    console.warn(`  Season ${statsSeason} only returned ${stats.length} players — trying another season`);
+  }
+
+  throw new Error("Could not fetch a complete player stats season");
 }
 
 function mergePlayers(
@@ -438,14 +472,24 @@ async function main() {
 
     const players = mergePlayers(stats, salaries, bdlRoster);
 
+    const withSalary = players.filter((p) => Object.keys(p.salaries).length > 0);
+    const withStats = players.filter((p) => p.games > 0);
+    const withBdlTeam = players.filter((p) => bdlRoster.has(normalizeName(p.name)));
+    const validationFailures = [
+      players.length < MIN_TOTAL_PLAYERS ? `only ${players.length} total players` : "",
+      withStats.length < MIN_STATS_PLAYERS ? `only ${withStats.length} players with stats` : "",
+      withSalary.length < MIN_SALARY_PLAYERS ? `only ${withSalary.length} players with salary data` : "",
+      bdlRoster.size < MIN_BALLDONTLIE_PLAYERS ? `only ${bdlRoster.size} BallDontLie roster matches` : "",
+    ].filter(Boolean);
+
+    if (validationFailures.length > 0) {
+      throw new Error(`Refusing to write degraded players.json: ${validationFailures.join("; ")}`);
+    }
+
     players.sort((a, b) => b.points - a.points);
 
     const outPath = join(__dirname, "..", "data", "players.json");
     writeFileSync(outPath, JSON.stringify(players, null, 2));
-
-    const withSalary = players.filter((p) => Object.keys(p.salaries).length > 0);
-    const withStats = players.filter((p) => p.games > 0);
-    const withBdlTeam = players.filter((p) => bdlRoster.has(normalizeName(p.name)));
 
     console.log(`\nDone!`);
     console.log(`  Total players: ${players.length}`);

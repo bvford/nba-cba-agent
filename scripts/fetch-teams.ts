@@ -17,6 +17,13 @@ function currentNBAYear(): { year: number; season: string } {
 
 const { year: NBA_YEAR, season: NBA_SEASON } = currentNBAYear();
 const SPOTRAC_URL = `https://www.spotrac.com/nba/cap/_/year/${NBA_YEAR}`;
+const MIN_TEAMS = 25;
+
+const NBA_TEAM_ABBRS = new Set([
+  "ATL", "BOS", "BKN", "CHA", "CHI", "CLE", "DAL", "DEN", "DET", "GSW",
+  "HOU", "IND", "LAC", "LAL", "MEM", "MIA", "MIL", "MIN", "NOP", "NYK",
+  "OKC", "ORL", "PHI", "PHX", "POR", "SAC", "SAS", "TOR", "UTA", "WAS",
+]);
 
 interface TeamCapEntry {
   abbr: string;
@@ -46,9 +53,59 @@ interface TeamsData {
 }
 
 function parseDollar(raw: string): number {
-  const match = raw.replace("−", "-").match(/-?\$[\d,]+/);
+  const match = raw.replace("−", "-").replace(/[,\s]/g, "").match(/(?:-?\$|\$-?)\d+/);
   if (!match) return 0;
-  return parseInt(match[0].replace(/[$,]/g, ""), 10) || 0;
+  return parseInt(match[0].replace("$", ""), 10) || 0;
+}
+
+function normalizeText(raw: string): string {
+  return raw.replace(/\s+/g, " ").trim();
+}
+
+function findColumn(headers: string[], candidates: string[]): number {
+  const normalizedHeaders = headers.map((header) => header.toLowerCase());
+  for (const candidate of candidates) {
+    const index = normalizedHeaders.findIndex((header) => header === candidate);
+    if (index >= 0) return index;
+  }
+  for (const candidate of candidates) {
+    const index = normalizedHeaders.findIndex((header) => header.includes(candidate));
+    if (index >= 0) return index;
+  }
+  return -1;
+}
+
+function parseTeamAbbr(teamCell: cheerio.Cheerio<any>): string {
+  const candidates: string[] = [];
+
+  candidates.push(teamCell.find("span.d-none").first().text());
+  candidates.push(teamCell.find("a.link").first().text());
+  candidates.push(teamCell.text());
+
+  const logoSrc = teamCell.find("img").first().attr("src") || "";
+  const logoMatch = logoSrc.match(/nba_([a-z]{2,3})/i);
+  if (logoMatch) candidates.push(logoMatch[1]);
+
+  for (const candidate of candidates) {
+    const tokens = normalizeText(candidate).toUpperCase().match(/[A-Z]{2,3}/g) || [];
+    const abbr = tokens.find((token) => NBA_TEAM_ABBRS.has(token));
+    if (abbr) return abbr;
+  }
+
+  return "";
+}
+
+function parseThresholdCard(
+  $: cheerio.CheerioAPI,
+  card: any,
+  label: RegExp
+): number {
+  const values = $(card)
+    .find(".fw-bold")
+    .map((_, el) => normalizeText($(el).text()))
+    .get();
+  const labeled = values.find((value) => label.test(value));
+  return parseDollar(labeled || values[0] || "");
 }
 
 async function fetchTeams(): Promise<void> {
@@ -69,30 +126,8 @@ async function fetchTeams(): Promise<void> {
   const html = await res.text();
   const $ = cheerio.load(html);
 
-  // Parse team rows from the main cap table
-  const teams: TeamCapEntry[] = [];
-  $("table.dataTable tbody tr").each((_, row) => {
-    const cells = $(row).find("td");
-    if (cells.length < 7) return;
-
-    // Team abbreviation: span.d-none inside td.text-left, fallback to link text
-    const teamCell = cells.eq(1);
-    const abbr = teamCell.find("span.d-none").text().trim() ||
-      teamCell.find("a.link").text().trim().split(/\s+/).pop() ||
-      "";
-
-    if (!abbr || abbr.length < 2 || abbr.length > 3) return;
-
-    // Column 6 (index 5) = Total Cap Allocations; Column 7 (index 6) = Cap Space
-    const capAllocations = parseDollar(cells.eq(5).text().trim());
-    const capSpace = parseDollar(cells.eq(6).text().trim());
-
-    if (capAllocations > 0) {
-      teams.push({ abbr, capAllocations, capSpace });
-    }
-  });
-
-  // Parse cap/apron threshold cards
+  // Parse cap/apron threshold cards first. The compact Spotrac table only exposes cap space,
+  // so salary cap is needed to derive total cap allocations.
   const thresholds: CapThresholds = {
     capFloor: 0,
     salaryCap: 0,
@@ -102,8 +137,7 @@ async function fetchTeams(): Promise<void> {
 
   $(".card.widget").each((_, card) => {
     const title = $(card).find("h2.h5").text().trim().toUpperCase();
-    const valueText = $(card).find(".fw-bold").first().text();
-    const value = parseDollar(valueText);
+    const value = parseThresholdCard($, card, /Floor|Maximum|Threshold/i);
     if (!value) return;
     if (title.includes("UNDER THE CAP") || title.includes("FLOOR")) {
       thresholds.capFloor = value;
@@ -116,7 +150,7 @@ async function fetchTeams(): Promise<void> {
     }
   });
 
-  // Parse exception amounts — look for labeled lines like "Non-Taxpayer MLE: $14,104,000"
+  // Parse exception amounts — look for labeled lines like "Non-Taxpayer MLE: $15,044,000"
   const exceptions: CapExceptions = {
     nonTaxpayerMLE: 0,
     taxpayerMLE: 0,
@@ -124,7 +158,7 @@ async function fetchTeams(): Promise<void> {
   };
 
   $(".card.widget .fw-bold").each((_, el) => {
-    const text = $(el).text();
+    const text = normalizeText($(el).text());
     const match = text.match(/\$[\d,]+/);
     if (!match) return;
     const value = parseDollar(match[0]);
@@ -137,13 +171,64 @@ async function fetchTeams(): Promise<void> {
     }
   });
 
-  // If exception data wasn't on Spotrac, use known 2025-26 values as fallback
-  if (!exceptions.nonTaxpayerMLE) exceptions.nonTaxpayerMLE = 14104000;
-  if (!exceptions.taxpayerMLE) exceptions.taxpayerMLE = 5685000;
-  if (!exceptions.biannual) exceptions.biannual = 5134000;
+  // Parse team rows from the main cap table
+  const teams: TeamCapEntry[] = [];
+  let capTable: cheerio.Cheerio<any> | undefined;
+  let headers: string[] = [];
+  let teamColumn = -1;
+  let capAllocationsColumn = -1;
+  let capSpaceColumn = -1;
 
-  if (teams.length < 25) {
+  for (const table of $("table").toArray()) {
+    const tableHeaders = $(table)
+      .find("thead th")
+      .map((_, th) => normalizeText($(th).text()))
+      .get();
+    const tableTeamColumn = findColumn(tableHeaders, ["team"]);
+    const tableCapAllocationsColumn = findColumn(tableHeaders, ["total cap allocations", "total cap"]);
+    const tableCapSpaceColumn = findColumn(tableHeaders, ["cap space all", "cap space"]);
+
+    if (tableTeamColumn >= 0 && tableCapAllocationsColumn >= 0 && tableCapSpaceColumn >= 0) {
+      capTable = $(table);
+      headers = tableHeaders;
+      teamColumn = tableTeamColumn;
+      capAllocationsColumn = tableCapAllocationsColumn;
+      capSpaceColumn = tableCapSpaceColumn;
+      break;
+    }
+  }
+
+  if (!capTable || teamColumn < 0 || capAllocationsColumn < 0 || capSpaceColumn < 0) {
+    throw new Error(`Could not identify Spotrac table columns: ${headers.join(" | ")}`);
+  }
+
+  capTable.find("tbody tr").each((_, row) => {
+    const cells = $(row).find("td");
+    if (cells.length <= Math.max(teamColumn, capAllocationsColumn, capSpaceColumn)) return;
+
+    const teamCell = cells.eq(teamColumn);
+    const abbr = parseTeamAbbr(teamCell);
+
+    if (!abbr || abbr.length < 2 || abbr.length > 3) return;
+
+    const capSpace = parseDollar(cells.eq(capSpaceColumn).text());
+    const capAllocations = capAllocationsColumn === capSpaceColumn
+      ? thresholds.salaryCap - capSpace
+      : parseDollar(cells.eq(capAllocationsColumn).text());
+
+    if (capAllocations > 0) {
+      teams.push({ abbr, capAllocations, capSpace });
+    }
+  });
+
+  if (teams.length < MIN_TEAMS) {
     throw new Error(`Only found ${teams.length} teams — something went wrong with parsing`);
+  }
+  if (!thresholds.capFloor || !thresholds.salaryCap || !thresholds.firstApron || !thresholds.secondApron) {
+    throw new Error(`Missing cap thresholds from Spotrac — parsed ${JSON.stringify(thresholds)}`);
+  }
+  if (!exceptions.nonTaxpayerMLE || !exceptions.taxpayerMLE || !exceptions.biannual) {
+    throw new Error(`Missing exception amounts from Spotrac — parsed ${JSON.stringify(exceptions)}`);
   }
 
   const output: TeamsData = {
