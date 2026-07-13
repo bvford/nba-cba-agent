@@ -81,7 +81,14 @@ export function ChatMessage({
           {isUser ? (
             <p className="whitespace-pre-wrap text-sm">{content}</p>
           ) : content === "" ? (
-            <span className="cursor-blink text-sm text-(--color-text-muted)">Thinking</span>
+            <span className="flex items-center gap-1.5 text-sm text-(--color-text-muted)">
+              Thinking
+              <span className="flex gap-0.5" aria-hidden="true">
+                <span className="thinking-dot h-1 w-1 rounded-full bg-(--color-accent)" style={{ animationDelay: "0ms" }} />
+                <span className="thinking-dot h-1 w-1 rounded-full bg-(--color-accent)" style={{ animationDelay: "150ms" }} />
+                <span className="thinking-dot h-1 w-1 rounded-full bg-(--color-accent)" style={{ animationDelay: "300ms" }} />
+              </span>
+            </span>
           ) : (
             <div className="text-sm leading-relaxed">
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
@@ -250,17 +257,21 @@ const markdownComponents = {
     </div>
   ),
   thead: ({ children }: React.ComponentPropsWithoutRef<"thead">) => (
-    <thead className="bg-(--color-surface) text-(--color-text-primary)">{children}</thead>
+    <thead className="bg-(--color-surface) text-(--color-text-primary) border-b-2 border-(--color-accent)">
+      {children}
+    </thead>
   ),
   tbody: ({ children }: React.ComponentPropsWithoutRef<"tbody">) => <tbody>{children}</tbody>,
   tr: ({ children }: React.ComponentPropsWithoutRef<"tr">) => (
     <tr className="border-b border-(--color-border) last:border-b-0">{children}</tr>
   ),
   th: ({ children }: React.ComponentPropsWithoutRef<"th">) => (
-    <th className="border-r border-(--color-border) px-3 py-2 font-semibold last:border-r-0">{children}</th>
+    <th className="font-condensed border-r border-(--color-border) px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-(--color-text-secondary) last:border-r-0">
+      {children}
+    </th>
   ),
   td: ({ children }: React.ComponentPropsWithoutRef<"td">) => (
-    <td className="border-r border-(--color-border) px-3 py-2 text-(--color-text-secondary) last:border-r-0">
+    <td className="border-r border-(--color-border) px-3 py-2 tabular-nums text-(--color-text-secondary) last:border-r-0">
       {children}
     </td>
   ),
