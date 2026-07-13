@@ -18,6 +18,12 @@ const RATE_LIMIT_ERROR = "You've hit today's free limit (20 questions/day). Come
 const OVERLOADED_ERROR = "The assistant is briefly overloaded — try again in a moment.";
 const GENERIC_ERROR = "Something went wrong — try again.";
 
+// Proper English possessive: names ending in "s" (Lakers, Celtics, Pacers…)
+// take a bare apostrophe; everything else takes 's.
+function possessive(name: string): string {
+  return name.endsWith("s") ? `${name}'` : `${name}'s`;
+}
+
 class ChatRequestError extends Error {
   constructor(public readonly status: number) {
     super(`Chat request failed with status ${status}`);
@@ -354,7 +360,7 @@ export function useChat() {
 
     const timeoutId = window.setTimeout(() => {
       trackEvent("team_ask_link_used", { abbr });
-      void sendMessage(`What's the ${teamName}'s cap situation and available exceptions this offseason?`);
+      void sendMessage(`What's the ${possessive(teamName)} cap situation and available exceptions this offseason?`);
     }, 0);
     return () => window.clearTimeout(timeoutId);
   }, [searchParams, router, sendMessage]);

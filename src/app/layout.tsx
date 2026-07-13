@@ -1,5 +1,27 @@
 import type { Metadata, Viewport } from "next";
+import { Bebas_Neue, Barlow_Condensed, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+
+const bebasNeue = Bebas_Neue({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-bebas-neue",
+  display: "swap",
+});
+
+const barlowCondensed = Barlow_Condensed({
+  weight: ["500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-barlow-condensed",
+  display: "swap",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-plus-jakarta-sans",
+  display: "swap",
+});
 
 const description =
   "Ask questions about NBA contracts, trades, free agency, salary cap rules, and more. Powered by the 2023 CBA with updated player data and live stats context.";
@@ -36,25 +58,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=Bebas+Neue&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body
-        className="antialiased bg-gradient-page"
-        style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
-      >
-        {children}
-      </body>
+    <html
+      lang="en"
+      className={`${bebasNeue.variable} ${barlowCondensed.variable} ${plusJakartaSans.variable}`}
+    >
+      <body className="antialiased bg-gradient-page">{children}</body>
     </html>
   );
 }

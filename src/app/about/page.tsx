@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ABOUT_SOURCES } from "@/lib/sources";
+import { formattedTeamsFetchedAt } from "@/lib/data-meta";
+
+export const metadata: Metadata = {
+  title: "About",
+};
 
 export default function AboutPage() {
   return (
@@ -26,7 +32,7 @@ export default function AboutPage() {
         <p className="text-sm text-(--color-text-secondary) mb-8">
           This is my first ever coding project, entirely created by artificial intelligence coding assistants.
           This tool is trained on the NBA/NBPA 2023 Collective Bargaining Agreement, and if I made it correctly,
-          should have up-to-date salary information as of February 2026, and live statistics from NBA.com.
+          should have up-to-date salary information as of {formattedTeamsFetchedAt}, and live statistics from NBA.com.
           Its purpose is to explain concepts from the CBA and NBA salary cap in plain English.
           I would like to train it to be smart and to understand context, like having an AI Bobby Marks in your pocket.
           That remains a work in progress, so Bobby, if you are reading this, your job is safe for now.

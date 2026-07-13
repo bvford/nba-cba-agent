@@ -36,6 +36,7 @@ export function ChatMessage({
 }: ChatMessageProps) {
   const isUser = role === "user";
   const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
   const copyTimeoutRef = useRef<number | null>(null);
 
   // Only scan for team mentions once the reply has finished streaming, and
@@ -55,10 +56,17 @@ export function ChatMessage({
   );
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(content);
-    setCopied(true);
     if (copyTimeoutRef.current !== null) window.clearTimeout(copyTimeoutRef.current);
-    copyTimeoutRef.current = window.setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopied(true);
+      setCopyFailed(false);
+      copyTimeoutRef.current = window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopyFailed(true);
+      setCopied(false);
+      copyTimeoutRef.current = window.setTimeout(() => setCopyFailed(false), 2000);
+    }
   };
 
   return (
@@ -162,9 +170,11 @@ export function ChatMessage({
               <button
                 onClick={handleCopy}
                 aria-label="Copy assistant response"
-                className={`flex items-center gap-1 text-[10px] text-(--color-text-muted) hover:text-(--color-text-secondary) transition-colors px-1.5 py-0.5 rounded hover:bg-(--color-surface-hover) ${actionFocus}`}
+                className={`flex items-center gap-1 text-[10px] transition-colors px-1.5 py-0.5 rounded hover:bg-(--color-surface-hover) ${actionFocus} ${
+                  copyFailed ? "text-(--color-danger)" : "text-(--color-text-muted) hover:text-(--color-text-secondary)"
+                }`}
               >
-                {copied ? "Copied" : "Copy"}
+                {copyFailed ? "Copy failed" : copied ? "Copied" : "Copy"}
               </button>
               {onFeedback && (
                 <>

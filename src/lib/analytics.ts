@@ -7,7 +7,7 @@ export function trackEvent(name: string, props: AnalyticsProps = {}): void {
     name,
     props,
     path: window.location.pathname,
-    ts: new Date().toISOString(),
+    ts: Date.now(),
   });
 
   try {

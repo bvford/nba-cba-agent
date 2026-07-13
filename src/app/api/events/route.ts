@@ -17,7 +17,9 @@ const EventSchema = z.object({
       { message: "props payload too large" }
     ),
   path: z.string().max(MAX_EVENT_PATH_CHARS).optional(),
-  ts: z.number().optional(),
+  // Accept both: legacy/stale clients may still send an ISO string; current
+  // clients send Date.now(). Union keeps either from being silently dropped.
+  ts: z.union([z.number(), z.string()]).optional(),
 });
 
 export async function POST(req: NextRequest) {
