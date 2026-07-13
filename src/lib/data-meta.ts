@@ -1,6 +1,8 @@
 import teams from "../../data/teams.json";
 
 export const teamsFetchedAt = teams.fetchedAt;
+export const leagueThresholds = teams.thresholds;
+export const leagueSeason = teams.season;
 
 export const formattedTeamsFetchedAt = new Intl.DateTimeFormat("en-US", {
   month: "short",

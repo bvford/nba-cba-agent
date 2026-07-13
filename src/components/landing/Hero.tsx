@@ -1,4 +1,5 @@
 import { Mark } from "@/components/Logo";
+import { ThresholdsTicker } from "./ThresholdsTicker";
 
 interface HeroProps {
   onStartChat: () => void;
@@ -20,7 +21,7 @@ export function Hero({ onStartChat }: HeroProps) {
         Ask questions about cap mechanics, contract structure, and roster-building strategy. Get concise
         answers grounded in the 2023 CBA and updated salary/stat context.
       </p>
-      <div className="mt-6 pb-8 flex flex-wrap items-center justify-center gap-2.5">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
         <button
           onClick={onStartChat}
           className="text-sm px-5 py-2.5 rounded-full bg-[linear-gradient(135deg,var(--color-accent),var(--color-accent-light))] text-(--color-accent-ink) font-semibold shadow-[0_8px_20px_rgba(255,106,31,0.25)] hover:-translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-surface)"
@@ -33,6 +34,9 @@ export function Hero({ onStartChat }: HeroProps) {
         >
           Learn More
         </a>
+      </div>
+      <div className="mt-7 pb-8 text-left">
+        <ThresholdsTicker />
       </div>
     </section>
   );
