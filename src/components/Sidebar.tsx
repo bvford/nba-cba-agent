@@ -62,7 +62,7 @@ export function Sidebar({
           as one unit instead of the sidebar pinning to the true viewport
           edge and leaving dead space on wide screens. */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-[linear-gradient(180deg,rgba(17,26,43,0.95),rgba(10,16,28,0.95))] backdrop-blur-xl border-r border-(--color-border)
+        className={`fixed top-0 left-0 h-full w-72 bg-[linear-gradient(180deg,rgba(19,22,28,0.95),rgba(8,10,13,0.95))] backdrop-blur-xl border-r border-(--color-border)
           z-40 flex flex-col transition-transform duration-200 ease-out shadow-2xl
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           lg:static lg:z-auto lg:flex-shrink-0 lg:translate-x-0 lg:shadow-none`}
@@ -151,7 +151,7 @@ export function Sidebar({
         </div>
 
         {/* Sources */}
-        <div className="p-3 border-t border-(--color-border) bg-gradient-to-b from-transparent to-[rgba(23,64,139,0.16)]">
+        <div className="p-3 border-t border-(--color-border) bg-gradient-to-b from-transparent to-[rgba(255,106,31,0.08)]">
           <p className="px-1 pb-2 text-[10px] uppercase tracking-[0.16em] text-(--color-text-muted)">
             Sources
           </p>

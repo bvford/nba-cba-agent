@@ -83,7 +83,7 @@ export default function TeamsIndexPage() {
               <Link
                 key={team.abbr}
                 href={`/teams/${abbr}`}
-                className="group flex flex-col p-4 rounded-2xl border border-(--color-border) bg-[linear-gradient(165deg,rgba(18,27,43,0.95),rgba(11,17,30,0.95))] hover:bg-(--color-surface-hover)/85 hover:border-(--color-border-light) hover:-translate-y-1 transition-all duration-200 shadow-[0_8px_18px_rgba(4,8,14,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent)"
+                className="group flex flex-col p-4 rounded-2xl border border-(--color-border) bg-[linear-gradient(165deg,rgba(20,23,29,0.95),rgba(10,12,16,0.95))] hover:bg-(--color-surface-hover)/85 hover:border-(--color-border-light) hover:-translate-y-1 transition-all duration-200 shadow-[0_8px_18px_rgba(4,8,14,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent)"
               >
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <span className="inline-flex items-center justify-center rounded-lg border border-(--color-border-light) bg-(--color-surface) px-2.5 py-1 text-xs font-bold tracking-wide text-(--color-text-primary)">

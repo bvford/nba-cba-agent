@@ -64,7 +64,7 @@ export function ChatMessage({
   return (
     <div className={`group flex ${isUser ? "justify-end" : "justify-start"} mb-5`}>
       {!isUser && (
-        <div className="w-7 h-7 rounded-lg bg-(--color-accent) flex items-center justify-center text-[#1a2234] text-xs font-bold mr-2.5 mt-0.5 shrink-0 shadow-[0_4px_14px_rgba(227,189,108,0.22)]">
+        <div className="w-7 h-7 rounded-lg bg-(--color-accent) flex items-center justify-center text-(--color-accent-ink) text-xs font-bold mr-2.5 mt-0.5 shrink-0 shadow-[0_4px_14px_rgba(255,106,31,0.22)]">
           AI
         </div>
       )}
@@ -213,7 +213,7 @@ const markdownComponents = {
   ),
   em: ({ children }: React.ComponentPropsWithoutRef<"em">) => <em>{children}</em>,
   code: ({ children }: React.ComponentPropsWithoutRef<"code">) => (
-    <code className="rounded bg-[rgba(74,142,255,0.1)] px-[0.35rem] py-[0.1rem] text-[0.85em] text-(--color-accent)">
+    <code className="rounded bg-[rgba(255,106,31,0.1)] px-[0.35rem] py-[0.1rem] text-[0.85em] text-(--color-accent)">
       {children}
     </code>
   ),
