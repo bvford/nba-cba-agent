@@ -6,7 +6,7 @@ import { formattedTeamsFetchedAt } from "@/lib/data-meta";
 import { TEAM_FULL_NAMES, computeCapStatus, normalizeTeamAbbr, type CapThresholds } from "@/lib/teams-meta";
 
 export const metadata: Metadata = {
-  title: "Team Cap Sheets — ChatCBA",
+  title: "Team Cap Sheets",
   description:
     "Every NBA team's total cap allocations, luxury-tax apron status, and available exceptions for the 2026-27 season.",
 };

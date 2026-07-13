@@ -93,11 +93,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { abbr: abbrParam } = await params;
   const team = findTeam(abbrParam);
-  if (!team) return { title: "Team Not Found — ChatCBA" };
+  if (!team) return { title: "Team Not Found" };
 
   const fullName = TEAM_FULL_NAMES[normalizeTeamAbbr(team.abbr)];
   return {
-    title: `${fullName} Cap Sheet — ChatCBA`,
+    title: `${fullName} Cap Sheet`,
     description: `${fullName} ${teams.season} salary cap allocations, apron status, available exceptions, and full player payroll.`,
   };
 }
