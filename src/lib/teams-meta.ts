@@ -36,13 +36,19 @@ export const TEAM_FULL_NAMES: Record<string, string> = {
 // Aliases for team abbreviations that appear inconsistently across data
 // sources. Both sides of a comparison should be run through
 // normalizeTeamAbbr() so it doesn't matter which variant either side uses.
-// PHO/PHX is the Suns (players.json uses both; teams.json only has PHX).
-// players.json also has BRK/CHO codes alongside BKN/CHA, but — unlike
-// PHO/PHX — these are NOT interchangeable: BRK holds the real Brooklyn
-// roster while the "BKN"-tagged rows are mislabeled (they're actually New
-// Orleans Pelicans players). That's an upstream fetch-players.ts data bug,
-// not a naming alias, so it's deliberately not mapped here.
-const TEAM_ABBR_ALIASES: Record<string, string> = { PHO: "PHX" };
+// Since teams.json and players.json now both come from capsheets.com and use a
+// single canonical abbreviation set (ATL BKN … WAS), there are no real aliases
+// to map anymore; a few historical stat-site variants are kept here defensively
+// so any stray code still resolves to the canonical abbreviation.
+const TEAM_ABBR_ALIASES: Record<string, string> = {
+  PHO: "PHX",
+  BRK: "BKN",
+  CHO: "CHA",
+  SA: "SAS",
+  NO: "NOP",
+  NY: "NYK",
+  GS: "GSW",
+};
 
 export function normalizeTeamAbbr(abbr: string): string {
   return TEAM_ABBR_ALIASES[abbr] ?? abbr;
@@ -61,42 +67,65 @@ export interface CapExceptions {
   biannual: number;
 }
 
-export type CapStatusTier = "under-cap" | "over-cap" | "over-first-apron" | "over-second-apron";
+export type CapStatusTier =
+  | "under-cap"
+  | "over-cap"
+  | "over-tax"
+  | "over-first-apron"
+  | "over-second-apron";
 
 export interface CapStatus {
   tier: CapStatusTier;
   overCap: boolean;
+  overTax: boolean;
   overFirstApron: boolean;
   overSecondApron: boolean;
-  /** capAllocations - firstApron. Positive = over, negative = under. */
+  /** Distance to the first apron. Positive = over, negative = under. */
   firstApronDistance: number;
-  /** capAllocations - secondApron. Positive = over, negative = under. */
+  /** Distance to the second apron. Positive = over, negative = under. */
   secondApronDistance: number;
+}
+
+// The capsheets fields that determine a team's cap standing. `firstApronSpace`
+// and `secondApronSpace` come straight from capsheets and are the authoritative
+// over/under numbers (they are computed on "Apron Total" = salaries + unlikely
+// incentives, which is more precise than comparing raw payroll to a threshold).
+// Negative space = over that line.
+export interface TeamCapFigures {
+  totalSalaries: number;
+  luxuryTaxSpace: number; // negative = over the tax
+  firstApronSpace: number; // negative = over the first apron
+  secondApronSpace: number; // negative = over the second apron
 }
 
 // Single source of truth for apron classification — used by both the chat
 // retrieval context (searchTeams()) and the /teams UI so they can never
 // disagree about a team's status.
-export function computeCapStatus(capAllocations: number, thresholds: CapThresholds): CapStatus {
-  const overCap = capAllocations > thresholds.salaryCap;
-  const overFirstApron = capAllocations > thresholds.firstApron;
-  const overSecondApron = capAllocations > thresholds.secondApron;
+export function computeCapStatus(figures: TeamCapFigures, thresholds: CapThresholds): CapStatus {
+  const overSecondApron = figures.secondApronSpace < 0;
+  const overFirstApron = figures.firstApronSpace < 0;
+  const overTax = figures.luxuryTaxSpace < 0;
+  const overCap = figures.totalSalaries > thresholds.salaryCap;
 
   const tier: CapStatusTier = overSecondApron
     ? "over-second-apron"
     : overFirstApron
       ? "over-first-apron"
-      : overCap
-        ? "over-cap"
-        : "under-cap";
+      : overTax
+        ? "over-tax"
+        : overCap
+          ? "over-cap"
+          : "under-cap";
 
   return {
     tier,
     overCap,
+    overTax,
     overFirstApron,
     overSecondApron,
-    firstApronDistance: capAllocations - thresholds.firstApron,
-    secondApronDistance: capAllocations - thresholds.secondApron,
+    // Space is negative when over, so distance-over = -space.
+    firstApronDistance: -figures.firstApronSpace,
+    secondApronDistance: -figures.secondApronSpace,
   };
 }
 
@@ -104,6 +133,7 @@ export function computeCapStatus(capAllocations: number, thresholds: CapThreshol
 export const CAP_STATUS_BADGE_LABELS: Record<CapStatusTier, string> = {
   "under-cap": "Under Cap",
   "over-cap": "Over Cap",
+  "over-tax": "Over Tax",
   "over-first-apron": "Over First Apron",
   "over-second-apron": "Over Second Apron",
 };
@@ -111,7 +141,8 @@ export const CAP_STATUS_BADGE_LABELS: Record<CapStatusTier, string> = {
 // Longer-form label matching searchTeams()'s existing chat-context wording.
 export const CAP_STATUS_CHAT_LABELS: Record<CapStatusTier, string> = {
   "under-cap": "Under cap",
-  "over-cap": "Over cap, under first apron",
+  "over-cap": "Over cap, under the luxury tax",
+  "over-tax": "Over the luxury tax, under the first apron",
   "over-first-apron": "Over first apron (hard-capped at second apron)",
   "over-second-apron": "Over second apron",
 };

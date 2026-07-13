@@ -14,11 +14,12 @@ npm run build       # Build for production
 npm start           # Run production server
 
 # Data scripts (run as needed to refresh data)
-npm run fetch-cba                   # Download CBA articles from GitHub
-npx tsx scripts/fetch-players.ts    # Refresh player stats & salaries
-npx tsx scripts/fetch-teams.ts      # Refresh team cap data from Spotrac
-npx tsx scripts/process-cba101.ts   # Rebuild educational content
-npx tsx scripts/process-guide.ts    # Rebuild guide summaries
+npm run fetch-cba                    # Download CBA articles from GitHub
+npm run fetch-capsheets              # Refresh team cap data from capsheets.com (run FIRST)
+npm run fetch-players                # Refresh player rosters/salaries (from teams.json) + stats (nbaapi.com)
+npm run validate-data                # Sanity-check the refreshed JSON
+npx tsx scripts/process-cba101.ts    # Rebuild educational content
+npx tsx scripts/process-guide.ts     # Rebuild guide summaries
 ```
 
 There are no lint or test scripts configured.
@@ -27,9 +28,6 @@ There are no lint or test scripts configured.
 
 **Required:**
 - `ANTHROPIC_API_KEY` — Claude API key
-
-**Required for player data refresh:**
-- `BALLDONTLIE_API_KEY` — BallDontLie API key (free tier); used by `fetch-players.ts` as the authoritative source for current team assignments
 
 **Optional (falls back to in-memory if missing):**
 - `UPSTASH_REDIS_REST_URL` — Upstash Redis for distributed rate limiting & response caching
@@ -67,24 +65,19 @@ Browser (React chat UI)
 
 ### Retrieval System
 
-`cba-search.ts` runs keyword matching across five data sources: `cba-articles.json`, `cba-guide.json`, `cba101.json`, `players.json`, and `teams.json`. When a team is mentioned, `searchTeams()` injects that team's cap allocations, apron status, distance to each threshold, and available exceptions. The retrieval profile (how many tokens, which sources) adapts based on query type.
+`cba-search.ts` runs keyword matching across five data sources: `cba-articles.json`, `cba-guide.json`, `cba101.json`, `players.json`, and `teams.json`. When a team is mentioned, `searchTeams()` injects that team's payroll, dead money, cap holds, luxury-tax/apron status (with exact over/under space), two-way players, and its exceptions ledger. The retrieval profile (how many tokens, which sources) adapts based on query type.
 
-The Claude model used is configured in `src/app/api/chat/route.ts` (currently `claude-sonnet-4-5-20250929`).
+The Claude model id is configured in `src/lib/config.ts` (`MODEL_ID`).
 
 ### Data Updates
 
 The `data/` JSON files are committed to the repo and served statically. To update them, run the fetch scripts and commit the new JSON. Player data and CBA articles are separate fetches.
 
-**Player team accuracy:** `fetch-players.ts` uses three sources merged in priority order:
-1. **BallDontLie** (free tier) — authoritative for current team assignments; paginated, rate-limited to ~30 req/min
-2. **HoopsHype scraping** — salary/contract data per season
-3. **nbaapi.com** — season stats
+**Team cap data (authoritative):** `fetch-capsheets.ts` scrapes each team's cap sheet on **capsheets.com** (server-rendered HTML tables) and writes `data/teams.json` (v2 shape: `{fetchedAt, season, source, thresholds, exceptions, teams}`). Each team entry has the active roster with salaries and option/non-guaranteed notes, dead money, total payroll, total salaries, luxury-tax space + repeater flag, first/second apron space (negative = over — these fields, not raw payroll comparisons, determine apron status), cap holds (separate from payroll), two-way players, and exceptions (MLE + TPEs with expiry).
 
-If BallDontLie hits its rate limit mid-fetch, it stops gracefully after 4 consecutive failures and uses what it collected. Run the script again in a few hours to get full coverage. Do not add hard-coded team overrides — fix data issues by re-running the fetch script instead.
+**Player data:** `fetch-players.ts` (run *after* `fetch-capsheets`) rebuilds `data/players.json` (v2 shape: `{fetchedAt, players}`). Rosters, team assignments, and 2026-27 salaries come from `data/teams.json`; last season's stats come from nbaapi.com, matched by normalized name (diacritics stripped, suffixes dropped) and deduped to one row per player. Stats rows with no roster match keep `team: null` + `notOnRoster: true` — never a stat-site pseudo-team like 2TM. Do not add hard-coded team overrides — fix data issues by re-running the fetch scripts instead.
 
-**Team cap data:** `fetch-teams.ts` scrapes Spotrac `/nba/cap/_/year/2025` (server-rendered HTML table) and writes `data/teams.json` with per-team payroll, cap space, league-wide thresholds (cap floor, salary cap, first/second apron), and exception amounts. Run any time to get current Spotrac numbers.
-
-**Automated refresh:** `.github/workflows/refresh-players.yml` runs both `fetch-players.ts` and `fetch-teams.ts` on the 1st of each month at 8am UTC, commits changes, and pushes. Requires `BALLDONTLIE_API_KEY` set as a GitHub repository secret.
+**Automated refresh:** `.github/workflows/refresh-players.yml` runs `fetch-capsheets.ts` then `fetch-players.ts` on the 1st of each month at 8am UTC, validates, commits changes, and pushes. No API keys required.
 
 ## UI Design
 

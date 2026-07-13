@@ -12,37 +12,23 @@ import {
   computeAvailableExceptions,
   computeCapStatus,
   normalizeTeamAbbr,
-  type CapThresholds,
   type ExceptionAvailability,
 } from "@/lib/teams-meta";
-
-interface TeamEntry {
-  abbr: string;
-  capAllocations: number;
-  capSpace: number;
-}
-
-interface TeamsJson {
-  fetchedAt: string;
-  season: string;
-  thresholds: CapThresholds;
-  exceptions: { nonTaxpayerMLE: number; taxpayerMLE: number; biannual: number };
-  teams: TeamEntry[];
-}
+import type { TeamEntry, TeamsJson } from "@/lib/teams-data";
 
 interface PlayerEntry {
   name: string;
-  team: string;
+  team: string | null;
   position: string;
-  salaries: Record<string, string>;
+}
+
+interface PlayersJson {
+  fetchedAt: string;
+  players: PlayerEntry[];
 }
 
 const teams = teamsData as TeamsJson;
-const players = playerData as PlayerEntry[];
-const CURRENT_SEASON_KEY = "2026-27";
-// Multi-team rows represent a player who changed teams mid-season — they
-// can't be attributed to a single roster.
-const MULTI_TEAM_CODES = new Set(["2TM", "3TM", "4TM"]);
+const players = (playerData as PlayersJson).players;
 
 function findTeam(abbrParam: string): TeamEntry | undefined {
   const abbr = normalizeTeamAbbr(abbrParam.toUpperCase());
@@ -66,21 +52,17 @@ function fmtCompact(n: number): string {
   }).format(n);
 }
 
-function fmtSignedDistance(n: number): string {
-  return n > 0 ? `${fmtCompact(n)} over` : `${fmtCompact(-n)} under`;
+// Apron "space" from capsheets: negative = over the line.
+function fmtSpace(space: number): string {
+  return space < 0 ? `${fmtCompact(-space)} over` : `${fmtCompact(space)} under`;
 }
 
-// Salary strings sometimes carry an annotation — "$679,042 (Two-Way)",
-// "$8,966,189 (Qualifying Offer)" — so pulling out the leading digit run is
-// safer than stripping non-numeric characters: "Two-Way"'s hyphen would
-// otherwise survive a naive strip and produce NaN.
-function parseSalary(value: string | undefined): number {
-  if (!value) return -1;
-  const match = value.match(/[\d,]+/);
-  if (!match) return -1;
-  const parsed = Number(match[0].replace(/,/g, ""));
-  return Number.isFinite(parsed) ? parsed : -1;
-}
+const NOTE_LABELS: Record<string, string> = {
+  "player option": "Player Option",
+  "team option": "Team Option",
+  "non-guaranteed": "Non-Guaranteed",
+  estimate: "Estimated",
+};
 
 export function generateStaticParams() {
   return teams.teams.map((t) => ({ abbr: t.abbr.toLowerCase() }));
@@ -98,7 +80,7 @@ export async function generateMetadata({
   const fullName = TEAM_FULL_NAMES[normalizeTeamAbbr(team.abbr)];
   return {
     title: `${fullName} Cap Sheet`,
-    description: `${fullName} ${teams.season} salary cap allocations, apron status, available exceptions, and full player payroll.`,
+    description: `${fullName} ${teams.season} payroll, luxury-tax and apron status, dead money, cap holds, and available exceptions.`,
   };
 }
 
@@ -140,31 +122,42 @@ function ExceptionsSummary({ availability }: { availability: ExceptionAvailabili
   }
 }
 
+function NamedAmountList({ entries }: { entries: Array<{ player: string; amount: number }> }) {
+  return (
+    <ul className="divide-y divide-(--color-border) rounded-xl border border-(--color-border)">
+      {entries.map((entry, index) => (
+        <li key={`${entry.player}-${index}`} className="flex items-center justify-between px-4 py-2.5 text-sm">
+          <span className="text-(--color-text-primary)">{entry.player}</span>
+          <span className="tabular-nums text-(--color-text-secondary)">{fmtExact(entry.amount)}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default async function TeamDetailPage({ params }: { params: Promise<{ abbr: string }> }) {
   const { abbr: abbrParam } = await params;
   const team = findTeam(abbrParam);
   if (!team) notFound();
 
   const abbr = normalizeTeamAbbr(team.abbr);
-  const fullName = TEAM_FULL_NAMES[abbr] ?? abbr;
+  const fullName = TEAM_FULL_NAMES[abbr] ?? team.name;
   const { thresholds, exceptions } = teams;
-  const capStatus = computeCapStatus(team.capAllocations, thresholds);
-  const availability = computeAvailableExceptions(capStatus, team.capSpace, exceptions);
+  const capStatus = computeCapStatus(team, thresholds);
+  const capSpace = thresholds.salaryCap - team.totalSalaries;
+  const availability = computeAvailableExceptions(capStatus, capSpace, exceptions);
 
-  const roster: PayrollRow[] = players
-    .filter((p) => !MULTI_TEAM_CODES.has(p.team))
-    .filter((p) => normalizeTeamAbbr(p.team) === abbr)
-    .map((p) => {
-      const raw = p.salaries[CURRENT_SEASON_KEY];
-      return {
-        name: p.name,
-        position: p.position,
-        salary: raw ?? null,
-        sortValue: parseSalary(raw),
-      };
-    })
-    .sort((a, b) => b.sortValue - a.sortValue)
-    .map(({ name, position, salary }) => ({ name, position, salary }));
+  // Position lookup from players.json (roster + salary come from teams.json).
+  const positionByName = new Map<string, string>();
+  for (const p of players) {
+    if (p.team === abbr && p.position) positionByName.set(p.name, p.position);
+  }
+
+  const roster: PayrollRow[] = team.activeRoster.map((p) => ({
+    name: p.player,
+    position: positionByName.get(p.player) ?? "",
+    salary: fmtExact(p.salary) + (p.note ? ` (${NOTE_LABELS[p.note] ?? p.note})` : ""),
+  }));
 
   return (
     <main className="min-h-screen bg-gradient-page">
@@ -196,7 +189,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ abb
           </span>
         </div>
         <p className="text-xs text-(--color-text-muted) mb-6">
-          {teams.season} season &middot; cap data fetched {formattedTeamsFetchedAt} (Spotrac)
+          {teams.season} season &middot; cap data fetched {formattedTeamsFetchedAt} (Capsheets)
         </p>
 
         <section className="panel-card rounded-2xl p-5 md:p-6 mb-6">
@@ -207,34 +200,43 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ abb
 
           <CapThresholdMeter
             teamAbbr={abbr}
-            capAllocations={team.capAllocations}
+            totalSalaries={team.totalSalaries}
             thresholds={thresholds}
             tier={capStatus.tier}
           />
 
-          <dl className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <dl className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <dt className="font-condensed text-(--color-text-muted) text-xs uppercase tracking-[0.08em] mb-1">
-                Total Cap Allocations
+                Total Salaries
               </dt>
               <dd className="font-scoreboard text-2xl tracking-wide tabular-nums text-(--color-text-primary)">
-                {fmtExact(team.capAllocations)}
+                {fmtExact(team.totalSalaries)}
               </dd>
             </div>
             <div>
               <dt className="font-condensed text-(--color-text-muted) text-xs uppercase tracking-[0.08em] mb-1">
-                Distance to First Apron
+                Luxury Tax
               </dt>
               <dd className="font-scoreboard text-2xl tracking-wide tabular-nums text-(--color-text-primary)">
-                {fmtSignedDistance(capStatus.firstApronDistance)}
+                {fmtSpace(team.luxuryTaxSpace)}
+                {team.repeater && <span className="block text-xs font-sans text-(--color-text-muted) mt-0.5">Repeater rate</span>}
               </dd>
             </div>
             <div>
               <dt className="font-condensed text-(--color-text-muted) text-xs uppercase tracking-[0.08em] mb-1">
-                Distance to Second Apron
+                First Apron
               </dt>
               <dd className="font-scoreboard text-2xl tracking-wide tabular-nums text-(--color-text-primary)">
-                {fmtSignedDistance(capStatus.secondApronDistance)}
+                {fmtSpace(team.firstApronSpace)}
+              </dd>
+            </div>
+            <div>
+              <dt className="font-condensed text-(--color-text-muted) text-xs uppercase tracking-[0.08em] mb-1">
+                Second Apron
+              </dt>
+              <dd className="font-scoreboard text-2xl tracking-wide tabular-nums text-(--color-text-primary)">
+                {fmtSpace(team.secondApronSpace)}
               </dd>
             </div>
           </dl>
@@ -243,15 +245,64 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ abb
         <section className="panel-card rounded-2xl p-5 md:p-6 mb-6">
           <h2 className="text-lg font-semibold text-(--color-text-primary) mb-3">Available Exceptions</h2>
           <ExceptionsSummary availability={availability} />
+          {team.exceptions.length > 0 && (
+            <ul className="mt-4 space-y-1.5 text-sm text-(--color-text-secondary)">
+              {team.exceptions.map((ex, index) => (
+                <li key={`${ex.type}-${index}`} className="flex flex-wrap items-baseline justify-between gap-x-4">
+                  <span>{ex.type}</span>
+                  <span className="tabular-nums">
+                    {ex.amount > 0 ? fmtExact(ex.amount) : "—"}
+                    {ex.expiry && <span className="text-(--color-text-muted)"> · expires {ex.expiry}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
-        <section className="mb-8">
+        <section className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-(--color-text-primary)">Payroll</h2>
-            <span className="text-xs text-(--color-text-muted)">{roster.length} players</span>
+            <span className="text-xs text-(--color-text-muted)">
+              {roster.length} players &middot; {fmtExact(team.totalPayroll)}
+            </span>
           </div>
-          <PayrollTable teamName={fullName} season={CURRENT_SEASON_KEY} players={roster} />
+          <PayrollTable teamName={fullName} season={teams.season} players={roster} />
         </section>
+
+        {team.twoWay.length > 0 && (
+          <section className="panel-card rounded-2xl p-5 md:p-6 mb-6">
+            <h2 className="text-lg font-semibold text-(--color-text-primary) mb-2">Two-Way Contracts</h2>
+            <p className="text-sm text-(--color-text-secondary) leading-relaxed">{team.twoWay.join(" · ")}</p>
+          </section>
+        )}
+
+        {team.deadMoney.length > 0 && (
+          <section className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold text-(--color-text-primary)">Dead Money</h2>
+              <span className="text-xs text-(--color-text-muted)">{fmtExact(team.deadMoneyTotal)} total</span>
+            </div>
+            <p className="text-xs text-(--color-text-muted) mb-3">
+              Waived or stretched players still counting against the cap. Included in total salaries.
+            </p>
+            <NamedAmountList entries={team.deadMoney} />
+          </section>
+        )}
+
+        {team.capHolds.length > 0 && (
+          <section className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold text-(--color-text-primary)">Cap Holds</h2>
+              <span className="text-xs text-(--color-text-muted)">{fmtExact(team.capHoldsTotal)} total</span>
+            </div>
+            <p className="text-xs text-(--color-text-muted) mb-3">
+              Placeholder charges for free agents and unfilled roster spots. Not part of payroll — the team can
+              renounce them to open cap room.
+            </p>
+            <NamedAmountList entries={team.capHolds} />
+          </section>
+        )}
 
         <a
           href={`/?ask=${abbr}`}

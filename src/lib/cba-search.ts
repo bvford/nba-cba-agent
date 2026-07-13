@@ -37,7 +37,9 @@ interface SearchOptions {
 
 interface PlayerData {
   name: string;
-  team: string;
+  team: string | null;
+  notOnRoster?: boolean;
+  twoWay?: boolean;
   position: string;
   age: number;
   games: number;
@@ -55,7 +57,12 @@ interface PlayerData {
   salaries: Record<string, string>;
 }
 
-const players: PlayerData[] = playerData as PlayerData[];
+interface PlayersJson {
+  fetchedAt: string;
+  players: PlayerData[];
+}
+
+const players: PlayerData[] = (playerData as PlayersJson).players;
 
 interface SectionEntry {
   heading: string;
@@ -309,7 +316,7 @@ export function searchCBAWithMeta(
 // ---- Player search ----
 
 function formatPlayerInfo(p: PlayerData): string {
-  const team = p.team;
+  const team = p.team ?? (p.notOnRoster ? "Free agent / not on a 2026-27 roster" : "N/A");
   const gp = p.games || 1;
   const ppg = (p.points / gp).toFixed(1);
   const rpg = (p.rebounds / gp).toFixed(1);
@@ -317,7 +324,7 @@ function formatPlayerInfo(p: PlayerData): string {
   const spg = (p.steals / gp).toFixed(1);
   const bpg = (p.blocks / gp).toFixed(1);
 
-  let info = `**${p.name}** (${team}, ${p.position || "N/A"})`;
+  let info = `**${p.name}** (${team}${p.twoWay ? ", Two-Way" : ""}, ${p.position || "N/A"})`;
   if (p.age) info += `, Age: ${p.age}`;
   info += "\n";
 
@@ -402,7 +409,7 @@ export function searchPlayers(query: string): string {
     for (const name of names) {
       if (queryLower.includes(name)) {
         const teamPlayers = players
-          .filter((p) => normalizeTeamAbbr(p.team) === normalizeTeamAbbr(abbr))
+          .filter((p) => p.team && normalizeTeamAbbr(p.team) === normalizeTeamAbbr(abbr))
           .sort((a, b) => b.points - a.points)
           .slice(0, TEAM_ROSTER_PLAYER_CAP);
         teamMatches.push(...teamPlayers);
@@ -423,7 +430,7 @@ export function searchPlayers(query: string): string {
 
   if (results.length === 0) return "";
 
-  let context = "\n\n--- PLAYER DATA (2025-26 snapshot — HoopsHype salaries, NBA stats feed) ---\n\n";
+  let context = "\n\n--- PLAYER DATA (2026-27 rosters & salaries from Capsheets; 2025-26 stats from NBA stats feed) ---\n\n";
   for (const p of results.slice(0, PLAYER_SEARCH_RESULT_CAP)) {
     context += formatPlayerInfo(p) + "\n";
   }
@@ -438,16 +445,34 @@ export function findPlayerNamesInQuery(query: string): string[] {
     .map((m) => m.player.name);
 }
 
+interface NamedAmount {
+  player: string;
+  amount: number;
+}
+
 interface TeamEntry {
   abbr: string;
-  capAllocations: number;
-  capSpace: number;
+  name: string;
+  totalPayroll: number;
+  totalSalaries: number;
+  deadMoney: NamedAmount[];
+  deadMoneyTotal: number;
+  capHolds: NamedAmount[];
+  capHoldsTotal: number;
+  luxuryTaxThreshold: number;
+  luxuryTaxSpace: number;
+  repeater: boolean;
+  firstApronSpace: number;
+  secondApronSpace: number;
+  twoWay: string[];
+  exceptions: Array<{ type: string; amount: number; expiry?: string }>;
 }
 
 interface TeamsJson {
   fetchedAt: string;
   season: string;
-  thresholds: { capFloor: number; salaryCap: number; firstApron: number; secondApron: number };
+  source: string;
+  thresholds: { capFloor: number; salaryCap: number; firstApron: number; secondApron: number; luxuryTax: number };
   exceptions: { nonTaxpayerMLE: number; taxpayerMLE: number; biannual: number };
   teams: TeamEntry[];
 }
@@ -455,7 +480,8 @@ interface TeamsJson {
 const teams = teamsData as TeamsJson;
 
 function fmt(n: number): string {
-  return "$" + (n / 1e6).toFixed(1) + "M";
+  const sign = n < 0 ? "-" : "";
+  return sign + "$" + (Math.abs(n) / 1e6).toFixed(1) + "M";
 }
 
 export function searchTeams(query: string): string {
@@ -475,16 +501,17 @@ export function searchTeams(query: string): string {
 
   const { thresholds, exceptions } = teams;
   const lines: string[] = [
-    `\n\n--- TEAM CAP DATA (${teams.season} — Spotrac, fetched ${teams.fetchedAt}) ---`,
-    `Thresholds: Salary cap ${fmt(thresholds.salaryCap)} | First apron ${fmt(thresholds.firstApron)} | Second apron ${fmt(thresholds.secondApron)}\n`,
+    `\n\n--- TEAM CAP DATA (${teams.season} — ${teams.source}, fetched ${teams.fetchedAt}) ---`,
+    `Thresholds: Salary cap ${fmt(thresholds.salaryCap)} | Luxury tax ${fmt(thresholds.luxuryTax)} | First apron ${fmt(thresholds.firstApron)} | Second apron ${fmt(thresholds.secondApron)}\n`,
   ];
 
   for (const abbr of matchedAbbrs) {
     const t = teams.teams.find((x) => normalizeTeamAbbr(x.abbr) === normalizeTeamAbbr(abbr));
     if (!t) continue;
 
-    const { capAllocations, capSpace } = t;
-    const capStatus = computeCapStatus(capAllocations, thresholds);
+    const capStatus = computeCapStatus(t, thresholds);
+    // Rough cap-room figure for teams under the cap (holds not renounced).
+    const capSpace = thresholds.salaryCap - t.totalSalaries;
     const availability = computeAvailableExceptions(capStatus, capSpace, exceptions);
 
     let availableExceptions: string;
@@ -499,33 +526,36 @@ export function searchTeams(query: string): string {
         availableExceptions = `Non-Taxpayer MLE: ${fmt(availability.nonTaxpayerMLE)}, Bi-Annual: ${fmt(availability.biannual)}`;
         break;
       case "cap-room":
-        availableExceptions = `Cap room: ${fmt(availability.capSpace)} available`;
+        availableExceptions = `Cap room: ~${fmt(availability.capSpace)} under the cap (before renouncing holds)`;
         break;
     }
 
-    lines.push(`**${abbr}**`);
-    lines.push(`  Total cap allocations: ${fmt(capAllocations)}`);
+    lines.push(`**${t.name} (${t.abbr})**`);
+    lines.push(`  Total payroll (active roster): ${fmt(t.totalPayroll)}`);
+    if (t.deadMoneyTotal > 0) lines.push(`  Dead money: ${fmt(t.deadMoneyTotal)}`);
+    lines.push(`  Total salaries (incl. dead money): ${fmt(t.totalSalaries)}`);
     lines.push(`  Status: ${CAP_STATUS_CHAT_LABELS[capStatus.tier]}`);
-    if (capStatus.overCap) {
-      const { firstApronDistance, secondApronDistance } = capStatus;
-      lines.push(`  Distance to first apron: ${firstApronDistance > 0 ? fmt(firstApronDistance) + " over" : fmt(-firstApronDistance) + " under"}`);
-      lines.push(`  Distance to second apron: ${secondApronDistance > 0 ? fmt(secondApronDistance) + " over" : fmt(-secondApronDistance) + " under"}`);
-    }
+    lines.push(`  Luxury tax: ${t.luxuryTaxSpace < 0 ? fmt(-t.luxuryTaxSpace) + " over the tax line" : fmt(t.luxuryTaxSpace) + " under the tax line"}${t.repeater ? " (repeater rate)" : ""}`);
+    lines.push(`  First apron: ${t.firstApronSpace < 0 ? fmt(-t.firstApronSpace) + " OVER" : fmt(t.firstApronSpace) + " under"}`);
+    lines.push(`  Second apron: ${t.secondApronSpace < 0 ? fmt(-t.secondApronSpace) + " OVER" : fmt(t.secondApronSpace) + " under"}`);
+    if (t.capHoldsTotal > 0) lines.push(`  Cap holds (separate from payroll, can be renounced): ${fmt(t.capHoldsTotal)} across ${t.capHolds.length} holds`);
+    if (t.twoWay.length > 0) lines.push(`  Two-way players: ${t.twoWay.join(", ")}`);
     lines.push(`  Available exception(s): ${availableExceptions}`);
+    if (t.exceptions.length > 0) {
+      lines.push(`  Trade/exception ledger (per Capsheets):`);
+      for (const ex of t.exceptions) {
+        lines.push(`    - ${ex.type}: ${fmt(ex.amount)}${ex.expiry ? ` (expires ${ex.expiry})` : ""}`);
+      }
+    }
     lines.push("");
   }
 
-  // Spotrac cap accounting notes — critical for correct interpretation
-  lines.push(`**How to read Spotrac "Total Cap Allocations":**`);
-  lines.push(`- This figure INCLUDES cap holds, which are placeholder amounts that may overstate actual committed payroll:`);
-  lines.push(`  - Unsigned draft picks carry a rookie-scale cap hold until signed or renounced`);
-  lines.push(`  - Unsigned free agents with Bird/Early Bird rights carry a qualifying offer hold (or salary-based hold)`);
-  lines.push(`  - Each unfilled roster spot carries a minimum salary hold (~${fmt(600000)})`);
-  lines.push(`- A team can renounce holds to create more cap room — so a team's "real" room may be higher than the cap space figure suggests`);
-  lines.push(`- Option years (player options, team options) count at full option value until the option is exercised or declined`);
-  lines.push(`- Dead cap (waived players with guaranteed money remaining) IS included and cannot be renounced`);
-  lines.push(`- Two-way contracts (~$576K) are NOT included in standard cap allocations`);
-  lines.push(`- The luxury tax line is NOT shown here — use general knowledge or note it's typically ~$30–35M above the salary cap`);
+  // Cap accounting notes — with capsheets, payroll and holds are kept separate.
+  lines.push(`**How to read these Capsheets numbers:**`);
+  lines.push(`- "Total payroll" is the active roster's guaranteed + non-guaranteed salaries. "Total salaries" adds dead money (waived players still owed).`);
+  lines.push(`- Cap holds are listed SEPARATELY and are NOT part of payroll. They are placeholders (unsigned picks, free agents with Bird rights, empty roster spots) that a team can renounce to open cap room.`);
+  lines.push(`- First/second apron "space" is the authoritative over/under figure (negative = over). Apron status is what governs which tools a team can use.`);
+  lines.push(`- Option years (player/team options) count at full value until exercised or declined; two-way contracts are not counted in the apron total.`);
 
   return lines.join("\n");
 }

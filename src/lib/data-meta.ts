@@ -1,6 +1,7 @@
 import teams from "../../data/teams.json";
 
 export const teamsFetchedAt = teams.fetchedAt;
+export const teamsSource = teams.source; // "capsheets.com"
 export const leagueThresholds = teams.thresholds;
 export const leagueSeason = teams.season;
 

@@ -30,8 +30,8 @@ export function PayrollTable({ teamName, season, players }: PayrollTableProps) {
         </thead>
         <tbody>
           {players.map((player, index) => (
-            // players.json occasionally has literal duplicate rows for the
-            // same name, so the index has to be part of the key.
+            // Keyed by name + index defensively, in case a scraped roster
+            // ever repeats a name.
             <tr
               key={`${player.name}-${index}`}
               className="border-t border-(--color-border) hover:bg-(--color-surface-hover)/50 transition-colors"

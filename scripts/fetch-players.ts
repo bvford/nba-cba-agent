@@ -1,55 +1,33 @@
-import { writeFileSync } from "fs";
+/**
+ * fetch-players.ts
+ * Rebuilds data/players.json from two sources:
+ *   1. data/teams.json (capsheets.com — run scripts/fetch-capsheets.ts first):
+ *      authoritative rosters, team assignments, and 2026-27 salaries.
+ *   2. nbaapi.com: last season's per-player stats.
+ *
+ * Stats rows are matched to capsheets players by normalized name (diacritics
+ * stripped, punctuation removed, Jr./III-style suffixes dropped). A stats row
+ * that matches no roster player is kept with team: null and notOnRoster: true
+ * (free agents' stats still matter for chat) — never with a stat-site team
+ * code, and 2TM/3TM/4TM pseudo-teams are never used as team labels.
+ *
+ * Run: npx tsx scripts/fetch-players.ts  (or npm run fetch-players)
+ */
+import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
-interface PlayerSalary {
-  name: string;
-  team: string;
-  salaries: Record<string, string>; // e.g. { "2025-26": "$55,000,000 (P)" }
-}
-
-interface PlayerStats {
-  name: string;
-  team: string;
-  position: string;
-  age: number;
-  games: number;
-  gamesStarted: number;
-  points: number;
-  rebounds: number;
-  assists: number;
-  steals: number;
-  blocks: number;
-  turnovers: number;
-  fieldPercent: number;
-  threePercent: number;
-  ftPercent: number;
-  minutesPerGame: number;
-}
-
-interface PlayerData {
-  name: string;
-  team: string;
-  position: string;
-  age: number;
-  games: number;
-  gamesStarted: number;
-  points: number;
-  rebounds: number;
-  assists: number;
-  steals: number;
-  blocks: number;
-  turnovers: number;
-  fieldPercent: number;
-  threePercent: number;
-  ftPercent: number;
-  minutesPerGame: number;
-  salaries: Record<string, string>;
-}
-
 const MIN_STATS_PLAYERS = 250;
-const MIN_SALARY_PLAYERS = 250;
-const MIN_BALLDONTLIE_PLAYERS = 250;
 const MIN_TOTAL_PLAYERS = 400;
+const MIN_ROSTER_SIZE = 12; // active + two-way
+// Offseason rosters can exceed the in-season limit (e.g. July 2026 MEM carried
+// 20 active + 3 two-way while sorting out non-guaranteed deals).
+const MAX_ROSTER_SIZE = 24;
+
+const CANONICAL_ABBRS = new Set([
+  "ATL", "BKN", "BOS", "CHA", "CHI", "CLE", "DAL", "DEN", "DET", "GSW",
+  "HOU", "IND", "LAC", "LAL", "MEM", "MIA", "MIL", "MIN", "NOP", "NYK",
+  "OKC", "ORL", "PHI", "PHX", "POR", "SAC", "SAS", "TOR", "UTA", "WAS",
+]);
 
 // NBA league year starts July 1. Example: Jul 2026-Jun 2027 is contract season 2026.
 function currentNBAContractSeason(): number {
@@ -58,276 +36,98 @@ function currentNBAContractSeason(): number {
 }
 
 const CURRENT_SEASON = currentNBAContractSeason();
+const SEASON_KEY = `${CURRENT_SEASON}-${String((CURRENT_SEASON + 1) % 100).padStart(2, "0")}`;
 
-const BALLDONTLIE_API_KEY = process.env.BALLDONTLIE_API_KEY;
+// ---- Types ----
 
-// NBA team ID to abbreviation map (HoopsHype IDs)
-const TEAM_MAP: Record<string, string> = {
-  "1": "ATL", "2": "BOS", "3": "BKN", "4": "CHA", "5": "CHI",
-  "6": "CLE", "7": "DAL", "8": "DEN", "9": "GSW", "10": "HOU",
-  "11": "IND", "12": "LAC", "13": "LAL", "14": "MEM", "15": "MIA",
-  "16": "MIL", "17": "MIN", "18": "NYK", "19": "ORL", "20": "PHI",
-  "21": "PHX", "22": "POR", "23": "SAC", "24": "SAS", "25": "OKC",
-  "26": "UTA", "27": "WAS", "28": "TOR", "29": "MEM", "30": "DET",
-  "5312": "CHA",
-};
-
-const TEAM_SLUG_TO_ABBR: Record<string, string> = {
-  "atlanta-hawks": "ATL",
-  "boston-celtics": "BOS",
-  "brooklyn-nets": "BKN",
-  "charlotte-hornets": "CHA",
-  "chicago-bulls": "CHI",
-  "cleveland-cavaliers": "CLE",
-  "dallas-mavericks": "DAL",
-  "denver-nuggets": "DEN",
-  "detroit-pistons": "DET",
-  "golden-state-warriors": "GSW",
-  "houston-rockets": "HOU",
-  "indiana-pacers": "IND",
-  "los-angeles-clippers": "LAC",
-  "los-angeles-lakers": "LAL",
-  "memphis-grizzlies": "MEM",
-  "miami-heat": "MIA",
-  "milwaukee-bucks": "MIL",
-  "minnesota-timberwolves": "MIN",
-  "new-orleans-pelicans": "NOP",
-  "new-york-knicks": "NYK",
-  "oklahoma-city-thunder": "OKC",
-  "orlando-magic": "ORL",
-  "philadelphia-76ers": "PHI",
-  "phoenix-suns": "PHX",
-  "portland-trail-blazers": "POR",
-  "sacramento-kings": "SAC",
-  "san-antonio-spurs": "SAS",
-  "toronto-raptors": "TOR",
-  "utah-jazz": "UTA",
-  "washington-wizards": "WAS",
-};
-
-function formatSeason(season: number): string {
-  const nextYear = (season + 1) % 100;
-  return `${season}-${nextYear.toString().padStart(2, "0")}`;
+interface RosterPlayer {
+  player: string;
+  salary: number;
+  note?: string;
 }
 
-function formatSalary(amount: number, options: { po: boolean; to: boolean; qo: boolean; tw: boolean }): string {
-  const formatted = "$" + amount.toLocaleString();
-  const tags: string[] = [];
-  if (options.po) tags.push("Player Option");
-  if (options.to) tags.push("Team Option");
-  if (options.qo) tags.push("Qualifying Offer");
-  if (options.tw) tags.push("Two-Way");
-  return tags.length > 0 ? `${formatted} (${tags.join(", ")})` : formatted;
+interface TeamsJson {
+  fetchedAt: string;
+  season: string;
+  source: string;
+  teams: Array<{
+    abbr: string;
+    activeRoster: RosterPlayer[];
+    twoWay: string[];
+  }>;
 }
 
+interface PlayerStats {
+  name: string;
+  position: string;
+  age: number;
+  games: number;
+  gamesStarted: number;
+  points: number;
+  rebounds: number;
+  assists: number;
+  steals: number;
+  blocks: number;
+  turnovers: number;
+  fieldPercent: number;
+  threePercent: number;
+  ftPercent: number;
+  minutesPerGame: number;
+}
+
+interface PlayerData extends PlayerStats {
+  team: string | null;
+  notOnRoster?: boolean;
+  twoWay?: boolean;
+  salaries: Record<string, string>;
+}
+
+// ---- Name normalization (shared matching key) ----
+// NFD-decompose and strip combining marks so "Jokić" === "Jokic", lowercase,
+// drop punctuation, and remove generational suffixes.
 function normalizeName(name: string): string {
   return name
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
-    .replace(/[.']/g, "")
-    .replace(/\s+jr$/i, "")
-    .replace(/\s+sr$/i, "")
-    .replace(/\s+iii$/i, "")
-    .replace(/\s+ii$/i, "")
-    .replace(/\s+iv$/i, "")
+    .replace(/[.,'’-]/g, "")
+    .replace(/\s+(jr|sr|ii|iii|iv|v)$/i, "")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
-// ---- Fetch current rosters from BallDontLie (authoritative team source) ----
-async function fetchRosterFromBallDontLie(): Promise<Map<string, string>> {
-  const rosterMap = new Map<string, string>(); // normalizedName → team abbreviation
+const EMPTY_STATS: PlayerStats = {
+  name: "",
+  position: "",
+  age: 0,
+  games: 0,
+  gamesStarted: 0,
+  points: 0,
+  rebounds: 0,
+  assists: 0,
+  steals: 0,
+  blocks: 0,
+  turnovers: 0,
+  fieldPercent: 0,
+  threePercent: 0,
+  ftPercent: 0,
+  minutesPerGame: 0,
+};
 
-  if (!BALLDONTLIE_API_KEY) {
-    throw new Error("BALLDONTLIE_API_KEY is required for reliable player team assignments");
-  }
-
-  console.log("Fetching current rosters from BallDontLie...");
-
-  let cursor: number | null = null;
-  let page = 0;
-  let totalFetched = 0;
-  let consecutiveRateLimits = 0;
-
-  while (true) {
-    const url: string = cursor
-      ? `https://api.balldontlie.io/v1/players?per_page=100&cursor=${cursor}`
-      : `https://api.balldontlie.io/v1/players?per_page=100`;
-
-    const res: Response = await fetch(url, {
-      headers: { Authorization: BALLDONTLIE_API_KEY },
-    });
-
-    if (!res.ok) {
-      if (res.status === 429) {
-        consecutiveRateLimits++;
-        if (consecutiveRateLimits >= 4) {
-          console.warn(`  BallDontLie rate limit hit ${consecutiveRateLimits} times — stopping early. Collected ${rosterMap.size} teams so far.`);
-          console.warn(`  Tip: the free tier quota may be exhausted. Try running again in a few hours.`);
-          break;
-        }
-        console.log(`  Rate limited (${consecutiveRateLimits}/4) — waiting 15s...`);
-        await new Promise((r) => setTimeout(r, 15000));
-        continue;
-      }
-      console.error(`  BallDontLie returned ${res.status} on page ${page}`);
-      break;
-    }
-    consecutiveRateLimits = 0;
-
-    const json: { data?: Array<{ first_name: string; last_name: string; team: { abbreviation: string } | null }>; meta?: { next_cursor?: number } } = await res.json();
-    const data = json.data || [];
-
-    if (data.length === 0) break;
-
-    for (const player of data) {
-      if (!player.team) continue; // skip players with no current team (retired, etc.)
-      const fullName = `${player.first_name} ${player.last_name}`;
-      const key = normalizeName(fullName);
-      rosterMap.set(key, player.team.abbreviation);
-    }
-
-    totalFetched += data.length;
-    page++;
-
-    const nextCursor: number | undefined = json.meta?.next_cursor;
-    if (!nextCursor) break;
-    cursor = nextCursor;
-
-    // Respect rate limits: 60 req/min on free tier → 2 req/sec to be safe
-    await new Promise((r) => setTimeout(r, 2000));
-  }
-
-  console.log(`  BallDontLie: ${totalFetched} players fetched, ${rosterMap.size} with active teams`);
-  return rosterMap;
+function formatSalary(amount: number, note?: string): string {
+  const formatted = "$" + amount.toLocaleString("en-US");
+  if (!note) return formatted;
+  const label = note
+    .split(" ")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+  return `${formatted} (${label})`;
 }
 
-function extractContractsFromNextData(
-  html: string,
-  season: number,
-  teamId: string
-): Array<{
-  playerName?: string;
-  seasons?: Array<{
-    season?: number;
-    salary?: number;
-    playerOption?: boolean;
-    teamOption?: boolean;
-    qualifyingOffer?: boolean;
-    twoWayContract?: boolean;
-    teamID?: string | number;
-  }>;
-}> {
-  const m = html.match(
-    /<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/
-  );
-  if (!m) return [];
-
-  try {
-    const data = JSON.parse(m[1]);
-    const queries = data?.props?.pageProps?.dehydratedState?.queries || [];
-    const query = queries.find(
-      (q: { queryKey?: unknown[] }) =>
-        Array.isArray(q.queryKey) &&
-        q.queryKey[0] === season &&
-        q.queryKey[1] === 500 &&
-        String(q.queryKey[2]) === teamId
-    );
-    const contracts = query?.state?.data?.contracts?.contracts;
-    return Array.isArray(contracts) ? contracts : [];
-  } catch {
-    return [];
-  }
-}
-
-async function fetchTeamSalaryUrls(): Promise<string[]> {
-  const res = await fetch("https://hoopshype.com/salaries/teams/", {
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-    },
-  });
-
-  if (!res.ok) return [];
-
-  const html = await res.text();
-  const matches = html.match(/\/salaries\/teams\/[a-z0-9-]+\/\d+\//g) || [];
-  return Array.from(new Set(matches)).slice(0, 30);
-}
-
-async function fetchSalaries(): Promise<PlayerSalary[]> {
-  const salaryMap = new Map<string, PlayerSalary>();
-
-  console.log("Fetching salary data from HoopsHype team pages...");
-
-  try {
-    const teamUrls = await fetchTeamSalaryUrls();
-    console.log(`  Team pages found: ${teamUrls.length}`);
-
-    for (const urlPath of teamUrls) {
-      const slugMatch = urlPath.match(/\/salaries\/teams\/([a-z0-9-]+)\/(\d+)\//);
-      const teamSlug = slugMatch?.[1] || "";
-      const teamId = slugMatch?.[2] || "";
-      const fallbackTeam = TEAM_SLUG_TO_ABBR[teamSlug] || "";
-
-      const res = await fetch(`https://hoopshype.com${urlPath}`, {
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-        },
-      });
-      if (!res.ok) continue;
-
-      const html = await res.text();
-      const contracts = extractContractsFromNextData(html, CURRENT_SEASON, teamId);
-
-      for (const contract of contracts) {
-        const name = contract.playerName || "";
-        if (!name) continue;
-
-        const key = normalizeName(name);
-        const existing = salaryMap.get(key);
-        const salaries: Record<string, string> = existing?.salaries || {};
-        let team = existing?.team || fallbackTeam;
-
-        let currentSeasonTeam: string | undefined;
-        let fallbackSeasonTeam: string | undefined;
-
-        for (const season of contract.seasons || []) {
-          if (!season.salary || !season.season || season.season < CURRENT_SEASON) continue;
-
-          const seasonKey = formatSeason(season.season);
-          salaries[seasonKey] = formatSalary(season.salary, {
-            po: season.playerOption || false,
-            to: season.teamOption || false,
-            qo: season.qualifyingOffer || false,
-            tw: season.twoWayContract || false,
-          });
-
-          if (season.teamID) {
-            const mapped = TEAM_MAP[String(season.teamID)];
-            if (mapped) {
-              if (!fallbackSeasonTeam) fallbackSeasonTeam = mapped;
-              if (season.season === CURRENT_SEASON) currentSeasonTeam = mapped;
-            }
-          }
-        }
-
-        team = currentSeasonTeam || fallbackSeasonTeam || team;
-        salaryMap.set(key, { name, team: team || fallbackTeam, salaries });
-      }
-
-      await new Promise((r) => setTimeout(r, 120));
-    }
-  } catch (err) {
-    console.error("  Team salary fetch failed:", err);
-  }
-
-  const players = Array.from(salaryMap.values());
-  console.log(`  Total players with salary data: ${players.length}`);
-  return players;
-}
+// ---- Stats from nbaapi.com ----
 
 async function fetchStatsForSeason(statsSeason: number): Promise<PlayerStats[]> {
-  console.log(`Fetching player stats from nbaStats API for season ${statsSeason}...`);
+  console.log(`Fetching player stats from nbaapi.com for season ${statsSeason}...`);
   const allPlayers: PlayerStats[] = [];
   let page = 1;
   const pageSize = 100;
@@ -353,7 +153,6 @@ async function fetchStatsForSeason(statsSeason: number): Promise<PlayerStats[]> 
       const gp = p.games || 1;
       allPlayers.push({
         name: p.playerName || "",
-        team: p.team || "",
         position: p.position || "",
         age: p.age || 0,
         games: p.games || 0,
@@ -367,7 +166,7 @@ async function fetchStatsForSeason(statsSeason: number): Promise<PlayerStats[]> 
         fieldPercent: p.fieldPercent || 0,
         threePercent: p.threePercent || 0,
         ftPercent: p.ftPercent || 0,
-        minutesPerGame: Math.round((p.minutesPg || p.minutesPlayed || 0) / gp * 10) / 10,
+        minutesPerGame: Math.round(((p.minutesPg || p.minutesPlayed || 0) / gp) * 10) / 10,
       });
     }
 
@@ -382,16 +181,14 @@ async function fetchStatsForSeason(statsSeason: number): Promise<PlayerStats[]> 
     await new Promise((r) => setTimeout(r, 200));
   }
 
-  console.log(`  Found ${allPlayers.length} players with stats for season ${statsSeason}`);
+  console.log(`  Found ${allPlayers.length} stat rows for season ${statsSeason}`);
   return allPlayers;
 }
 
 async function fetchStats(): Promise<PlayerStats[]> {
-  const candidateSeasons = Array.from(new Set([
-    CURRENT_SEASON + 1,
-    CURRENT_SEASON,
-    CURRENT_SEASON - 1,
-  ]));
+  const candidateSeasons = Array.from(
+    new Set([CURRENT_SEASON + 1, CURRENT_SEASON, CURRENT_SEASON - 1])
+  );
 
   for (const statsSeason of candidateSeasons) {
     const stats = await fetchStatsForSeason(statsSeason);
@@ -404,98 +201,165 @@ async function fetchStats(): Promise<PlayerStats[]> {
   throw new Error("Could not fetch a complete player stats season");
 }
 
-function mergePlayers(
-  stats: PlayerStats[],
-  salaries: PlayerSalary[],
-  bdlRoster: Map<string, string>
-): PlayerData[] {
-  const salaryMap = new Map<string, PlayerSalary>();
-  for (const s of salaries) {
-    salaryMap.set(normalizeName(s.name), s);
+// One stats row per normalized name. nbaapi returns a per-team row for traded
+// players PLUS a combined 2TM/3TM row; keeping the row with the most games
+// naturally selects the combined season totals.
+function dedupeStats(stats: PlayerStats[]): Map<string, PlayerStats> {
+  const byName = new Map<string, PlayerStats>();
+  for (const row of stats) {
+    if (!row.name) continue;
+    const key = normalizeName(row.name);
+    const existing = byName.get(key);
+    if (!existing || row.games > existing.games) {
+      byName.set(key, row);
+    }
   }
+  return byName;
+}
 
-  const merged: PlayerData[] = [];
+// ---- Merge ----
 
-  for (const stat of stats) {
-    const key = normalizeName(stat.name);
-    const salary = salaryMap.get(key);
+function buildPlayers(teamsJson: TeamsJson, statsByName: Map<string, PlayerStats>): PlayerData[] {
+  const players: PlayerData[] = [];
+  const rosteredKeys = new Set<string>();
 
-    // Team priority: BallDontLie (most accurate, live rosters) > HoopsHype salary source > stats source
-    const team = bdlRoster.get(key) || salary?.team || stat.team;
+  for (const team of teamsJson.teams) {
+    if (!CANONICAL_ABBRS.has(team.abbr)) {
+      throw new Error(`teams.json has non-canonical abbreviation: ${team.abbr}`);
+    }
 
-    merged.push({
-      ...stat,
-      team,
-      salaries: salary?.salaries || {},
-    });
-  }
+    for (const rosterPlayer of team.activeRoster) {
+      const key = normalizeName(rosterPlayer.player);
+      if (rosteredKeys.has(key)) {
+        throw new Error(`Player "${rosterPlayer.player}" appears on more than one roster`);
+      }
+      rosteredKeys.add(key);
+      const stats = statsByName.get(key);
+      players.push({
+        ...(stats ?? EMPTY_STATS),
+        name: rosterPlayer.player, // capsheets spelling is canonical (keeps diacritics)
+        team: team.abbr,
+        salaries: {
+          [SEASON_KEY]: formatSalary(rosterPlayer.salary, rosterPlayer.note),
+        },
+      });
+    }
 
-  // Add salary-only players (injured, not yet playing, etc.)
-  const statsNames = new Set(stats.map((s) => normalizeName(s.name)));
-  for (const sal of salaries) {
-    const key = normalizeName(sal.name);
-    if (!statsNames.has(key)) {
-      const team = bdlRoster.get(key) || sal.team;
-      merged.push({
-        name: sal.name,
-        team,
-        position: "",
-        age: 0,
-        games: 0,
-        gamesStarted: 0,
-        points: 0,
-        rebounds: 0,
-        assists: 0,
-        steals: 0,
-        blocks: 0,
-        turnovers: 0,
-        fieldPercent: 0,
-        threePercent: 0,
-        ftPercent: 0,
-        minutesPerGame: 0,
-        salaries: sal.salaries,
+    for (const twoWayName of team.twoWay) {
+      const key = normalizeName(twoWayName);
+      if (rosteredKeys.has(key)) continue; // defensive: already on a roster
+      rosteredKeys.add(key);
+      const stats = statsByName.get(key);
+      players.push({
+        ...(stats ?? EMPTY_STATS),
+        name: twoWayName,
+        team: team.abbr,
+        twoWay: true,
+        salaries: {
+          [SEASON_KEY]: "Two-Way",
+        },
       });
     }
   }
 
-  return merged;
+  // Stats-only players: not on any 2026-27 roster (free agents, retired,
+  // overseas). Keep their stats for chat, but never assign a team.
+  for (const [key, stats] of statsByName) {
+    if (rosteredKeys.has(key)) continue;
+    players.push({
+      ...stats,
+      team: null,
+      notOnRoster: true,
+      salaries: {},
+    });
+  }
+
+  return players;
+}
+
+// ---- Validation (loud, refuses to write bad data) ----
+
+function validate(players: PlayerData[], teamsJson: TeamsJson): void {
+  const failures: string[] = [];
+
+  if (players.length < MIN_TOTAL_PLAYERS) {
+    failures.push(`only ${players.length} total players`);
+  }
+
+  const withStats = players.filter((p) => p.games > 0).length;
+  if (withStats < MIN_STATS_PLAYERS) {
+    failures.push(`only ${withStats} players with stats`);
+  }
+
+  // Zero duplicate normalized names.
+  const seen = new Map<string, number>();
+  for (const p of players) {
+    const key = normalizeName(p.name);
+    seen.set(key, (seen.get(key) || 0) + 1);
+  }
+  const dupes = Array.from(seen.entries()).filter(([, n]) => n > 1);
+  if (dupes.length > 0) {
+    failures.push(`${dupes.length} duplicate normalized names (e.g. ${dupes.slice(0, 5).map(([k]) => k).join(", ")})`);
+  }
+
+  // No stat-site pseudo-teams or non-canonical codes.
+  for (const p of players) {
+    if (p.team !== null && !CANONICAL_ABBRS.has(p.team)) {
+      failures.push(`player "${p.name}" has non-canonical team "${p.team}"`);
+      break;
+    }
+  }
+
+  // Every team has a plausible roster (active + two-way).
+  for (const team of teamsJson.teams) {
+    const size = players.filter((p) => p.team === team.abbr).length;
+    if (size < MIN_ROSTER_SIZE || size > MAX_ROSTER_SIZE) {
+      failures.push(`${team.abbr} roster has ${size} players (expected ${MIN_ROSTER_SIZE}-${MAX_ROSTER_SIZE})`);
+    }
+  }
+
+  if (failures.length > 0) {
+    throw new Error(`Refusing to write degraded players.json: ${failures.join("; ")}`);
+  }
 }
 
 async function main() {
   try {
-    // Run stats and salary fetches in parallel; BallDontLie is sequential (rate limits)
-    const [stats, salaries, bdlRoster] = await Promise.all([
-      fetchStats(),
-      fetchSalaries(),
-      fetchRosterFromBallDontLie(),
-    ]);
-
-    const players = mergePlayers(stats, salaries, bdlRoster);
-
-    const withSalary = players.filter((p) => Object.keys(p.salaries).length > 0);
-    const withStats = players.filter((p) => p.games > 0);
-    const withBdlTeam = players.filter((p) => bdlRoster.has(normalizeName(p.name)));
-    const validationFailures = [
-      players.length < MIN_TOTAL_PLAYERS ? `only ${players.length} total players` : "",
-      withStats.length < MIN_STATS_PLAYERS ? `only ${withStats.length} players with stats` : "",
-      withSalary.length < MIN_SALARY_PLAYERS ? `only ${withSalary.length} players with salary data` : "",
-      bdlRoster.size < MIN_BALLDONTLIE_PLAYERS ? `only ${bdlRoster.size} BallDontLie roster matches` : "",
-    ].filter(Boolean);
-
-    if (validationFailures.length > 0) {
-      throw new Error(`Refusing to write degraded players.json: ${validationFailures.join("; ")}`);
+    // Rosters/salaries come from data/teams.json (capsheets). Require the v2
+    // shape so this can't silently run against stale Spotrac data.
+    const teamsPath = join(process.cwd(), "data", "teams.json");
+    const teamsJson = JSON.parse(readFileSync(teamsPath, "utf8")) as TeamsJson;
+    if (teamsJson.source !== "capsheets.com" || !Array.isArray(teamsJson.teams)) {
+      throw new Error("data/teams.json is not the capsheets v2 shape — run scripts/fetch-capsheets.ts first");
     }
+    if (teamsJson.teams.length !== 30) {
+      throw new Error(`data/teams.json has ${teamsJson.teams.length} teams — run scripts/fetch-capsheets.ts first`);
+    }
+
+    const stats = await fetchStats();
+    const statsByName = dedupeStats(stats);
+
+    const players = buildPlayers(teamsJson, statsByName);
+    validate(players, teamsJson);
 
     players.sort((a, b) => b.points - a.points);
 
-    const outPath = join(__dirname, "..", "data", "players.json");
-    writeFileSync(outPath, JSON.stringify(players, null, 2));
+    const output = {
+      fetchedAt: new Date().toISOString().slice(0, 10),
+      players,
+    };
 
+    const outPath = join(process.cwd(), "data", "players.json");
+    writeFileSync(outPath, JSON.stringify(output, null, 2));
+
+    const rostered = players.filter((p) => p.team !== null);
+    const twoWay = players.filter((p) => p.twoWay).length;
+    const freeAgents = players.filter((p) => p.notOnRoster).length;
+    const rosteredWithStats = rostered.filter((p) => p.games > 0).length;
     console.log(`\nDone!`);
     console.log(`  Total players: ${players.length}`);
-    console.log(`  With stats: ${withStats.length}`);
-    console.log(`  With salary data: ${withSalary.length}`);
-    console.log(`  Team confirmed by BallDontLie: ${withBdlTeam.length}`);
+    console.log(`  On 2026-27 rosters: ${rostered.length} (${twoWay} two-way; ${rosteredWithStats} with stats)`);
+    console.log(`  Stats-only (no current roster): ${freeAgents}`);
     console.log(`  Output: ${outPath}`);
   } catch (err) {
     console.error("Error:", err);

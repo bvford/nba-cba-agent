@@ -1,11 +1,13 @@
 {
-  "fetchedAt": "2026-07-01",
+  "fetchedAt": "2026-07-13",
   "season": "2026-27",
+  "source": "capsheets.com",
   "thresholds": {
     "capFloor": 148465000,
     "salaryCap": 164961000,
     "firstApron": 209015000,
-    "secondApron": 221686000
+    "secondApron": 221686000,
+    "luxuryTax": 200428000
   },
   "exceptions": {
     "nonTaxpayerMLE": 15044000,
@@ -15,153 +17,3820 @@
   "teams": [
     {
       "abbr": "ATL",
-      "capAllocations": 240796978,
-      "capSpace": -75835978
+      "name": "Atlanta Hawks",
+      "slug": "atlanta-hawks",
+      "rosterHeader": "16/15 + 2/3",
+      "activeRoster": [
+        {
+          "player": "Jalen Johnson",
+          "salary": 30000000
+        },
+        {
+          "player": "Dyson Daniels",
+          "salary": 25000000
+        },
+        {
+          "player": "C.J. McCollum",
+          "salary": 21000000
+        },
+        {
+          "player": "Onyeka Okungwu",
+          "salary": 16120000
+        },
+        {
+          "player": "Nickeil Alexander-Walker",
+          "salary": 14403710
+        },
+        {
+          "player": "Jock Landale",
+          "salary": 14100000
+        },
+        {
+          "player": "Corey Kispert",
+          "salary": 13975000
+        },
+        {
+          "player": "Zaccharie Risacher",
+          "salary": 13826040
+        },
+        {
+          "player": "Buddy Hield",
+          "salary": 9658536
+        },
+        {
+          "player": "Aaron Wiggins",
+          "salary": 8831776
+        },
+        {
+          "player": "Kingston Flemings",
+          "salary": 7348680
+        },
+        {
+          "player": "Devin Carter",
+          "salary": 5158080
+        },
+        {
+          "player": "Asa Newell",
+          "salary": 3399880
+        },
+        {
+          "player": "Zuby Ejiofor",
+          "salary": 3453360
+        },
+        {
+          "player": "Mouhamed Gueye",
+          "salary": 2406205,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Henri Veesaar",
+          "salary": 1357763
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 190039030,
+      "totalSalaries": 190039030,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 10388970,
+      "repeater": false,
+      "firstApronSpace": 18583446,
+      "secondApronSpace": 31254446,
+      "capHolds": [
+        {
+          "player": "Jonathan Kuminga",
+          "amount": 28559483
+        },
+        {
+          "player": "Gabe Vincent",
+          "amount": 21850000
+        },
+        {
+          "player": "Tony Bradley",
+          "amount": 2449421
+        },
+        {
+          "player": "Trent Forrest",
+          "amount": 2449421
+        },
+        {
+          "player": "Wesley Matthews",
+          "amount": 2450001
+        },
+        {
+          "player": "Keaton Wallace",
+          "amount": 2450001
+        },
+        {
+          "player": "Christian Koloko",
+          "amount": 2185633
+        },
+        {
+          "player": "Dylan Windler",
+          "amount": 2185633
+        }
+      ],
+      "capHoldsTotal": 64579593,
+      "twoWay": [
+        "RayJ Dennis",
+        "Keshon Gilbert"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 944000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Kobe Bufkin)",
+          "amount": 4503720,
+          "expiry": "9/16/26"
+        },
+        {
+          "type": "TPE (Vit Krejci)",
+          "amount": 2349578,
+          "expiry": "2/1/27"
+        },
+        {
+          "type": "TPE (Luke Kennard)",
+          "amount": 2168224,
+          "expiry": "2/5/27"
+        },
+        {
+          "type": "TPE (Trae Young)",
+          "amount": 1357993,
+          "expiry": "1/9/27"
+        }
+      ]
     },
     {
       "abbr": "BKN",
-      "capAllocations": 180943536,
-      "capSpace": -15982536
+      "name": "Brooklyn Nets",
+      "slug": "brooklyn-nets",
+      "rosterHeader": "15/15 + 2/3",
+      "activeRoster": [
+        {
+          "player": "Michael Porter Jr.",
+          "salary": 40806150
+        },
+        {
+          "player": "Julius Randle",
+          "salary": 33333334
+        },
+        {
+          "player": "Terance Mann",
+          "salary": 15500000
+        },
+        {
+          "player": "Day'Ron Sharpe",
+          "salary": 10000000
+        },
+        {
+          "player": "Moe Wagner",
+          "salary": 9366000,
+          "note": "estimate"
+        },
+        {
+          "player": "Keon Ellis",
+          "salary": 9000000
+        },
+        {
+          "player": "Mikel Brown Jr.",
+          "salary": 8787000
+        },
+        {
+          "player": "Egor Dëmin",
+          "salary": 7233720
+        },
+        {
+          "player": "Noah Clowney",
+          "salary": 5414034
+        },
+        {
+          "player": "Josh Minott",
+          "salary": 4500000
+        },
+        {
+          "player": "Nolan Traoré",
+          "salary": 4002000
+        },
+        {
+          "player": "Drake Powell",
+          "salary": 3540600
+        },
+        {
+          "player": "Ben Saraf",
+          "salary": 3028560
+        },
+        {
+          "player": "Joshua Jefferson",
+          "salary": 2969520
+        },
+        {
+          "player": "Danny Wolf",
+          "salary": 2941440
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 160422358,
+      "totalSalaries": 160422358,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 39745469,
+      "repeater": false,
+      "firstApronSpace": 48332469,
+      "secondApronSpace": 61003469,
+      "capHolds": [],
+      "capHoldsTotal": 0,
+      "twoWay": [
+        "Tyler Bilodeau",
+        "Chaney Johnson"
+      ],
+      "exceptions": [
+        {
+          "type": "Room Mid-Level",
+          "amount": 9366000,
+          "expiry": "4/11/27"
+        }
+      ]
     },
     {
       "abbr": "BOS",
-      "capAllocations": 233501359,
-      "capSpace": -68540359
+      "name": "Boston Celtics",
+      "slug": "boston-celtics",
+      "rosterHeader": "14/15 + 2/3",
+      "activeRoster": [
+        {
+          "player": "Jayson Tatum",
+          "salary": 58456566
+        },
+        {
+          "player": "Paul George",
+          "salary": 54126380
+        },
+        {
+          "player": "Derrick White",
+          "salary": 30348000
+        },
+        {
+          "player": "Mitchell Robinson",
+          "salary": 15044000
+        },
+        {
+          "player": "Sam Hauser",
+          "salary": 10848215
+        },
+        {
+          "player": "Payton Pritchard",
+          "salary": 7767857
+        },
+        {
+          "player": "Ron Harper Jr.",
+          "salary": 3150752
+        },
+        {
+          "player": "Chris Cenac Jr.",
+          "salary": 2988120
+        },
+        {
+          "player": "Hugo González",
+          "salary": 2923560
+        },
+        {
+          "player": "Luka Garza",
+          "salary": 2801346
+        },
+        {
+          "player": "Baylor Scheierman",
+          "salary": 2744040
+        },
+        {
+          "player": "Neemias Queta",
+          "salary": 2667944
+        },
+        {
+          "player": "Mike Conley Jr.",
+          "salary": 2449421
+        },
+        {
+          "player": "Jordan Walsh",
+          "salary": 2406205,
+          "note": "non-guaranteed"
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 198722406,
+      "totalSalaries": 198722406,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 1705594,
+      "repeater": false,
+      "firstApronSpace": 10292594,
+      "secondApronSpace": 22963594,
+      "capHolds": [
+        {
+          "player": "Torrey Craig",
+          "amount": 2449421
+        },
+        {
+          "player": "Blake Griffin",
+          "amount": 2449421
+        },
+        {
+          "player": "Mfiondu Kabengele",
+          "amount": 2185116
+        },
+        {
+          "player": "Max Shulga",
+          "amount": 2185116
+        },
+        {
+          "player": "Jon Tonje",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 11454190,
+      "twoWay": [
+        "Milos Uzan",
+        "Amari Williams"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 0,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Anfernee Simons)",
+          "amount": 27678571,
+          "expiry": "2/5/27"
+        },
+        {
+          "type": "TPE (Georges Niang)",
+          "amount": 8200000,
+          "expiry": "8/6/26"
+        },
+        {
+          "type": "TPE (Jaylen Brown)",
+          "amount": 2952348,
+          "expiry": "7/6/27"
+        },
+        {
+          "type": "TPE (Xavier Tillman)",
+          "amount": 2546674,
+          "expiry": "2/5/27"
+        },
+        {
+          "type": "TPE (Josh Minott)",
+          "amount": 2378870,
+          "expiry": "2/5/27"
+        },
+        {
+          "type": "TPE (Chris Boucher)",
+          "amount": 2296274,
+          "expiry": "2/5/27"
+        }
+      ]
     },
     {
       "abbr": "CHA",
-      "capAllocations": 187012404,
-      "capSpace": -22051404
+      "name": "Charlotte Hornets",
+      "slug": "charlotte-hornets",
+      "rosterHeader": "17/15 + 2/3",
+      "activeRoster": [
+        {
+          "player": "Coby White",
+          "salary": 26811593
+        },
+        {
+          "player": "Naz Reid",
+          "salary": 23275862
+        },
+        {
+          "player": "Grayson Allen",
+          "salary": 18125000
+        },
+        {
+          "player": "Brandon Miller",
+          "salary": 15104626
+        },
+        {
+          "player": "Grant Williams",
+          "salary": 14265750
+        },
+        {
+          "player": "Dorian Finney-Smith",
+          "salary": 14196974
+        },
+        {
+          "player": "Royce O'Neale",
+          "salary": 10875000
+        },
+        {
+          "player": "Kon Knueppel",
+          "salary": 10516560
+        },
+        {
+          "player": "Tidjane Salaün",
+          "salary": 8237880
+        },
+        {
+          "player": "Tre Mann",
+          "salary": 8000000
+        },
+        {
+          "player": "Hannes Steinbach",
+          "salary": 5227200
+        },
+        {
+          "player": "Christian Anderson",
+          "salary": 4257480
+        },
+        {
+          "player": "Pat Connaughton",
+          "salary": 3815861,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Liam McNeeley",
+          "salary": 2902080
+        },
+        {
+          "player": "Moussa Diabaté",
+          "salary": 2461462,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Sion James",
+          "salary": 2411090
+        },
+        {
+          "player": "Ryan Kalbrenner",
+          "salary": 2411090
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 172895508,
+      "totalSalaries": 172895508,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 27532492,
+      "repeater": false,
+      "firstApronSpace": 35619492,
+      "secondApronSpace": 48290492,
+      "capHolds": [
+        {
+          "player": "Xavier Tillman",
+          "amount": 2449421
+        },
+        {
+          "player": "Antonio Reeves",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 4634537,
+      "twoWay": [
+        "Michael Ajayi",
+        "PJ Hall"
+      ],
+      "exceptions": [
+        {
+          "type": "Nontaxpayer Mid-Level",
+          "amount": 847026,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (LaMelo Ball)",
+          "amount": 40770520,
+          "expiry": "7/6/27"
+        },
+        {
+          "type": "TPE (Collin Sexton)",
+          "amount": 8200962,
+          "expiry": "2/4/27"
+        },
+        {
+          "type": "TPE (Tyus Jones)",
+          "amount": 7000000,
+          "expiry": "2/5/27"
+        },
+        {
+          "type": "TPE (Mason Plumlee)",
+          "amount": 2296274,
+          "expiry": "2/4/27"
+        }
+      ]
     },
     {
       "abbr": "CHI",
-      "capAllocations": 220108542,
-      "capSpace": -55147542
+      "name": "Chicago Bulls",
+      "slug": "chicago-bulls",
+      "rosterHeader": "14/15 + 2/3",
+      "activeRoster": [
+        {
+          "player": "Josh Giddey",
+          "salary": 25000000
+        },
+        {
+          "player": "Nicolas Claxton",
+          "salary": 23320738
+        },
+        {
+          "player": "Norman Powell",
+          "salary": 21500000
+        },
+        {
+          "player": "Patrick Williams",
+          "salary": 18000000
+        },
+        {
+          "player": "Isaac Okoro",
+          "salary": 11814814
+        },
+        {
+          "player": "Caleb Wilson",
+          "salary": 10683720
+        },
+        {
+          "player": "Jalen Smith",
+          "salary": 9428571
+        },
+        {
+          "player": "Zach Collins",
+          "salary": 8500000
+        },
+        {
+          "player": "Tre Jones",
+          "salary": 8000000
+        },
+        {
+          "player": "Rob Dillingham",
+          "salary": 6889320
+        },
+        {
+          "player": "Matas Buzelis",
+          "salary": 5715360
+        },
+        {
+          "player": "Noa Essengue",
+          "salary": 5701200
+        },
+        {
+          "player": "Dailyn Swain",
+          "salary": 4965480
+        },
+        {
+          "player": "Leonard Miller",
+          "salary": 2406205
+        }
+      ],
+      "deadMoney": [
+        {
+          "player": "Kam Jones",
+          "amount": 1075459
+        }
+      ],
+      "deadMoneyTotal": 1075459,
+      "totalPayroll": 161925408,
+      "totalSalaries": 163000867,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 37427133,
+      "repeater": false,
+      "firstApronSpace": 43699016,
+      "secondApronSpace": 56370016,
+      "capHolds": [],
+      "capHoldsTotal": 0,
+      "twoWay": [
+        "Tobe Akawa",
+        "Jaylin Sellers"
+      ],
+      "exceptions": [
+        {
+          "type": "Room Mid-Level",
+          "amount": 9366000,
+          "expiry": "4/11/27"
+        }
+      ]
     },
     {
       "abbr": "CLE",
-      "capAllocations": 219687753,
-      "capSpace": -54726753
+      "name": "Cleveland Cavaliers",
+      "slug": "cleveland-cavaliers",
+      "rosterHeader": "12/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Donovan Mitchell",
+          "salary": 50105628
+        },
+        {
+          "player": "Evan Mobley",
+          "salary": 50105628
+        },
+        {
+          "player": "Jarrett Allen",
+          "salary": 28000000
+        },
+        {
+          "player": "Max Strus",
+          "salary": 16660836
+        },
+        {
+          "player": "Dennis Schröder",
+          "salary": 14809200
+        },
+        {
+          "player": "Sam Merrill",
+          "salary": 9160715
+        },
+        {
+          "player": "Jaylon Tyson",
+          "salary": 3658560
+        },
+        {
+          "player": "Nae'Qwan Tomlin",
+          "salary": 2411090
+        },
+        {
+          "player": "Thomas Bryant",
+          "salary": 2449421
+        },
+        {
+          "player": "Craig Porter Jr.",
+          "salary": 2406205,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Tyrese Proctor",
+          "salary": 2150917
+        },
+        {
+          "player": "Meleek Thomas",
+          "salary": 1357763
+        }
+      ],
+      "deadMoney": [
+        {
+          "player": "Ricky Rubio",
+          "amount": 424672
+        }
+      ],
+      "deadMoneyTotal": 424672,
+      "totalPayroll": 183275963,
+      "totalSalaries": 183700635,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 16727365,
+      "repeater": false,
+      "firstApronSpace": 25314365,
+      "secondApronSpace": 37985365,
+      "capHolds": [
+        {
+          "player": "James Harden",
+          "amount": 47335308
+        },
+        {
+          "player": "Ed Davis",
+          "amount": 2449421
+        },
+        {
+          "player": "Damian Jones",
+          "amount": 2449421
+        },
+        {
+          "player": "Raul Neto",
+          "amount": 2449421
+        },
+        {
+          "player": "Chuma Okeke",
+          "amount": 2449421
+        },
+        {
+          "player": "Rajon Rondo",
+          "amount": 2449421
+        },
+        {
+          "player": "Tristan Thompson",
+          "amount": 2449421
+        },
+        {
+          "player": "Olivier Sarr",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 64216950,
+      "twoWay": [
+        "Tristan Enaruna",
+        "Riley Minix",
+        "Ernest Udeh"
+      ],
+      "exceptions": [
+        {
+          "type": "Taxpayer Mid-Level",
+          "amount": 6064000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Lonzo Ball)",
+          "amount": 10000000,
+          "expiry": "2/5/27"
+        },
+        {
+          "type": "TPE (De'Andre Hunter)",
+          "amount": 6897984,
+          "expiry": "2/1/27"
+        }
+      ]
     },
     {
       "abbr": "DAL",
-      "capAllocations": 249416673,
-      "capSpace": -84416673
+      "name": "Dallas Mavericks",
+      "slug": "dallas-mavericks",
+      "rosterHeader": "15/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Kyrie Irving",
+          "salary": 39491282
+        },
+        {
+          "player": "P.J. Washington",
+          "salary": 19813044
+        },
+        {
+          "player": "Klay Thompson",
+          "salary": 17460317
+        },
+        {
+          "player": "Daniel Gafford",
+          "salary": 17263584
+        },
+        {
+          "player": "Santi Aldama",
+          "salary": 17007043
+        },
+        {
+          "player": "Cooper Flagg",
+          "salary": 14517480
+        },
+        {
+          "player": "Caleb Martin",
+          "salary": 10001494
+        },
+        {
+          "player": "Naji Marshall",
+          "salary": 9428571
+        },
+        {
+          "player": "Max Christie",
+          "salary": 8285714
+        },
+        {
+          "player": "Dereck Lively II",
+          "salary": 7239131
+        },
+        {
+          "player": "Morez Johnson Jr.",
+          "salary": 6754800
+        },
+        {
+          "player": "Marcus Sasser",
+          "salary": 5198983
+        },
+        {
+          "player": "Sergio De Larrea",
+          "salary": 3182280
+        },
+        {
+          "player": "Tarik Biberović",
+          "salary": 3000000
+        },
+        {
+          "player": "Ryan Nembhard",
+          "salary": 2150917
+        }
+      ],
+      "deadMoney": [
+        {
+          "player": "JaVale McGee",
+          "amount": 2208856
+        },
+        {
+          "player": "Olivier-Maxence Prosper",
+          "amount": 1002360
+        }
+      ],
+      "deadMoneyTotal": 3211216,
+      "totalPayroll": 180794640,
+      "totalSalaries": 184005856,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 16161971,
+      "repeater": false,
+      "firstApronSpace": 23404386,
+      "secondApronSpace": 36075386,
+      "capHolds": [
+        {
+          "player": "Dwight Powell",
+          "amount": 7600000
+        },
+        {
+          "player": "Nicolo Melli",
+          "amount": 5066667
+        },
+        {
+          "player": "Theo Pinson",
+          "amount": 2449421
+        },
+        {
+          "player": "Brandon Williams",
+          "amount": 2449421
+        },
+        {
+          "player": "Greg Brown III",
+          "amount": 2185116
+        },
+        {
+          "player": "Mousa Cisse",
+          "amount": 2185116
+        },
+        {
+          "player": "Kai Jones",
+          "amount": 2185116
+        },
+        {
+          "player": "McKinley Wright IV",
+          "amount": 2185116
+        },
+        {
+          "player": "Moses Wright",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 28491089,
+      "twoWay": [
+        "John Poulakidas",
+        "Tobi Lawal",
+        "Tyler Smith"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 12044000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 278017,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Anthony Davis)",
+          "amount": 20830154,
+          "expiry": "2/5/27"
+        },
+        {
+          "type": "TPE (Jaden Hardy)",
+          "amount": 2909520,
+          "expiry": "2/5/27"
+        }
+      ]
     },
     {
       "abbr": "DEN",
-      "capAllocations": 262238998,
-      "capSpace": -97277998
+      "name": "Denver Nuggets",
+      "slug": "denver-nuggets",
+      "rosterHeader": "11/15 + 1/3",
+      "activeRoster": [
+        {
+          "player": "Nikola Jokić",
+          "salary": 59033114
+        },
+        {
+          "player": "Jamal Murray",
+          "salary": 50105628
+        },
+        {
+          "player": "Aaron Gordon",
+          "salary": 31978037
+        },
+        {
+          "player": "Cameron Johnson",
+          "salary": 23062500
+        },
+        {
+          "player": "Christian Braun",
+          "salary": 21551726
+        },
+        {
+          "player": "Zeke Nnaji",
+          "salary": 7466667
+        },
+        {
+          "player": "Julian Strawther",
+          "salary": 4826931
+        },
+        {
+          "player": "DaRon Holmes",
+          "salary": 3372120
+        },
+        {
+          "player": "Marvin Bagley",
+          "salary": 2449421
+        },
+        {
+          "player": "Tyus Jones",
+          "salary": 2449421
+        },
+        {
+          "player": "Trevon Brazile",
+          "salary": 1357763
+        }
+      ],
+      "deadMoney": [
+        {
+          "player": "Jonas Valančiūnas",
+          "amount": 2000000
+        }
+      ],
+      "deadMoneyTotal": 2000000,
+      "totalPayroll": 207653328,
+      "totalSalaries": 209653328,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": -9225328,
+      "repeater": true,
+      "firstApronSpace": -6255828,
+      "secondApronSpace": 6415172,
+      "capHolds": [
+        {
+          "player": "Peyton Watson",
+          "amount": 13069428
+        },
+        {
+          "player": "Spener Jones",
+          "amount": 2649421
+        },
+        {
+          "player": "Bruce Brown",
+          "amount": 2449421
+        },
+        {
+          "player": "Vlatko Cancar",
+          "amount": 2449421
+        },
+        {
+          "player": "DeMarcus Cousins",
+          "amount": 2449421
+        },
+        {
+          "player": "Troy Daniels",
+          "amount": 2449421
+        },
+        {
+          "player": "Justin Holiday",
+          "amount": 2449421
+        },
+        {
+          "player": "Richard Jefferson",
+          "amount": 2449421
+        },
+        {
+          "player": "Jalen Pickett",
+          "amount": 2449421
+        },
+        {
+          "player": "Markus Howard",
+          "amount": 2185116
+        },
+        {
+          "player": "Curtis Jones",
+          "amount": 2185116
+        },
+        {
+          "player": "David Roddy",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 39420144,
+      "twoWay": [
+        "KJ Simpson"
+      ],
+      "exceptions": [
+        {
+          "type": "Taxpayer Mid-Level",
+          "amount": 6064000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Michael Porter Jr.)",
+          "amount": 6880985,
+          "expiry": "7/8/26"
+        },
+        {
+          "type": "TPE (Dario Saric)",
+          "amount": 5426400,
+          "expiry": "7/13/26"
+        },
+        {
+          "type": "TPE (Hunter Tyson)",
+          "amount": 2221677,
+          "expiry": "2/5/27"
+        }
+      ]
     },
     {
       "abbr": "DET",
-      "capAllocations": 239520907,
-      "capSpace": -74559907
+      "name": "Detroit Pistons",
+      "slug": "detroit-pistons",
+      "rosterHeader": "15/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Cade Cunningham",
+          "salary": 50105628
+        },
+        {
+          "player": "John Collins",
+          "salary": 17000000
+        },
+        {
+          "player": "Duncan Robinson",
+          "salary": 15992957,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Isaiah Joe",
+          "salary": 11323006
+        },
+        {
+          "player": "Ausar Thompson",
+          "salary": 11117925
+        },
+        {
+          "player": "Kevin Huerter",
+          "salary": 9507042
+        },
+        {
+          "player": "Ron Holland",
+          "salary": 9069600
+        },
+        {
+          "player": "Paul Reed",
+          "salary": 5602689,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Ebuka Okorie",
+          "salary": 4481280
+        },
+        {
+          "player": "Daniss Jenkins",
+          "salary": 4000000
+        },
+        {
+          "player": "Javonte Green",
+          "salary": 3943679
+        },
+        {
+          "player": "Gary Harris",
+          "salary": 3815861
+        },
+        {
+          "player": "Taurean Prince",
+          "salary": 3815861
+        },
+        {
+          "player": "Tolu Smith III",
+          "salary": 2411090,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Chaz Lanier",
+          "salary": 2150917
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 154337535,
+      "totalSalaries": 154337535,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 46090465,
+      "repeater": false,
+      "firstApronSpace": 54677465,
+      "secondApronSpace": 67348465,
+      "capHolds": [
+        {
+          "player": "Jalen Duren",
+          "amount": 19449432
+        },
+        {
+          "player": "Malik Beasley",
+          "amount": 7200000
+        },
+        {
+          "player": "Wendell Moore",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 28834548,
+      "twoWay": [
+        "Elijah Harkless",
+        "Isaac Jones",
+        "Ugonna Onyenso"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 3720994,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Isaiah Stewart)",
+          "amount": 15000000,
+          "expiry": "7/8/27"
+        },
+        {
+          "type": "TPE (Marcus Sasser)",
+          "amount": 5198983,
+          "expiry": "7/8/27"
+        }
+      ]
     },
     {
       "abbr": "GSW",
-      "capAllocations": 270844164,
-      "capSpace": -105883164
+      "name": "Golden State Warriors",
+      "slug": "golden-state-warriors",
+      "rosterHeader": "11/15 + 2/3",
+      "activeRoster": [
+        {
+          "player": "Stephen Curry",
+          "salary": 62587158
+        },
+        {
+          "player": "Jimmy Butler",
+          "salary": 56832773
+        },
+        {
+          "player": "Kristaps Porziņģis",
+          "salary": 20000000
+        },
+        {
+          "player": "Moses Moody",
+          "salary": 12500000
+        },
+        {
+          "player": "Al Horford",
+          "salary": 6822000
+        },
+        {
+          "player": "Yaxel Lendeborg",
+          "salary": 6096240
+        },
+        {
+          "player": "Brandin Podziemski",
+          "salary": 5679459
+        },
+        {
+          "player": "De'Anthony Melton",
+          "salary": 5477000,
+          "note": "estimate"
+        },
+        {
+          "player": "Gui Santos",
+          "salary": 4629630
+        },
+        {
+          "player": "Charles Bassey",
+          "salary": 2449421,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Will Richard",
+          "salary": 2150917
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 185224598,
+      "totalSalaries": 185224598,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 15203402,
+      "repeater": false,
+      "firstApronSpace": 23290402,
+      "secondApronSpace": 35961402,
+      "capHolds": [
+        {
+          "player": "Draymond Green",
+          "amount": 38839286
+        },
+        {
+          "player": "Matt Barnes",
+          "amount": 2449421
+        },
+        {
+          "player": "Nemanja Bjelica",
+          "amount": 2449421
+        },
+        {
+          "player": "Andrew Bogut",
+          "amount": 2449421
+        },
+        {
+          "player": "Seth Curry",
+          "amount": 2449421
+        },
+        {
+          "player": "Usman Garuba",
+          "amount": 2449421
+        },
+        {
+          "player": "JaMychal Green",
+          "amount": 2449421
+        },
+        {
+          "player": "Andre Iguodala",
+          "amount": 2449421
+        },
+        {
+          "player": "Jonas Jerebko",
+          "amount": 2449421
+        },
+        {
+          "player": "Anthony Lamb",
+          "amount": 2449421
+        },
+        {
+          "player": "Gary Payton II",
+          "amount": 2449421
+        },
+        {
+          "player": "David West",
+          "amount": 2449421
+        },
+        {
+          "player": "Taran Armstrong",
+          "amount": 2185116
+        },
+        {
+          "player": "Nico Mannion",
+          "amount": 2185116
+        },
+        {
+          "player": "Jerome Robinson",
+          "amount": 2185116
+        },
+        {
+          "player": "Nate Williams",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 74523381,
+      "twoWay": [
+        "LJ Cryer",
+        "Malevy Leons"
+      ],
+      "exceptions": [
+        {
+          "type": "Taxpayer Mid-Level",
+          "amount": 587000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Trayce Jackson-Davis)",
+          "amount": 2221677,
+          "expiry": "2/5/27"
+        }
+      ]
     },
     {
       "abbr": "HOU",
-      "capAllocations": 226319662,
-      "capSpace": -61358662
+      "name": "Houston Rockets",
+      "slug": "houston-rockets",
+      "rosterHeader": "13/15 + 2/3",
+      "activeRoster": [
+        {
+          "player": "Kevin Durant",
+          "salary": 43902439
+        },
+        {
+          "player": "Alperen Şengün",
+          "salary": 35642202
+        },
+        {
+          "player": "Fred VanVleet",
+          "salary": 25000000
+        },
+        {
+          "player": "Jabari Smith Jr.",
+          "salary": 23643411
+        },
+        {
+          "player": "Tari Eason",
+          "salary": 14053356
+        },
+        {
+          "player": "Steven Adams",
+          "salary": 13000000
+        },
+        {
+          "player": "Amen Thompson",
+          "salary": 12258609
+        },
+        {
+          "player": "Reed Sheppard",
+          "salary": 11108880
+        },
+        {
+          "player": "Clint Capela",
+          "salary": 7035000
+        },
+        {
+          "player": "Marcus Smart",
+          "salary": 6064000
+        },
+        {
+          "player": "JD Davison",
+          "salary": 2584539,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Bogdan Bogdanović",
+          "salary": 2449421
+        },
+        {
+          "player": "Bruce Thornton",
+          "salary": 1357763
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 198099620,
+      "totalSalaries": 198099620,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 2328380,
+      "repeater": false,
+      "firstApronSpace": 10915380,
+      "secondApronSpace": 23586380,
+      "capHolds": [
+        {
+          "player": "Reggie Bullock",
+          "amount": 2449421
+        },
+        {
+          "player": "Jeff Green",
+          "amount": 2449421
+        },
+        {
+          "player": "Aaron Holiday",
+          "amount": 2449421
+        },
+        {
+          "player": "Boban Marjanovic",
+          "amount": 2449421
+        },
+        {
+          "player": "Jae'Sean Tate",
+          "amount": 2449421
+        },
+        {
+          "player": "Isaiah Crawford",
+          "amount": 2185116
+        },
+        {
+          "player": "Jack McVeigh",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 16617337,
+      "twoWay": [
+        "Quadir Copeland",
+        "Tristen Newton"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 8980000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Dorian Finney-Smith)",
+          "amount": 13335000,
+          "expiry": "7/6/27"
+        }
+      ]
     },
     {
       "abbr": "IND",
-      "capAllocations": 210213571,
-      "capSpace": -45213571
+      "name": "Indiana Pacers",
+      "slug": "indiana-pacers",
+      "rosterHeader": "14/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Tyrese Haliburton",
+          "salary": 48924624
+        },
+        {
+          "player": "Pascal Siakam",
+          "salary": 48924624
+        },
+        {
+          "player": "Ivica Zubac",
+          "salary": 20342140
+        },
+        {
+          "player": "Andrew Nembhard",
+          "salary": 19550160
+        },
+        {
+          "player": "Obi Toppin",
+          "salary": 15000000
+        },
+        {
+          "player": "T.J. McConnell",
+          "salary": 11000000
+        },
+        {
+          "player": "Aaron Nesmith",
+          "salary": 11000000
+        },
+        {
+          "player": "Jarace Walker",
+          "salary": 8478541
+        },
+        {
+          "player": "Kelly Oubre Jr.",
+          "salary": 8050000
+        },
+        {
+          "player": "Ben Sheppard",
+          "salary": 5031668
+        },
+        {
+          "player": "Jay Huff",
+          "salary": 2667944
+        },
+        {
+          "player": "Quenton Jackson",
+          "salary": 2584539,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Larry Nance Jr.",
+          "salary": 2449421
+        },
+        {
+          "player": "Johnny Furphy",
+          "salary": 2296271
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 206299932,
+      "totalSalaries": 206299932,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": -5871932,
+      "repeater": false,
+      "firstApronSpace": 2235068,
+      "secondApronSpace": 14906068,
+      "capHolds": [
+        {
+          "player": "James Johnson",
+          "amount": 2449421
+        },
+        {
+          "player": "Jalen Slawson",
+          "amount": 2185116
+        },
+        {
+          "player": "Gabe York",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 6819653,
+      "twoWay": [
+        "Kobe Brown",
+        "Taelon Peter",
+        "Ethan Thompson"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 6994000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Kam Jones)",
+          "amount": 1075459,
+          "expiry": "6/24/27"
+        }
+      ]
     },
     {
       "abbr": "LAC",
-      "capAllocations": 318865744,
-      "capSpace": -153904744
+      "name": "LA Clippers",
+      "slug": "los-angeles-clippers",
+      "rosterHeader": "14/15 + 2/3",
+      "activeRoster": [
+        {
+          "player": "Darius Garland",
+          "salary": 42166510
+        },
+        {
+          "player": "Brandon Ingram",
+          "salary": 40000000
+        },
+        {
+          "player": "Rui Hachimura",
+          "salary": 14000000
+        },
+        {
+          "player": "Derrick Jones Jr.",
+          "salary": 10476190
+        },
+        {
+          "player": "Keaton Wagler",
+          "salary": 9674760
+        },
+        {
+          "player": "Brook Lopez",
+          "salary": 9187500
+        },
+        {
+          "player": "Gradey Dick",
+          "salary": 7131510
+        },
+        {
+          "player": "Isaiah Jackson",
+          "salary": 7000000
+        },
+        {
+          "player": "Kris Dunn",
+          "salary": 5684800
+        },
+        {
+          "player": "Jordan Miller",
+          "salary": 5300000
+        },
+        {
+          "player": "Yanic Konan Niederhäuser",
+          "salary": 2880960
+        },
+        {
+          "player": "Kobe Sanders",
+          "salary": 2622139
+        },
+        {
+          "player": "Cam Christie",
+          "salary": 2296271,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Baba Miller",
+          "salary": 1705630
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 160126270,
+      "totalSalaries": 160126270,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 40301730,
+      "repeater": false,
+      "firstApronSpace": 48888730,
+      "secondApronSpace": 61559730,
+      "capHolds": [
+        {
+          "player": "Bennedict Mathurin",
+          "amount": 27562719
+        },
+        {
+          "player": "Nicolas Batum",
+          "amount": 7282080
+        },
+        {
+          "player": "Bradley Beal",
+          "amount": 6424800
+        },
+        {
+          "player": "Rodney Hood",
+          "amount": 2449421
+        },
+        {
+          "player": "Patty Mills",
+          "amount": 2449421
+        },
+        {
+          "player": "Ben Simmons",
+          "amount": 2449421
+        },
+        {
+          "player": "Xavier Moon",
+          "amount": 2185116
+        },
+        {
+          "player": "Norchad Omier",
+          "amount": 2185116
+        },
+        {
+          "player": "TyTy Washington Jr.",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 55173210,
+      "twoWay": [
+        "Nick Martinelli",
+        "Sean Pedulla"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 1044000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (John Collins)",
+          "amount": 17000000,
+          "expiry": "7/8/27"
+        },
+        {
+          "type": "TPE (Kobe Brown)",
+          "amount": 2654880,
+          "expiry": "2/5/27"
+        },
+        {
+          "type": "TPE (Chris Paul)",
+          "amount": 2296274,
+          "expiry": "2/5/27"
+        },
+        {
+          "type": "TPE (Ivica Zubac)",
+          "amount": 1314427,
+          "expiry": "2/5/27"
+        }
+      ]
     },
     {
       "abbr": "LAL",
-      "capAllocations": 271583429,
-      "capSpace": -106622429
+      "name": "Los Angeles Lakers",
+      "slug": "los-angeles-lakers",
+      "rosterHeader": "14/15 + 2/3",
+      "activeRoster": [
+        {
+          "player": "Luka Dončić",
+          "salary": 49488300
+        },
+        {
+          "player": "Austin Reaves",
+          "salary": 41240250
+        },
+        {
+          "player": "Walker Kessler",
+          "salary": 30108821
+        },
+        {
+          "player": "Quentin Grimes",
+          "salary": 13953489
+        },
+        {
+          "player": "Sandro Mamukelashvili",
+          "salary": 13000000
+        },
+        {
+          "player": "Jarred Vanderbilt",
+          "salary": 12428571
+        },
+        {
+          "player": "Collin Sexton",
+          "salary": 9366000
+        },
+        {
+          "player": "Jaden Hardy",
+          "salary": 6000000
+        },
+        {
+          "player": "Jake LaRavia",
+          "salary": 6000000
+        },
+        {
+          "player": "Dalton Knecht",
+          "salary": 4201080
+        },
+        {
+          "player": "Cameron Carr",
+          "salary": 3315360
+        },
+        {
+          "player": "Kevon Looney",
+          "salary": 2449421
+        },
+        {
+          "player": "Bronny James",
+          "salary": 2296271
+        },
+        {
+          "player": "Adou Thiero",
+          "salary": 2150917
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 195998480,
+      "totalSalaries": 195998480,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 4429520,
+      "repeater": false,
+      "firstApronSpace": 13016520,
+      "secondApronSpace": 25687520,
+      "capHolds": [],
+      "capHoldsTotal": 0,
+      "twoWay": [
+        "Chris Manon",
+        "AK Okereke",
+        "Peter Suder"
+      ],
+      "exceptions": [
+        {
+          "type": "Room Mid-Level",
+          "amount": 0,
+          "expiry": "4/11/27"
+        }
+      ]
     },
     {
       "abbr": "MEM",
-      "capAllocations": 162303167,
-      "capSpace": 2657833
+      "name": "Memphis Grizzlies",
+      "slug": "memphis-grizzlies",
+      "rosterHeader": "20/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Jerami Grant",
+          "salary": 34206898
+        },
+        {
+          "player": "Kentavious Caldwell-Pope",
+          "salary": 21621500
+        },
+        {
+          "player": "Isaiah Stewart",
+          "salary": 15000000
+        },
+        {
+          "player": "Cameron Boozer",
+          "salary": 11849760
+        },
+        {
+          "player": "Ty Jerome",
+          "salary": 9220050
+        },
+        {
+          "player": "Quinten Post",
+          "salary": 9000000
+        },
+        {
+          "player": "Taylor Hendricks",
+          "salary": 7805900
+        },
+        {
+          "player": "Zach Edey",
+          "salary": 6332760
+        },
+        {
+          "player": "Cedric Coward",
+          "salary": 6001080
+        },
+        {
+          "player": "D'Angelo Russell",
+          "salary": 5969250
+        },
+        {
+          "player": "Kris Murray",
+          "salary": 5315004
+        },
+        {
+          "player": "Walter Clayton Jr.",
+          "salary": 4190520
+        },
+        {
+          "player": "Taj Gibson",
+          "salary": 3815861,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Karim Lopez",
+          "salary": 3746760
+        },
+        {
+          "player": "AJ Johnson",
+          "salary": 3237120
+        },
+        {
+          "player": "Olivier-Maxence Prosper",
+          "salary": 2497812
+        },
+        {
+          "player": "Scotty Pippen Jr.",
+          "salary": 2461462
+        },
+        {
+          "player": "Cam Spencer",
+          "salary": 2411090
+        },
+        {
+          "player": "GG Jackson",
+          "salary": 2406205
+        },
+        {
+          "player": "Jaylen Wells",
+          "salary": 2296271,
+          "note": "non-guaranteed"
+        }
+      ],
+      "deadMoney": [
+        {
+          "player": "Cole Anthony",
+          "amount": 3700000
+        },
+        {
+          "player": "Mamadi Diakite",
+          "amount": 464050
+        }
+      ],
+      "deadMoneyTotal": 4164050,
+      "totalPayroll": 159385303,
+      "totalSalaries": 163549353,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 36878647,
+      "repeater": false,
+      "firstApronSpace": 43115647,
+      "secondApronSpace": 55786647,
+      "capHolds": [],
+      "capHoldsTotal": 0,
+      "twoWay": [
+        "Carson Cooper",
+        "Jahmai Mashack",
+        "Javon Small"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 4694000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Jaren Jackson Jr.)",
+          "amount": 28872920,
+          "expiry": "2/3/27"
+        },
+        {
+          "type": "TPE (Ja Morant)",
+          "amount": 4314089,
+          "expiry": "6/29/27"
+        }
+      ]
     },
     {
       "abbr": "MIA",
-      "capAllocations": 236131814,
-      "capSpace": -71170814
+      "name": "Miami Heat",
+      "slug": "miami-heat",
+      "rosterHeader": "12/15 + 0/3",
+      "activeRoster": [
+        {
+          "player": "Giannis Antetokounmpo",
+          "salary": 58456566
+        },
+        {
+          "player": "Bam Adebayo",
+          "salary": 49488300
+        },
+        {
+          "player": "Andrew Wiggins",
+          "salary": 30169644
+        },
+        {
+          "player": "Nikola Jovic",
+          "salary": 16200000
+        },
+        {
+          "player": "Bobby Portis",
+          "salary": 14521414
+        },
+        {
+          "player": "Davion Mitchell",
+          "salary": 12400000
+        },
+        {
+          "player": "Tim Hardaway Jr.",
+          "salary": 6065000
+        },
+        {
+          "player": "Dru Smith",
+          "salary": 2584539
+        },
+        {
+          "player": "Simone Fontecchio",
+          "salary": 2449421
+        },
+        {
+          "player": "Pelle Larsson",
+          "salary": 2296271,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Myron Gardner",
+          "salary": 2150917,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Ryan Conwell",
+          "salary": 1357763
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 198139835,
+      "totalSalaries": 198139835,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 2027992,
+      "repeater": false,
+      "firstApronSpace": 10614992,
+      "secondApronSpace": 23285992,
+      "capHolds": [
+        {
+          "player": "Alec Burks",
+          "amount": 2449421
+        },
+        {
+          "player": "Udonis Haslem",
+          "amount": 2449421
+        },
+        {
+          "player": "Keshad Johnson",
+          "amount": 2449421
+        },
+        {
+          "player": "Jordan Mickey",
+          "amount": 2449421
+        },
+        {
+          "player": "Dwyane Wade",
+          "amount": 2449421
+        },
+        {
+          "player": "Jahmir Young",
+          "amount": 2449421
+        },
+        {
+          "player": "Josh Christopher",
+          "amount": 2185116
+        },
+        {
+          "player": "Vlad Goldin",
+          "amount": 2185116
+        },
+        {
+          "player": "Trevor Keels",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 21251874,
+      "twoWay": [
+        "Tre Donaldson"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 8979000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Haywood Highsmith)",
+          "amount": 5616000,
+          "expiry": "8/15/26"
+        },
+        {
+          "type": "TPE (Duncan Robinson)",
+          "amount": 2313278,
+          "expiry": "7/7/26"
+        }
+      ]
     },
     {
       "abbr": "MIL",
-      "capAllocations": 217360904,
-      "capSpace": -52399904
+      "name": "Milwaukee Bucks",
+      "slug": "milwaukee-bucks",
+      "rosterHeader": "17/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Tyler Herro",
+          "salary": 33000000
+        },
+        {
+          "player": "Myles Turner",
+          "salary": 26584164
+        },
+        {
+          "player": "Kyle Kuzma",
+          "salary": 20490152
+        },
+        {
+          "player": "Gary Trent Jr.",
+          "salary": 15235500
+        },
+        {
+          "player": "Caris LeVert",
+          "salary": 14809200
+        },
+        {
+          "player": "A.J. Green",
+          "salary": 10044644
+        },
+        {
+          "player": "Brayden Burries",
+          "salary": 6417360
+        },
+        {
+          "player": "Jaime Jaquez Jr.",
+          "salary": 5939141
+        },
+        {
+          "player": "Ousmane Dieng",
+          "salary": 5750000
+        },
+        {
+          "player": "Nate Ament",
+          "salary": 5502000
+        },
+        {
+          "player": "Kevin Porter Jr.",
+          "salary": 5390700
+        },
+        {
+          "player": "Kel'el Ware",
+          "salary": 4654920
+        },
+        {
+          "player": "Ryan Rollins",
+          "salary": 4000000
+        },
+        {
+          "player": "Kasparas Jakucionis",
+          "salary": 3841680
+        },
+        {
+          "player": "Jericho Sims",
+          "salary": 2801346
+        },
+        {
+          "player": "Pete Nance",
+          "salary": 2537526,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Bogoljub Markovic",
+          "salary": 1357763
+        }
+      ],
+      "deadMoney": [
+        {
+          "player": "Damian Lillard",
+          "amount": 21311053
+        },
+        {
+          "player": "Vasilije Micic",
+          "amount": 666667
+        }
+      ],
+      "deadMoneyTotal": 21977720,
+      "totalPayroll": 168356096,
+      "totalSalaries": 190333816,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 10094184,
+      "repeater": false,
+      "firstApronSpace": 13906184,
+      "secondApronSpace": 26577184,
+      "capHolds": [
+        {
+          "player": "Thanasis Antetokounmpo",
+          "amount": 2449421
+        },
+        {
+          "player": "Andre Jackson Jr.",
+          "amount": 2449421
+        },
+        {
+          "player": "Alex Antetokounmpo",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 7083958,
+      "twoWay": [
+        "Kam Jones",
+        "Rafael Castro",
+        "Cormac Ryan"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 15044000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Giannis Antetokounmpo)",
+          "amount": 25456566,
+          "expiry": "7/6/27"
+        },
+        {
+          "type": "TPE (Bobby Portis)",
+          "amount": 85673,
+          "expiry": "7/6/27"
+        }
+      ]
     },
     {
       "abbr": "MIN",
-      "capAllocations": 257897854,
-      "capSpace": -92936854
+      "name": "Minnesota Timberwolves",
+      "slug": "minnesota-timberwolves",
+      "rosterHeader": "13/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Anthony Edwards",
+          "salary": 48924624
+        },
+        {
+          "player": "LaMelo Ball",
+          "salary": 41250000
+        },
+        {
+          "player": "Rudy Gobert",
+          "salary": 36500000
+        },
+        {
+          "player": "Jaden McDaniels",
+          "salary": 26200000
+        },
+        {
+          "player": "Ayo Dosunmu",
+          "salary": 19310345
+        },
+        {
+          "player": "Josh Green",
+          "salary": 14679012
+        },
+        {
+          "player": "Donte DiVincenzo",
+          "salary": 12535000
+        },
+        {
+          "player": "Joan Beringer",
+          "salary": 4411200
+        },
+        {
+          "player": "Jaylen Clark",
+          "salary": 3086420
+        },
+        {
+          "player": "Terrence Shannon Jr.",
+          "salary": 2801640
+        },
+        {
+          "player": "Bones Hyland",
+          "salary": 2449421
+        },
+        {
+          "player": "Trey Lyles",
+          "salary": 2449421
+        },
+        {
+          "player": "Isaiah Evans",
+          "salary": 1357763
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 215954846,
+      "totalSalaries": 215954846,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": -15526846,
+      "repeater": false,
+      "firstApronSpace": -8689846,
+      "secondApronSpace": 3981154,
+      "capHolds": [
+        {
+          "player": "Evan Turner",
+          "amount": 27909834
+        },
+        {
+          "player": "Aaron Brooks",
+          "amount": 2449421
+        },
+        {
+          "player": "Joe Ingles",
+          "amount": 2449421
+        },
+        {
+          "player": "Greg Monroe",
+          "amount": 2449421
+        },
+        {
+          "player": "Julian Phillips",
+          "amount": 2449421
+        },
+        {
+          "player": "Austin Rivers",
+          "amount": 2449421
+        }
+      ],
+      "capHoldsTotal": 40156939,
+      "twoWay": [
+        "Enrique Freeman",
+        "Zyon Pullin",
+        "Rocco Zikarsky"
+      ],
+      "exceptions": [
+        {
+          "type": "Taxpayer Mid-Level",
+          "amount": 6064000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Mike Conley Jr.)",
+          "amount": 10774038,
+          "expiry": "2/3/27"
+        },
+        {
+          "type": "TPE (Rob Dillingham)",
+          "amount": 6576120,
+          "expiry": "2/5/27"
+        }
+      ]
     },
     {
       "abbr": "NOP",
-      "capAllocations": 227931396,
-      "capSpace": -62970396
+      "name": "New Orleans Pelicans",
+      "slug": "new-orleans-pelicans",
+      "rosterHeader": "14/15 + 1/3",
+      "activeRoster": [
+        {
+          "player": "Zion Williamson",
+          "salary": 42166510
+        },
+        {
+          "player": "Jordan Poole",
+          "salary": 34044642
+        },
+        {
+          "player": "Dejounte Murray",
+          "salary": 32785071
+        },
+        {
+          "player": "Trey Murphy III",
+          "salary": 27000000
+        },
+        {
+          "player": "Herb Jones",
+          "salary": 14898786
+        },
+        {
+          "player": "Jeremiah Fears",
+          "salary": 7896240
+        },
+        {
+          "player": "Jordan Hawkins",
+          "salary": 7021895
+        },
+        {
+          "player": "Saddiq Bey",
+          "salary": 6557080
+        },
+        {
+          "player": "Derik Queen",
+          "salary": 5416080
+        },
+        {
+          "player": "DeAndre Jordan",
+          "salary": 3876529
+        },
+        {
+          "player": "Yves Missi",
+          "salary": 3512760
+        },
+        {
+          "player": "Bryce McGowens",
+          "salary": 2584539
+        },
+        {
+          "player": "Karlo Matkovic",
+          "salary": 2296271
+        },
+        {
+          "player": "Micah Peavy",
+          "salary": 2150917
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 192207320,
+      "totalSalaries": 192207320,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 8220680,
+      "repeater": false,
+      "firstApronSpace": 9888875,
+      "secondApronSpace": 22559875,
+      "capHolds": [
+        {
+          "player": "Willy Hernangómez",
+          "amount": 4642804
+        },
+        {
+          "player": "Brandon Boston",
+          "amount": 2449421
+        },
+        {
+          "player": "Elfrid Payton",
+          "amount": 2449421
+        },
+        {
+          "player": "Tony Snell",
+          "amount": 2449421
+        },
+        {
+          "player": "Keion Brooks Jr.",
+          "amount": 2185116
+        },
+        {
+          "player": "Gary Clark",
+          "amount": 2185116
+        },
+        {
+          "player": "Jared Harper",
+          "amount": 2185116
+        },
+        {
+          "player": "James Nunnally",
+          "amount": 2185116
+        },
+        {
+          "player": "Josh Oduro",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 22916647,
+      "twoWay": [
+        "Hunter Dickinson"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 15044000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Jose Alvarado)",
+          "amount": 4500000,
+          "expiry": "2/5/27"
+        }
+      ]
     },
     {
       "abbr": "NYK",
-      "capAllocations": 262645053,
-      "capSpace": -97684053
+      "name": "New York Knicks",
+      "slug": "new-york-knicks",
+      "rosterHeader": "13/15 + 0/3",
+      "activeRoster": [
+        {
+          "player": "Karl-Anthony Towns",
+          "salary": 57078728
+        },
+        {
+          "player": "OG Anunoby",
+          "salary": 42500000
+        },
+        {
+          "player": "Jalen Brunson",
+          "salary": 37739521
+        },
+        {
+          "player": "Mikal Bridges",
+          "salary": 33482145
+        },
+        {
+          "player": "Josh Hart",
+          "salary": 20923760
+        },
+        {
+          "player": "Landry Shamet",
+          "salary": 5490967
+        },
+        {
+          "player": "Jose Alvarado",
+          "salary": 4439656
+        },
+        {
+          "player": "Miles McBride",
+          "salary": 3956523
+        },
+        {
+          "player": "Pacôme Dadiet",
+          "salary": 2983680
+        },
+        {
+          "player": "Mohamed Diawara",
+          "salary": 2622139
+        },
+        {
+          "player": "Jordan Clarkson",
+          "salary": 2449421
+        },
+        {
+          "player": "Andre Drummond",
+          "salary": 2449421
+        },
+        {
+          "player": "Tyler Kolek",
+          "salary": 2296271
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 218412232,
+      "totalSalaries": 218412232,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": -17984232,
+      "repeater": false,
+      "firstApronSpace": -9397232,
+      "secondApronSpace": 3273768,
+      "capHolds": [
+        {
+          "player": "Jeremy Sochan",
+          "amount": 2449421
+        },
+        {
+          "player": "P.J. Tucker",
+          "amount": 2449421
+        },
+        {
+          "player": "Kevin McCullar Jr.",
+          "amount": 2185116
+        },
+        {
+          "player": "Trey Jemison",
+          "amount": 2185116
+        },
+        {
+          "player": "Dillon Jones",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 11454190,
+      "twoWay": [],
+      "exceptions": [
+        {
+          "type": "Taxpayer Mid-Level",
+          "amount": 6064000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Dalen Terry)",
+          "amount": 899118,
+          "expiry": "2/5/27"
+        },
+        {
+          "type": "TPE (Guerschon Yabusele)",
+          "amount": 100882,
+          "expiry": "2/5/27"
+        }
+      ]
     },
     {
       "abbr": "OKC",
-      "capAllocations": 287122058,
-      "capSpace": -122161058
+      "name": "Oklahoma City Thunder",
+      "slug": "oklahoma-city-thunder",
+      "rosterHeader": "15/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Chet Holmgren",
+          "salary": 41240250
+        },
+        {
+          "player": "Jalen Williams",
+          "salary": 41240250
+        },
+        {
+          "player": "Shai Gilgeous-Alexander",
+          "salary": 40806150
+        },
+        {
+          "player": "Isaiah Hartenstein",
+          "salary": 23148148
+        },
+        {
+          "player": "Alex Caruso",
+          "salary": 19550160
+        },
+        {
+          "player": "Luguentz Dort",
+          "salary": 17722222
+        },
+        {
+          "player": "Jaylin Williams",
+          "salary": 7774648
+        },
+        {
+          "player": "Cason Wallace",
+          "salary": 7420806
+        },
+        {
+          "player": "Aday Mara",
+          "salary": 5791680
+        },
+        {
+          "player": "Nikola Topić",
+          "salary": 5429760
+        },
+        {
+          "player": "Kenrich Williams",
+          "salary": 5000000
+        },
+        {
+          "player": "Thomas Sorber",
+          "salary": 4887720
+        },
+        {
+          "player": "Bennett Stirtz",
+          "salary": 4717320
+        },
+        {
+          "player": "Jared McCain",
+          "salary": 4422600
+        },
+        {
+          "player": "Ajay Mitchell",
+          "salary": 2850000
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 232001714,
+      "totalSalaries": 232001714,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": -31573714,
+      "repeater": false,
+      "firstApronSpace": -24486714,
+      "secondApronSpace": -11815714,
+      "capHolds": [
+        {
+          "player": "Alex Ducas",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 2185116,
+      "twoWay": [
+        "Brooks Barnhizer",
+        "Josh Dix",
+        "Otega Oweh"
+      ],
+      "exceptions": [
+        {
+          "type": "TPE (Isaiah Joe)",
+          "amount": 11323006,
+          "expiry": "7/6/27"
+        },
+        {
+          "type": "TPE (Aaron Wiggins)",
+          "amount": 9028038,
+          "expiry": "7/6/27"
+        },
+        {
+          "type": "TPE (Ousmane Dieng)",
+          "amount": 6670882,
+          "expiry": "2/4/27"
+        }
+      ]
     },
     {
       "abbr": "ORL",
-      "capAllocations": 240166950,
-      "capSpace": -75205950
+      "name": "Orlando Magic",
+      "slug": "orlando-magic",
+      "rosterHeader": "14/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Franz Wagner",
+          "salary": 41754690
+        },
+        {
+          "player": "Paolo Banchero",
+          "salary": 41240250
+        },
+        {
+          "player": "Desmond Bane",
+          "salary": 39446090
+        },
+        {
+          "player": "Jalen Suggs",
+          "salary": 32400000
+        },
+        {
+          "player": "Wendell Carter Jr.",
+          "salary": 18102000
+        },
+        {
+          "player": "Anthony Black",
+          "salary": 10106316
+        },
+        {
+          "player": "Goga Bitzade",
+          "salary": 7608696
+        },
+        {
+          "player": "Tristan da Silva",
+          "salary": 3991200
+        },
+        {
+          "player": "Jase Richardson",
+          "salary": 3132360
+        },
+        {
+          "player": "Jamal Cain",
+          "salary": 2584539,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Jevon Carter",
+          "salary": 2449421
+        },
+        {
+          "player": "Jonathan Isaac",
+          "salary": 2449421
+        },
+        {
+          "player": "Nikola Vučević",
+          "salary": 2449421
+        },
+        {
+          "player": "Noah Penda",
+          "salary": 2150917
+        }
+      ],
+      "deadMoney": [
+        {
+          "player": "Jonathan Isaac",
+          "amount": 8000000
+        }
+      ],
+      "deadMoneyTotal": 8000000,
+      "totalPayroll": 209865321,
+      "totalSalaries": 217865321,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": -17437321,
+      "repeater": false,
+      "firstApronSpace": -10174751,
+      "secondApronSpace": 2496249,
+      "capHolds": [
+        {
+          "player": "Jett Howard",
+          "amount": 7337938
+        },
+        {
+          "player": "Cory Joseph",
+          "amount": 2449421
+        },
+        {
+          "player": "Trevelin Queen",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 11972475,
+      "twoWay": [
+        "Colin Castleton",
+        "Alex Morales",
+        "Izaiyah Nelson"
+      ],
+      "exceptions": [
+        {
+          "type": "Taxpayer Mid-Level",
+          "amount": 6064000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Tyus Jones)",
+          "amount": 7000000,
+          "expiry": "2/4/27"
+        }
+      ]
     },
     {
       "abbr": "PHI",
-      "capAllocations": 241954093,
-      "capSpace": -76993093
+      "name": "Philadelphia 76ers",
+      "slug": "philadelphia-76ers",
+      "rosterHeader": "14/15 + 2/3",
+      "activeRoster": [
+        {
+          "player": "Joel Embiid",
+          "salary": 57985752
+        },
+        {
+          "player": "Jaylen Brown",
+          "salary": 57736350
+        },
+        {
+          "player": "Tyrese Maxey",
+          "salary": 40770520
+        },
+        {
+          "player": "VJ Edgecombe",
+          "salary": 11663880
+        },
+        {
+          "player": "Dean Wade",
+          "salary": 9000000
+        },
+        {
+          "player": "Anfernee Simons",
+          "salary": 6000000
+        },
+        {
+          "player": "Labaron Philon Jr.",
+          "salary": 3597120
+        },
+        {
+          "player": "Dominick Barlow",
+          "salary": 3415000
+        },
+        {
+          "player": "Ariel Hukporti",
+          "salary": 3400000
+        },
+        {
+          "player": "Dalen Terry",
+          "salary": 2584539,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Jabari Walker",
+          "salary": 2584539,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Justin Edwards",
+          "salary": 2411090
+        },
+        {
+          "player": "Adem Bona",
+          "salary": 2296271
+        },
+        {
+          "player": "Johni Broome",
+          "salary": 2150917
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 205595978,
+      "totalSalaries": 205595978,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": -5167978,
+      "repeater": false,
+      "firstApronSpace": 3419022,
+      "secondApronSpace": 16090022,
+      "capHolds": [
+        {
+          "player": "Kyle Lowry",
+          "amount": 2449421
+        },
+        {
+          "player": "Lonnie Walker IV",
+          "amount": 2449421
+        },
+        {
+          "player": "Trendon Watford",
+          "amount": 2449421
+        },
+        {
+          "player": "MarJon Beauchamp",
+          "amount": 2185116
+        },
+        {
+          "player": "Jeff Dowtin Jr.",
+          "amount": 2185116
+        },
+        {
+          "player": "Jalen Hood-Schifino",
+          "amount": 2185116
+        },
+        {
+          "player": "Tyrese Martin",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 16088727,
+      "twoWay": [
+        "Caleb Love",
+        "Rayan Rupert"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 44000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 2077000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Jared McCain)",
+          "amount": 4221360,
+          "expiry": "2/4/27"
+        },
+        {
+          "type": "TPE (Eric Gordon)",
+          "amount": 2296274,
+          "expiry": "2/5/27"
+        }
+      ]
     },
     {
       "abbr": "PHX",
-      "capAllocations": 242020027,
-      "capSpace": -77059027
+      "name": "Phoenix Suns",
+      "slug": "phoenix-suns",
+      "rosterHeader": "15/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Devin Booker",
+          "salary": 57078728
+        },
+        {
+          "player": "Jalen Green",
+          "salary": 36251166
+        },
+        {
+          "player": "Miles Bridges",
+          "salary": 22826087
+        },
+        {
+          "player": "Dillon Brooks",
+          "salary": 20992727
+        },
+        {
+          "player": "Mark Williams",
+          "salary": 11728395
+        },
+        {
+          "player": "Collin Gillespie",
+          "salary": 10714286
+        },
+        {
+          "player": "Khaman Maluach",
+          "salary": 6316680
+        },
+        {
+          "player": "Luke Kennard",
+          "salary": 6064000
+        },
+        {
+          "player": "Jordan Goodwin",
+          "salary": 5864198
+        },
+        {
+          "player": "Haywood Highsmith",
+          "salary": 3018158,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Koa Peat",
+          "salary": 2926800
+        },
+        {
+          "player": "Ryan Dunn",
+          "salary": 2784240
+        },
+        {
+          "player": "Jamaree Bouyea",
+          "salary": 2584539,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Oso Ighodaro",
+          "salary": 2296271
+        },
+        {
+          "player": "Rasheer Fleming",
+          "salary": 2150917
+        }
+      ],
+      "deadMoney": [
+        {
+          "player": "Bradley Beal",
+          "amount": 19383009
+        },
+        {
+          "player": "Nassir Little",
+          "amount": 3107143
+        },
+        {
+          "player": "E.J. Liddell",
+          "amount": 706898
+        }
+      ],
+      "deadMoneyTotal": 23197050,
+      "totalPayroll": 193597192,
+      "totalSalaries": 216794242,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": -16366242,
+      "repeater": true,
+      "firstApronSpace": -7779242,
+      "secondApronSpace": 4891758,
+      "capHolds": [
+        {
+          "player": "Bol Bol",
+          "amount": 2449421
+        },
+        {
+          "player": "Amir Coffey",
+          "amount": 2449421
+        },
+        {
+          "player": "Damion Lee",
+          "amount": 2449421
+        },
+        {
+          "player": "Terrence Ross",
+          "amount": 2449421
+        },
+        {
+          "player": "Isaiah Thomas",
+          "amount": 2449421
+        },
+        {
+          "player": "Thaddeus Young",
+          "amount": 2449421
+        },
+        {
+          "player": "Udoka Azubuike",
+          "amount": 2185116
+        },
+        {
+          "player": "Saben Lee",
+          "amount": 2185116
+        },
+        {
+          "player": "Isaiah Livers",
+          "amount": 2185116
+        },
+        {
+          "player": "Iffe Lundberg",
+          "amount": 2185116
+        },
+        {
+          "player": "Ishmail Wainright",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 25622106,
+      "twoWay": [
+        "Koby Brea",
+        "CJ Huntley",
+        "Pat Spencer"
+      ],
+      "exceptions": [
+        {
+          "type": "Taxpayer Mid-Level",
+          "amount": 0,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Royce O'Neale)",
+          "amount": 10875000,
+          "expiry": "7/6/27"
+        },
+        {
+          "type": "TPE (Nick Richards)",
+          "amount": 5000000,
+          "expiry": "2/5/27"
+        },
+        {
+          "type": "TPE (Nigel Hayes-Davis)",
+          "amount": 2048494,
+          "expiry": "2/5/27"
+        }
+      ]
     },
     {
       "abbr": "POR",
-      "capAllocations": 227065564,
-      "capSpace": -62104564
+      "name": "Portland Trail Blazers",
+      "slug": "portland-trail-blazers",
+      "rosterHeader": "14/15 + 2/3",
+      "activeRoster": [
+        {
+          "player": "Ja Morant",
+          "salary": 42166510
+        },
+        {
+          "player": "Jrue Holiday",
+          "salary": 34800000
+        },
+        {
+          "player": "Shaedon Sharpe",
+          "salary": 20089287
+        },
+        {
+          "player": "Toumani Camara",
+          "salary": 18080358
+        },
+        {
+          "player": "Robert Williams III",
+          "salary": 14000000
+        },
+        {
+          "player": "Scoot Henderson",
+          "salary": 13585523
+        },
+        {
+          "player": "Damian Lillard",
+          "salary": 13398800
+        },
+        {
+          "player": "Deni Avdija",
+          "salary": 13125000
+        },
+        {
+          "player": "Donovan Clingan",
+          "salary": 7519920
+        },
+        {
+          "player": "Yang Hansen",
+          "salary": 4643520
+        },
+        {
+          "player": "Micah Potter",
+          "salary": 2801346,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Vít Krejčí",
+          "salary": 2667944,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Sidy Cissoko",
+          "salary": 2497812,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Branden Carlsen",
+          "salary": 2449421
+        }
+      ],
+      "deadMoney": [
+        {
+          "player": "Didi Louzada",
+          "amount": 268032
+        }
+      ],
+      "deadMoneyTotal": 268032,
+      "totalPayroll": 191825441,
+      "totalSalaries": 192093473,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 8334527,
+      "repeater": false,
+      "firstApronSpace": 16921527,
+      "secondApronSpace": 29592527,
+      "capHolds": [
+        {
+          "player": "Matisse Thybulle",
+          "amount": 21945000
+        },
+        {
+          "player": "Rondae Hollis-Jefferson",
+          "amount": 2449421
+        },
+        {
+          "player": "Ben McLemore",
+          "amount": 2449421
+        },
+        {
+          "player": "Blake Wesley",
+          "amount": 2449421
+        },
+        {
+          "player": "Keljin Blevins",
+          "amount": 2185116
+        },
+        {
+          "player": "Ashton Hagans",
+          "amount": 2185116
+        },
+        {
+          "player": "T.J. Leaf",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 35848611,
+      "twoWay": [
+        "Jayson Kent",
+        "Chris Youngblood"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 15044000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Kris Murray)",
+          "amount": 3132000,
+          "expiry": "2/4/27"
+        }
+      ]
     },
     {
       "abbr": "SAC",
-      "capAllocations": 255300556,
-      "capSpace": -90339556
+      "name": "Sacramento Kings",
+      "slug": "sacramento-kings",
+      "rosterHeader": "13/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Zach LaVine",
+          "salary": 48967380
+        },
+        {
+          "player": "Domantas Sabonis",
+          "salary": 45472000
+        },
+        {
+          "player": "De'Andre Hunter",
+          "salary": 24910714
+        },
+        {
+          "player": "Keegan Murray",
+          "salary": 24137936
+        },
+        {
+          "player": "Malik Monk",
+          "salary": 20190035
+        },
+        {
+          "player": "Darius Acuff Jr.",
+          "salary": 8021520
+        },
+        {
+          "player": "Precious Achiuwa",
+          "salary": 5477000
+        },
+        {
+          "player": "Nique Clifford",
+          "salary": 3263400
+        },
+        {
+          "player": "Alex Karaban",
+          "salary": 2948280
+        },
+        {
+          "player": "Daeqwon Plowden",
+          "salary": 2449421
+        },
+        {
+          "player": "Dylan Cardwell",
+          "salary": 2150917
+        },
+        {
+          "player": "Maxime Raynaud",
+          "salary": 2150917
+        },
+        {
+          "player": "Emanuel Sharp",
+          "salary": 1357763
+        }
+      ],
+      "deadMoney": [
+        {
+          "player": "DeMar DeRozan",
+          "amount": 10000000
+        }
+      ],
+      "deadMoneyTotal": 10000000,
+      "totalPayroll": 191497283,
+      "totalSalaries": 201497283,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": -1329456,
+      "repeater": false,
+      "firstApronSpace": 3407544,
+      "secondApronSpace": 16078544,
+      "capHolds": [
+        {
+          "player": "Jae Crowder",
+          "amount": 2449421
+        },
+        {
+          "player": "Drew Eubanks",
+          "amount": 2449421
+        },
+        {
+          "player": "Killian Hayes",
+          "amount": 2449421
+        },
+        {
+          "player": "JaVale McGee",
+          "amount": 2449421
+        },
+        {
+          "player": "Doug McDermott",
+          "amount": 2449421
+        },
+        {
+          "player": "Russell Westbrook",
+          "amount": 2449421
+        },
+        {
+          "player": "Patrick Baldwin Jr.",
+          "amount": 2185116
+        },
+        {
+          "player": "Jordan Ford",
+          "amount": 2185116
+        },
+        {
+          "player": "Mason Jones",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 21251874,
+      "twoWay": [
+        "Adam Flagler",
+        "Jonathan Mogbo",
+        "Isaiah Stevens"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 15044000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 0,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Dario Saric)",
+          "amount": 5426400,
+          "expiry": "2/1/27"
+        },
+        {
+          "type": "TPE (Devin Carter)",
+          "amount": 5158080,
+          "expiry": "7/6/27"
+        },
+        {
+          "type": "TPE (Jonas Valanciunas)",
+          "amount": 4968600,
+          "expiry": "7/13/26"
+        }
+      ]
     },
     {
       "abbr": "SAS",
-      "capAllocations": 243614052,
-      "capSpace": -78653052
+      "name": "San Antonio Spurs",
+      "slug": "san-antonio-spurs",
+      "rosterHeader": "13/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "De'Aaron Fox",
+          "salary": 49488300
+        },
+        {
+          "player": "Devin Vassell",
+          "salary": 27500000
+        },
+        {
+          "player": "Keldon Johnson",
+          "salary": 18000000
+        },
+        {
+          "player": "Victor Wembanyama",
+          "salary": 16868246
+        },
+        {
+          "player": "Julian Champagnie",
+          "salary": 15350000
+        },
+        {
+          "player": "Tobias Harris",
+          "salary": 15044000
+        },
+        {
+          "player": "Dylan Harper",
+          "salary": 12989040
+        },
+        {
+          "player": "Luke Kornet",
+          "salary": 10450000
+        },
+        {
+          "player": "Stephon Castle",
+          "salary": 10015920
+        },
+        {
+          "player": "Harrison Barnes",
+          "salary": 8000000
+        },
+        {
+          "player": "Carter Bryant",
+          "salary": 5145360
+        },
+        {
+          "player": "Jayden Quaintance",
+          "salary": 3902760
+        },
+        {
+          "player": "Tarris Reed",
+          "salary": 3076920
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 195830546,
+      "totalSalaries": 195830546,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 4597454,
+      "repeater": false,
+      "firstApronSpace": 10484454,
+      "secondApronSpace": 23155454,
+      "capHolds": [
+        {
+          "player": "Kelly Olynyk",
+          "amount": 25545732
+        },
+        {
+          "player": "Bismack Biyombo",
+          "amount": 2449421
+        },
+        {
+          "player": "Jordan McLaughlin",
+          "amount": 2449421
+        },
+        {
+          "player": "Mason Plumlee",
+          "amount": 2449421
+        },
+        {
+          "player": "Lindy Waters III",
+          "amount": 2449421
+        },
+        {
+          "player": "Harrison Ingram",
+          "amount": 2449421
+        },
+        {
+          "player": "David Jones-Garcia",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 39977953,
+      "twoWay": [
+        "Maliq Brown",
+        "Ja'Kobi Gillespie",
+        "Emanuel Miller"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 15044000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        }
+      ]
     },
     {
       "abbr": "TOR",
-      "capAllocations": 213959590,
-      "capSpace": -48998590
+      "name": "Toronto Raptors",
+      "slug": "toronto-raptors",
+      "rosterHeader": "13/15 + 2/3",
+      "activeRoster": [
+        {
+          "player": "Kawhi Leonard",
+          "salary": 50300000
+        },
+        {
+          "player": "Scottie Barnes",
+          "salary": 41754690
+        },
+        {
+          "player": "Immanuel Quickley",
+          "salary": 32500000
+        },
+        {
+          "player": "R.J. Barrett",
+          "salary": 29616071
+        },
+        {
+          "player": "Jakob Poeltl",
+          "salary": 19500000
+        },
+        {
+          "player": "Collin Murray-Boyles",
+          "salary": 6649560
+        },
+        {
+          "player": "Allen Graves",
+          "salary": 4065720
+        },
+        {
+          "player": "Ja'Kobe Walter",
+          "salary": 3811800
+        },
+        {
+          "player": "Kyle Anderson",
+          "salary": 2449421
+        },
+        {
+          "player": "Trayce Jackson-Davis",
+          "salary": 2406205
+        },
+        {
+          "player": "Jamison Battle",
+          "salary": 2296271
+        },
+        {
+          "player": "Jamal Shead",
+          "salary": 2296271
+        },
+        {
+          "player": "Alijah Martin",
+          "salary": 2185117
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 199831126,
+      "totalSalaries": 199831126,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 332570,
+      "repeater": false,
+      "firstApronSpace": 2321361,
+      "secondApronSpace": 14992361,
+      "capHolds": [
+        {
+          "player": "Jordan Nwora",
+          "amount": 5700000
+        },
+        {
+          "player": "Will Barton",
+          "amount": 2449421
+        },
+        {
+          "player": "A.J. Lawson",
+          "amount": 2449421
+        },
+        {
+          "player": "Garrett Temple",
+          "amount": 2449421
+        }
+      ],
+      "capHoldsTotal": 13048263,
+      "twoWay": [
+        "Jaden Bradley",
+        "Chucky Hepburn"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 15044000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "Bi-Annual",
+          "amount": 5477000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Ochai Agbaji)",
+          "amount": 6383525,
+          "expiry": "2/5/27"
+        }
+      ]
     },
     {
       "abbr": "UTA",
-      "capAllocations": 212439194,
-      "capSpace": -47439194
+      "name": "Utah Jazz",
+      "slug": "utah-jazz",
+      "rosterHeader": "15/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Jaren Jackson Jr.",
+          "salary": 49000000
+        },
+        {
+          "player": "Lauri Markkanen",
+          "salary": 46113154
+        },
+        {
+          "player": "Darryn Peterson",
+          "salary": 13195320
+        },
+        {
+          "player": "Jusuf Nurkić",
+          "salary": 11458333
+        },
+        {
+          "player": "Ace Bailey",
+          "salary": 9523080
+        },
+        {
+          "player": "Keyonte George",
+          "salary": 6563925
+        },
+        {
+          "player": "John Konchar",
+          "salary": 6165000
+        },
+        {
+          "player": "Cody Williams",
+          "salary": 6015600
+        },
+        {
+          "player": "Jaxson Hayes",
+          "salary": 6000000
+        },
+        {
+          "player": "Josh Okogie",
+          "salary": 6000000
+        },
+        {
+          "player": "Brice Sensabaugh",
+          "salary": 4862237
+        },
+        {
+          "player": "Svi Mykhailiuk",
+          "salary": 3850000
+        },
+        {
+          "player": "Mo Bamba",
+          "salary": 3506659,
+          "note": "non-guaranteed"
+        },
+        {
+          "player": "Kyle Filipowski",
+          "salary": 3000000
+        },
+        {
+          "player": "Isaiah Collier",
+          "salary": 2763960
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 178017268,
+      "totalSalaries": 178017268,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 21716942,
+      "repeater": false,
+      "firstApronSpace": 30650837,
+      "secondApronSpace": 43321837,
+      "capHolds": [
+        {
+          "player": "Kevin Love",
+          "amount": 7885000
+        },
+        {
+          "player": "Hayden Gray",
+          "amount": 2185116
+        },
+        {
+          "player": "Bez Mbeng",
+          "amount": 2185116
+        },
+        {
+          "player": "Oscar Tshiebwe",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 14440348,
+      "twoWay": [
+        "Trey Alexander",
+        "Tamar Bates",
+        "Blake Hinson"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 3044000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Walker Kessler)",
+          "amount": 15056444,
+          "expiry": "7/8/27"
+        },
+        {
+          "type": "TPE (Jock Landale)",
+          "amount": 2296274,
+          "expiry": "2/5/27"
+        }
+      ]
     },
     {
       "abbr": "WAS",
-      "capAllocations": 240612111,
-      "capSpace": -75651111
+      "name": "Washington Wizards",
+      "slug": "washington-wizards",
+      "rosterHeader": "14/15 + 3/3",
+      "activeRoster": [
+        {
+          "player": "Anthony Davis",
+          "salary": 58456566
+        },
+        {
+          "player": "Trae Young",
+          "salary": 49488300
+        },
+        {
+          "player": "AJ Dybantsa",
+          "salary": 14748000
+        },
+        {
+          "player": "Alex Sarr",
+          "salary": 12370680
+        },
+        {
+          "player": "Bilal Coulibaly",
+          "salary": 9240012
+        },
+        {
+          "player": "Tre Johnson",
+          "salary": 8649600
+        },
+        {
+          "player": "Deandre Ayton",
+          "salary": 8104000
+        },
+        {
+          "player": "Khris Middleton",
+          "salary": 5591122
+        },
+        {
+          "player": "Cam Whitmore",
+          "salary": 5458310
+        },
+        {
+          "player": "Bub Carrington",
+          "salary": 4900560
+        },
+        {
+          "player": "Will Riley",
+          "salary": 3688320
+        },
+        {
+          "player": "Kyshawn George",
+          "salary": 3108000
+        },
+        {
+          "player": "Tristan Vukčević",
+          "salary": 3000000
+        },
+        {
+          "player": "Justin Champagnie",
+          "salary": 2667944,
+          "note": "non-guaranteed"
+        }
+      ],
+      "deadMoney": [],
+      "deadMoneyTotal": 0,
+      "totalPayroll": 189471414,
+      "totalSalaries": 189471414,
+      "luxuryTaxThreshold": 200428000,
+      "luxuryTaxSpace": 10956586,
+      "repeater": false,
+      "firstApronSpace": 19543586,
+      "secondApronSpace": 32214586,
+      "capHolds": [
+        {
+          "player": "Ian Mahinmi",
+          "amount": 23175077
+        },
+        {
+          "player": "Kendrick Nunn",
+          "amount": 6825000
+        },
+        {
+          "player": "Anthony Gill",
+          "amount": 2449421
+        },
+        {
+          "player": "Ty Lawson",
+          "amount": 2449421
+        },
+        {
+          "player": "Shabazz Napier",
+          "amount": 2449421
+        },
+        {
+          "player": "Tomas Satoransky",
+          "amount": 2449421
+        },
+        {
+          "player": "Ramon Sessions",
+          "amount": 2449421
+        },
+        {
+          "player": "Sharife Cooper",
+          "amount": 2185116
+        },
+        {
+          "player": "JT Thor",
+          "amount": 2185116
+        },
+        {
+          "player": "Cassius Winston",
+          "amount": 2185116
+        },
+        {
+          "player": "Johnathan Williams",
+          "amount": 2185116
+        }
+      ],
+      "capHoldsTotal": 50987646,
+      "twoWay": [
+        "Felix Okpara",
+        "Julian Reese",
+        "Jamir Watkins"
+      ],
+      "exceptions": [
+        {
+          "type": "Non-taxpayer Mid-Level",
+          "amount": 15044000,
+          "expiry": "4/11/27"
+        },
+        {
+          "type": "TPE (Jaden Hardy)",
+          "amount": 6000000,
+          "expiry": "7/7/27"
+        },
+        {
+          "type": "TPE (D'Angelo Russell)",
+          "amount": 5969250,
+          "expiry": "7/8/27"
+        }
+      ]
     }
   ]
 }

@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "eslint src scripts",
     "fetch-cba": "tsx scripts/fetch-cba.ts",
+    "fetch-capsheets": "tsx scripts/fetch-capsheets.ts",
     "fetch-players": "tsx scripts/fetch-players.ts",
-    "fetch-teams": "tsx scripts/fetch-teams.ts",
     "validate-data": "tsx scripts/validate-refresh-data.ts"
   },
   "dependencies": {

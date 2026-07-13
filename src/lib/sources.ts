@@ -45,12 +45,6 @@ export const SOURCE_METADATA: SourceMetadata[] = [
     showOnAbout: true,
   },
   {
-    id: "hoopshype",
-    label: "HoopsHype Salaries",
-    url: "https://hoopshype.com/salaries/players/",
-    matcher: (source) => source.includes("hoopshype"),
-  },
-  {
     id: "nba-stats",
     label: "NBA Stats",
     url: "https://www.nba.com/stats/players/traditional",

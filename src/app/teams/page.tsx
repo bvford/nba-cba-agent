@@ -3,27 +3,14 @@ import type { Metadata } from "next";
 import teamsData from "../../../data/teams.json";
 import { CapStatusBadge } from "@/components/teams/CapStatusBadge";
 import { formattedTeamsFetchedAt } from "@/lib/data-meta";
-import { TEAM_FULL_NAMES, computeCapStatus, normalizeTeamAbbr, type CapThresholds } from "@/lib/teams-meta";
+import { TEAM_FULL_NAMES, computeCapStatus, normalizeTeamAbbr } from "@/lib/teams-meta";
+import type { TeamsJson } from "@/lib/teams-data";
 
 export const metadata: Metadata = {
   title: "Team Cap Sheets",
   description:
-    "Every NBA team's total cap allocations, luxury-tax apron status, and available exceptions for the 2026-27 season.",
+    "Every NBA team's total salaries, luxury-tax apron status, and available exceptions for the 2026-27 season.",
 };
-
-interface TeamEntry {
-  abbr: string;
-  capAllocations: number;
-  capSpace: number;
-}
-
-interface TeamsJson {
-  fetchedAt: string;
-  season: string;
-  thresholds: CapThresholds;
-  exceptions: { nonTaxpayerMLE: number; taxpayerMLE: number; biannual: number };
-  teams: TeamEntry[];
-}
 
 const teams = teamsData as TeamsJson;
 
@@ -70,14 +57,14 @@ export default function TeamsIndexPage() {
           and luxury-tax aprons.
         </p>
         <p className="text-xs text-(--color-text-muted) mb-8">
-          Cap data fetched {formattedTeamsFetchedAt} (Spotrac)
+          Cap data fetched {formattedTeamsFetchedAt} (Capsheets)
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           {sortedTeams.map((team) => {
             const abbr = normalizeTeamAbbr(team.abbr);
             const fullName = TEAM_FULL_NAMES[abbr] ?? abbr;
-            const capStatus = computeCapStatus(team.capAllocations, teams.thresholds);
+            const capStatus = computeCapStatus(team, teams.thresholds);
 
             return (
               <Link
@@ -95,7 +82,7 @@ export default function TeamsIndexPage() {
                   {fullName}
                 </h2>
                 <p className="text-xs text-(--color-text-secondary) mt-auto pt-2">
-                  {fmtCompact(team.capAllocations)} total cap allocations
+                  {fmtCompact(team.totalSalaries)} total salaries
                 </p>
               </Link>
             );

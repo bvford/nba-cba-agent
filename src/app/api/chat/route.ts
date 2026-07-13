@@ -238,7 +238,8 @@ async function gatherRetrievalContext(query: string, retrievalProfile: Retrieval
   });
   const cbaContext = cbaResult.context;
 
-  // On salary queries where Notte failed, force a player lookup so HoopsHype data is always present as fallback
+  // On salary queries where Notte failed, force a player lookup so the cached
+  // Capsheets salary data is always present as fallback
   const playerContext =
     searchPlayers(query) ||
     (notteAttempted && !notteContext ? searchPlayers(findPlayerNamesInQuery(query).join(" ")) : "");
@@ -251,13 +252,11 @@ async function gatherRetrievalContext(query: string, retrievalProfile: Retrieval
     ...(notteContext ? ["Contract data: Spotrac (real-time)"] : []),
     ...(playerContext
       ? [
-          ...(notteAttempted && !notteContext
-            ? ["Contract data: HoopsHype (cached snapshot — Spotrac unavailable)"]
-            : ["Player salaries: HoopsHype team salary pages"]),
+          "Player salaries: Capsheets (2026-27 cap sheets)",
           "Player stats: NBA stats feed (2025-26)",
         ]
       : []),
-    ...(teamContext ? ["Team cap data: Spotrac (2025-26 snapshot)"] : []),
+    ...(teamContext ? ["Team cap data: Capsheets (2026-27 snapshot)"] : []),
   ];
 
   return { cbaContext, playerContext, teamContext, notteContext, sources };
@@ -274,7 +273,7 @@ function buildAugmentedMessages(
     if (i === trimmedMessages.length - 1 && m.role === "user") {
       return {
         role: "user" as const,
-        content: `${m.content}\n\n---\n\nCurrent date context: ${currentDateContext}\nCurrent NBA season context in this app: 2025-26\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${context.cbaContext}${context.notteContext}${context.playerContext}${context.teamContext}`,
+        content: `${m.content}\n\n---\n\nCurrent date context: ${currentDateContext}\nCurrent NBA cap year in this app: 2026-27 (player stats are from the completed 2025-26 season)\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${context.cbaContext}${context.notteContext}${context.playerContext}${context.teamContext}`,
       };
     }
     return { role: m.role, content: m.content };
