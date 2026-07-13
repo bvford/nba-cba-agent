@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 interface AppHeaderProps {
   sidebarOpen: boolean;
@@ -10,7 +11,7 @@ interface AppHeaderProps {
 }
 
 const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent] focus-visible:ring-offset-2 focus-visible:ring-offset-[--color-surface]";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-surface)";
 
 export function AppHeader({
   sidebarOpen,
@@ -21,14 +22,14 @@ export function AppHeader({
   onExportChat,
 }: AppHeaderProps) {
   return (
-    <header className="border-b border-[--color-border] bg-[--color-surface-raised]/88 backdrop-blur-xl sticky top-0 z-10">
+    <header className="border-b border-(--color-border) bg-(--color-surface-raised)/88 backdrop-blur-xl sticky top-0 z-10">
       <div className="header-accent-line w-full" />
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
         <button
           onClick={onToggleSidebar}
           aria-label={sidebarOpen ? "Close chat history" : "Open chat history"}
           aria-expanded={sidebarOpen}
-          className={`p-1.5 rounded-lg hover:bg-[--color-surface-hover] text-[--color-text-muted] hover:text-[--color-text-secondary] transition-colors lg:hidden ${focusRing}`}
+          className={`p-1.5 rounded-lg hover:bg-(--color-surface-hover) text-(--color-text-muted) hover:text-(--color-text-secondary) transition-colors lg:hidden ${focusRing}`}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <line x1="3" y1="12" x2="21" y2="12" />
@@ -47,31 +48,37 @@ export function AppHeader({
             alt="ChatCBA logo"
             width={40}
             height={40}
-            className="rounded-full border border-[--color-border-light] shadow-[0_4px_14px_rgba(8,10,15,0.4)]"
+            className="rounded-full border border-(--color-border-light) shadow-[0_4px_14px_rgba(8,10,15,0.4)]"
           />
           <div className="text-left">
-            <h1 className="text-lg sm:text-xl font-semibold tracking-[0.06em] text-[--color-text-primary] leading-tight">
+            <h1 className="text-lg sm:text-xl font-semibold tracking-[0.06em] text-(--color-text-primary) leading-tight">
               ChatCBA
             </h1>
           </div>
         </button>
 
-        <nav className="ml-auto hidden md:flex items-center gap-1 rounded-full border border-[--color-border] bg-[--color-surface]/55 px-1.5 py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+        <nav className="ml-auto hidden md:flex items-center gap-1 rounded-full border border-(--color-border) bg-(--color-surface)/55 px-1.5 py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
           <button
             onClick={onNewChat}
-            className={`text-xs px-3 py-1.5 rounded-full text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors ${focusRing}`}
+            className={`text-xs px-3 py-1.5 rounded-full text-(--color-text-secondary) hover:text-(--color-text-primary) hover:bg-(--color-surface-hover) transition-colors ${focusRing}`}
           >
             Home
           </button>
           <button
             onClick={onGoToComposer}
-            className={`text-xs px-3 py-1.5 rounded-full text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors ${focusRing}`}
+            className={`text-xs px-3 py-1.5 rounded-full text-(--color-text-secondary) hover:text-(--color-text-primary) hover:bg-(--color-surface-hover) transition-colors ${focusRing}`}
           >
             Chat
           </button>
+          <Link
+            href="/teams"
+            className={`text-xs px-3 py-1.5 rounded-full text-(--color-text-secondary) hover:text-(--color-text-primary) hover:bg-(--color-surface-hover) transition-colors ${focusRing}`}
+          >
+            Team Cap Sheets
+          </Link>
           <a
             href="/about"
-            className={`text-xs px-3 py-1.5 rounded-full text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors ${focusRing}`}
+            className={`text-xs px-3 py-1.5 rounded-full text-(--color-text-secondary) hover:text-(--color-text-primary) hover:bg-(--color-surface-hover) transition-colors ${focusRing}`}
           >
             About
           </a>
@@ -80,7 +87,7 @@ export function AppHeader({
         {hasMessages && (
           <button
             onClick={onExportChat}
-            className={`text-xs px-3 py-1.5 rounded-full border border-[--color-border] text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] hover:border-[--color-border-light] transition-colors ${focusRing}`}
+            className={`text-xs px-3 py-1.5 rounded-full border border-(--color-border) text-(--color-text-secondary) hover:text-(--color-text-primary) hover:bg-(--color-surface-hover) hover:border-(--color-border-light) transition-colors ${focusRing}`}
             title="Copy chat as markdown"
           >
             Export Chat

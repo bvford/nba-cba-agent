@@ -9,6 +9,13 @@ import {
   PLAYER_SEARCH_RESULT_CAP,
   TEAM_ROSTER_PLAYER_CAP,
 } from "@/lib/config";
+import {
+  CAP_STATUS_CHAT_LABELS,
+  TEAM_NAMES,
+  computeAvailableExceptions,
+  computeCapStatus,
+  normalizeTeamAbbr,
+} from "@/lib/teams-meta";
 
 export interface CBAArticle {
   id: string;
@@ -301,34 +308,6 @@ export function searchCBAWithMeta(
 
 // ---- Player search ----
 
-// NBA team full names for matching. Data sources are inconsistent about the
-// Suns' abbreviation (players.json has both "PHX" and "PHO"; teams.json only
-// has "PHX") — normalizeTeamAbbr() below is the single place that reconciles
-// this rather than each caller doing its own ad hoc .replace().
-const TEAM_NAMES: Record<string, string[]> = {
-  ATL: ["hawks", "atlanta"], BOS: ["celtics", "boston"], BKN: ["nets", "brooklyn"],
-  CHA: ["hornets", "charlotte"], CHI: ["bulls", "chicago"], CLE: ["cavaliers", "cavs", "cleveland"],
-  DAL: ["mavericks", "mavs", "dallas"], DEN: ["nuggets", "denver"], DET: ["pistons", "detroit"],
-  GSW: ["warriors", "golden state"], HOU: ["rockets", "houston"], IND: ["pacers", "indiana"],
-  LAC: ["clippers", "la clippers"], LAL: ["lakers", "la lakers", "los angeles lakers"],
-  MEM: ["grizzlies", "memphis"], MIA: ["heat", "miami"], MIL: ["bucks", "milwaukee"],
-  MIN: ["timberwolves", "wolves", "minnesota"], NOP: ["pelicans", "new orleans"],
-  NYK: ["knicks", "new york"], OKC: ["thunder", "oklahoma city"],
-  ORL: ["magic", "orlando"], PHI: ["76ers", "sixers", "philadelphia"],
-  PHX: ["suns", "phoenix"], POR: ["trail blazers", "blazers", "portland"],
-  SAC: ["kings", "sacramento"], SAS: ["spurs", "san antonio"], TOR: ["raptors", "toronto"],
-  UTA: ["jazz", "utah"], WAS: ["wizards", "washington"],
-};
-
-// Aliases for team abbreviations that appear inconsistently across data
-// sources. Both sides of a comparison should be run through
-// normalizeTeamAbbr() so it doesn't matter which variant either side uses.
-const TEAM_ABBR_ALIASES: Record<string, string> = { PHO: "PHX" };
-
-function normalizeTeamAbbr(abbr: string): string {
-  return TEAM_ABBR_ALIASES[abbr] ?? abbr;
-}
-
 function formatPlayerInfo(p: PlayerData): string {
   const team = p.team;
   const gp = p.games || 1;
@@ -505,36 +484,32 @@ export function searchTeams(query: string): string {
     if (!t) continue;
 
     const { capAllocations, capSpace } = t;
-    const overCap = capAllocations > thresholds.salaryCap;
-    const overFirstApron = capAllocations > thresholds.firstApron;
-    const overSecondApron = capAllocations > thresholds.secondApron;
-
-    const firstApronDist = capAllocations - thresholds.firstApron;
-    const secondApronDist = capAllocations - thresholds.secondApron;
-
-    let apronStatus: string;
-    if (overSecondApron) apronStatus = "Over second apron";
-    else if (overFirstApron) apronStatus = "Over first apron (hard-capped at second apron)";
-    else if (overCap) apronStatus = "Over cap, under first apron";
-    else apronStatus = "Under cap";
+    const capStatus = computeCapStatus(capAllocations, thresholds);
+    const availability = computeAvailableExceptions(capStatus, capSpace, exceptions);
 
     let availableExceptions: string;
-    if (overSecondApron) {
-      availableExceptions = "No MLE or bi-annual exception (over second apron)";
-    } else if (overFirstApron) {
-      availableExceptions = `Taxpayer MLE: ${fmt(exceptions.taxpayerMLE)} (using it hard-caps team at second apron)`;
-    } else if (overCap) {
-      availableExceptions = `Non-Taxpayer MLE: ${fmt(exceptions.nonTaxpayerMLE)}, Bi-Annual: ${fmt(exceptions.biannual)}`;
-    } else {
-      availableExceptions = `Cap room: ${fmt(capSpace)} available`;
+    switch (availability.kind) {
+      case "none-over-second-apron":
+        availableExceptions = "No MLE or bi-annual exception (over second apron)";
+        break;
+      case "taxpayer-mle":
+        availableExceptions = `Taxpayer MLE: ${fmt(availability.taxpayerMLE)} (using it hard-caps team at second apron)`;
+        break;
+      case "non-taxpayer-mle-and-biannual":
+        availableExceptions = `Non-Taxpayer MLE: ${fmt(availability.nonTaxpayerMLE)}, Bi-Annual: ${fmt(availability.biannual)}`;
+        break;
+      case "cap-room":
+        availableExceptions = `Cap room: ${fmt(availability.capSpace)} available`;
+        break;
     }
 
     lines.push(`**${abbr}**`);
     lines.push(`  Total cap allocations: ${fmt(capAllocations)}`);
-    lines.push(`  Status: ${apronStatus}`);
-    if (overCap) {
-      lines.push(`  Distance to first apron: ${firstApronDist > 0 ? fmt(firstApronDist) + " over" : fmt(-firstApronDist) + " under"}`);
-      lines.push(`  Distance to second apron: ${secondApronDist > 0 ? fmt(secondApronDist) + " over" : fmt(-secondApronDist) + " under"}`);
+    lines.push(`  Status: ${CAP_STATUS_CHAT_LABELS[capStatus.tier]}`);
+    if (capStatus.overCap) {
+      const { firstApronDistance, secondApronDistance } = capStatus;
+      lines.push(`  Distance to first apron: ${firstApronDistance > 0 ? fmt(firstApronDistance) + " over" : fmt(-firstApronDistance) + " under"}`);
+      lines.push(`  Distance to second apron: ${secondApronDistance > 0 ? fmt(secondApronDistance) + " over" : fmt(-secondApronDistance) + " under"}`);
     }
     lines.push(`  Available exception(s): ${availableExceptions}`);
     lines.push("");

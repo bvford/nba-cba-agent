@@ -19,12 +19,12 @@ export const RESPONSE_CACHE_TTL_SECONDS = Math.floor(RESPONSE_CACHE_TTL_MS / 100
  * Bump this whenever a prompt or retrieval change should invalidate
  * previously cached responses (both in-memory and in Upstash).
  */
-export const CACHE_SCHEMA_VERSION = "2026-02-18-team-context-v2";
+export const CACHE_SCHEMA_VERSION = "2026-07-13-sonnet-5";
 /** How many of the most recent conversation turns are folded into the cache key. */
 export const CACHE_KEY_RECENT_MESSAGES = 6;
 
 // ---- Model ----
-export const MODEL_ID = process.env.CHATCBA_MODEL || "claude-sonnet-4-5-20250929";
+export const MODEL_ID = process.env.CHATCBA_MODEL || "claude-sonnet-5";
 
 // ---- Sources shown to the user ----
 /** Max distinct source citations returned with a response. */

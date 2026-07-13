@@ -2,7 +2,7 @@ export const EXAMPLE_QUESTIONS = [
   { label: "What is LeBron James eligible for in free agency?", icon: "👑" },
   { label: "How do Bird rights work?", icon: "🦅" },
   { label: "Explain the second apron and its restrictions", icon: "📊" },
-  { label: "What kind of extension can the Thunder offer SGA?", icon: "📝" },
+  { label: "What triggers a hard cap at the first apron?", icon: "📝" },
   { label: "What is the mid-level exception?", icon: "💰" },
   { label: "How does restricted free agency work?", icon: "🔒" },
 ];

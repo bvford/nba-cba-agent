@@ -59,25 +59,25 @@ export function ConfirmDialog({ title, description, onCancel, onConfirm }: Confi
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="w-full max-w-sm rounded-2xl border border-[--color-border-light] bg-[--color-surface-raised] p-5 shadow-2xl"
+        className="w-full max-w-sm rounded-2xl border border-(--color-border-light) bg-(--color-surface-raised) p-5 shadow-2xl"
       >
-        <h2 id={titleId} className="text-base font-semibold text-[--color-text-primary]">
+        <h2 id={titleId} className="text-base font-semibold text-(--color-text-primary)">
           {title}
         </h2>
-        <p id={descriptionId} className="mt-2 text-sm leading-relaxed text-[--color-text-secondary]">
+        <p id={descriptionId} className="mt-2 text-sm leading-relaxed text-(--color-text-secondary)">
           {description}
         </p>
         <div className="mt-5 flex justify-end gap-2">
           <button
             ref={cancelRef}
             onClick={onCancel}
-            className="rounded-lg border border-[--color-border] px-3 py-2 text-sm text-[--color-text-secondary] hover:bg-[--color-surface-hover] hover:text-[--color-text-primary] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
+            className="rounded-lg border border-(--color-border) px-3 py-2 text-sm text-(--color-text-secondary) hover:bg-(--color-surface-hover) hover:text-(--color-text-primary) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent)"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="rounded-lg bg-[linear-gradient(135deg,#c8a24a,#d4b15e)] px-3 py-2 text-sm font-semibold text-[#0d1117] hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent] focus-visible:ring-offset-2 focus-visible:ring-offset-[--color-surface-raised]"
+            className="rounded-lg bg-[linear-gradient(135deg,#c8a24a,#d4b15e)] px-3 py-2 text-sm font-semibold text-[#0d1117] hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-surface-raised)"
           >
             Delete Chat
           </button>

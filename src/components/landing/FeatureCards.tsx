@@ -12,10 +12,10 @@ export function FeatureCards({ onSelect }: FeatureCardsProps) {
           <button
             key={card.title}
             onClick={() => onSelect(card.prompt)}
-            className="text-left p-4 rounded-2xl border border-[--color-border] bg-[linear-gradient(165deg,rgba(18,27,43,0.95),rgba(11,17,30,0.95))] hover:bg-[--color-surface-hover]/85 hover:border-[--color-border-light] hover:-translate-y-1 transition-all duration-200 shadow-[0_8px_18px_rgba(4,8,14,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
+            className="text-left p-4 rounded-2xl border border-(--color-border) bg-[linear-gradient(165deg,rgba(18,27,43,0.95),rgba(11,17,30,0.95))] hover:bg-(--color-surface-hover)/85 hover:border-(--color-border-light) hover:-translate-y-1 transition-all duration-200 shadow-[0_8px_18px_rgba(4,8,14,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent)"
           >
-            <h3 className="text-base font-semibold text-[--color-text-primary] mb-1.5">{card.title}</h3>
-            <p className="text-xs leading-relaxed text-[--color-text-secondary] break-words">
+            <h3 className="text-base font-semibold text-(--color-text-primary) mb-1.5">{card.title}</h3>
+            <p className="text-xs leading-relaxed text-(--color-text-secondary) break-words">
               {card.description}
             </p>
           </button>

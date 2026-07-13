@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { ChatInput } from "@/components/ChatInput";
 import { ChatMessage } from "@/components/ChatMessage";
@@ -9,7 +10,18 @@ import { Sidebar } from "@/components/Sidebar";
 import { Toast } from "@/components/Toast";
 import { useChat } from "@/lib/use-chat";
 
+// useChat() reads the `ask` search param (for /teams -> chat handoff), and
+// Next.js requires a Suspense boundary around any client-side useSearchParams()
+// call or `next build` fails.
 export default function Home() {
+  return (
+    <Suspense fallback={<div className="h-screen w-full bg-gradient-page" />}>
+      <HomeInner />
+    </Suspense>
+  );
+}
+
+function HomeInner() {
   const {
     chats,
     activeChatId,
@@ -83,6 +95,7 @@ export default function Home() {
                       message.role === "user" ? () => beginEditUserMessage(index) : undefined
                     }
                     onRetry={message.isError ? () => retryError(index) : undefined}
+                    isStreaming={isLoading && index === messages.length - 1 && message.role === "assistant"}
                   />
                 ))}
               </div>

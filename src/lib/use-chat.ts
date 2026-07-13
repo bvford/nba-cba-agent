@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createParser } from "eventsource-parser";
 import { trackEvent } from "@/lib/analytics";
 import type { FeedbackValue, Message } from "@/lib/chat-types";
@@ -11,6 +12,7 @@ import {
   loadChats,
   saveChat,
 } from "@/lib/chat-store";
+import { TEAM_FULL_NAMES, normalizeTeamAbbr } from "@/lib/teams-meta";
 
 const RATE_LIMIT_ERROR = "You've hit today's free limit (20 questions/day). Come back tomorrow!";
 const OVERLOADED_ERROR = "The assistant is briefly overloaded — try again in a moment.";
@@ -33,6 +35,9 @@ export function useChat() {
   const [chatPendingDelete, setChatPendingDelete] = useState<Chat | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const askHandledRef = useRef(false);
 
   const refreshChats = useCallback(() => setChats(loadChats()), []);
 
@@ -220,14 +225,17 @@ export function useChat() {
     [activeChatId, persistChat, refreshChats]
   );
 
-  const sendMessage = async (content: string) => {
-    if (isLoading) return;
-    trackEvent("message_sent", { chars: content.length, source: "new" });
-    const nextMessages: Message[] = [...messages, { role: "user", content }];
-    setMessages(nextMessages);
-    const chatId = ensureChat(content, nextMessages);
-    await streamAssistantResponse(nextMessages, chatId);
-  };
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (isLoading) return;
+      trackEvent("message_sent", { chars: content.length, source: "new" });
+      const nextMessages: Message[] = [...messages, { role: "user", content }];
+      setMessages(nextMessages);
+      const chatId = ensureChat(content, nextMessages);
+      await streamAssistantResponse(nextMessages, chatId);
+    },
+    [isLoading, messages, ensureChat, streamAssistantResponse]
+  );
 
   const sendEditedMessage = async (content: string, index: number) => {
     trackEvent("message_sent", { chars: content.length, source: "edit_resend" });
@@ -327,6 +335,29 @@ export function useChat() {
       composer.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
+
+  // Handles the "Ask about the {Team}" link from a /teams/[abbr] page
+  // (/?ask=ATL). askHandledRef — not the dependency array — is what stops
+  // this from firing more than once. The send itself is deferred a tick
+  // (same pattern as refreshChats above) so the effect body never calls
+  // setState synchronously.
+  useEffect(() => {
+    if (askHandledRef.current) return;
+    const ask = searchParams.get("ask");
+    if (!ask) return;
+    askHandledRef.current = true;
+
+    const abbr = normalizeTeamAbbr(ask.toUpperCase());
+    const teamName = TEAM_FULL_NAMES[abbr];
+    router.replace("/", { scroll: false });
+    if (!teamName) return;
+
+    const timeoutId = window.setTimeout(() => {
+      trackEvent("team_ask_link_used", { abbr });
+      void sendMessage(`What's the ${teamName}'s cap situation and available exceptions this offseason?`);
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [searchParams, router, sendMessage]);
 
   return {
     chats,

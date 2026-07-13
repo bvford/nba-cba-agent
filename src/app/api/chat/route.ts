@@ -315,7 +315,8 @@ Answer from general knowledge and flag it plainly: note that this answer is base
 - Do not add disclaimers or timestamps unless the uncertainty materially changes the answer.
 
 ## Formatting
-- Bullet points for lists. Headers only when there are genuinely multiple distinct sections. Compact by default unless the user asks for more depth.`;
+- Bullet points for lists. Headers only when there are genuinely multiple distinct sections. Compact by default unless the user asks for more depth.
+- Use a markdown table for any season-by-season salary, contract-year, or multi-team cap breakdown — this renders as a real table for the user. Reserve bullets for everything else.`;
 
 // ---- Anthropic error classification ----
 
