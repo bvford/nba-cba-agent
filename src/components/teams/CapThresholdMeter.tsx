@@ -56,7 +56,7 @@ export function CapThresholdMeter({ teamAbbr, capAllocations, thresholds, tier }
     <div>
       <div className="relative pt-6">
         <div
-          className="absolute top-0 -translate-x-1/2 whitespace-nowrap text-xs font-semibold text-(--color-text-primary)"
+          className="font-scoreboard absolute top-0 -translate-x-1/2 whitespace-nowrap text-base tracking-wide text-(--color-text-primary)"
           style={{ left: `${fillPct}%` }}
         >
           {teamAbbr} · {fmtCompact(capAllocations)}

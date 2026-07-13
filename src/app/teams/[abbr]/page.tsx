@@ -188,7 +188,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ abb
         </nav>
 
         <div className="flex flex-wrap items-center gap-3 mb-1">
-          <h1 className="text-2xl md:text-3xl font-semibold text-(--color-text-primary) tracking-tight">
+          <h1 className="font-scoreboard text-4xl md:text-5xl tracking-wide text-(--color-text-primary)">
             {fullName}
           </h1>
           <span className="rounded-md border border-(--color-border-light) bg-(--color-surface-raised) px-2 py-0.5 text-xs font-bold tracking-wide text-(--color-text-secondary)">
@@ -212,26 +212,28 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ abb
             tier={capStatus.tier}
           />
 
-          <dl className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+          <dl className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <dt className="text-(--color-text-muted) text-xs uppercase tracking-wide mb-1">
+              <dt className="font-condensed text-(--color-text-muted) text-xs uppercase tracking-[0.08em] mb-1">
                 Total Cap Allocations
               </dt>
-              <dd className="text-(--color-text-primary) font-semibold">{fmtExact(team.capAllocations)}</dd>
+              <dd className="font-scoreboard text-2xl tracking-wide tabular-nums text-(--color-text-primary)">
+                {fmtExact(team.capAllocations)}
+              </dd>
             </div>
             <div>
-              <dt className="text-(--color-text-muted) text-xs uppercase tracking-wide mb-1">
+              <dt className="font-condensed text-(--color-text-muted) text-xs uppercase tracking-[0.08em] mb-1">
                 Distance to First Apron
               </dt>
-              <dd className="text-(--color-text-primary) font-semibold">
+              <dd className="font-scoreboard text-2xl tracking-wide tabular-nums text-(--color-text-primary)">
                 {fmtSignedDistance(capStatus.firstApronDistance)}
               </dd>
             </div>
             <div>
-              <dt className="text-(--color-text-muted) text-xs uppercase tracking-wide mb-1">
+              <dt className="font-condensed text-(--color-text-muted) text-xs uppercase tracking-[0.08em] mb-1">
                 Distance to Second Apron
               </dt>
-              <dd className="text-(--color-text-primary) font-semibold">
+              <dd className="font-scoreboard text-2xl tracking-wide tabular-nums text-(--color-text-primary)">
                 {fmtSignedDistance(capStatus.secondApronDistance)}
               </dd>
             </div>

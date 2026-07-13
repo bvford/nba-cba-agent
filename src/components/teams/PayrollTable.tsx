@@ -15,15 +15,15 @@ export function PayrollTable({ teamName, season, players }: PayrollTableProps) {
     <div className="max-h-[32rem] overflow-auto rounded-xl border border-(--color-border)">
       <table className="w-full min-w-[420px] border-collapse text-left text-sm">
         <caption className="sr-only">{`${teamName} ${season} player payroll, sorted by salary, highest first`}</caption>
-        <thead className="sticky top-0 z-10 bg-(--color-surface-raised) text-(--color-text-primary) shadow-[0_1px_0_var(--color-border)]">
+        <thead className="sticky top-0 z-10 bg-(--color-surface-raised) text-(--color-text-primary) border-b-2 border-(--color-accent)">
           <tr>
-            <th scope="col" className="px-4 py-2.5 font-semibold">
+            <th scope="col" className="font-condensed px-4 py-2.5 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-(--color-text-secondary)">
               Player
             </th>
-            <th scope="col" className="px-4 py-2.5 font-semibold">
+            <th scope="col" className="font-condensed px-4 py-2.5 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-(--color-text-secondary)">
               Pos
             </th>
-            <th scope="col" className="px-4 py-2.5 text-right font-semibold">
+            <th scope="col" className="font-condensed px-4 py-2.5 text-right text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-(--color-text-secondary)">
               {season} Salary
             </th>
           </tr>
