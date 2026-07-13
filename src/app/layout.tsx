@@ -1,10 +1,28 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+const description =
+  "Ask questions about NBA contracts, trades, free agency, salary cap rules, and more. Powered by the 2023 CBA with updated player data and live stats context.";
+
 export const metadata: Metadata = {
-  title: "ChatCBA",
-  description:
-    "Ask questions about NBA contracts, trades, free agency, salary cap rules, and more. Powered by the 2023 CBA with updated player data and live stats context.",
+  metadataBase: new URL("https://chatcba.vercel.app"),
+  title: {
+    default: "ChatCBA — Your AI Salary Cap Expert",
+    template: "%s — ChatCBA",
+  },
+  description,
+  openGraph: {
+    title: "ChatCBA — Your AI Salary Cap Expert",
+    description,
+    url: "https://chatcba.vercel.app",
+    siteName: "ChatCBA",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ChatCBA — Your AI Salary Cap Expert",
+    description,
+  },
 };
 
 export const viewport: Viewport = {
