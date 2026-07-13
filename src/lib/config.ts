@@ -33,9 +33,7 @@ export const MAX_SOURCES = 5;
 // ---- Retrieval caps ----
 /** How many of the most recent conversation turns are sent to the model. */
 export const MESSAGE_HISTORY_TURNS = 8;
-/** Max players we'll ask Notte (real-time Spotrac) to look up per request. */
-export const NOTTE_PLAYER_LOOKUP_CAP = 2;
-/** Max distinct player names extracted from a single query for Notte lookups. */
+/** Max distinct player names extracted from a single query. */
 export const PLAYER_NAME_MATCH_CAP = 3;
 /** Max players included in the injected PLAYER DATA context block. */
 export const PLAYER_SEARCH_RESULT_CAP = 15;

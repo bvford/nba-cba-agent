@@ -956,6 +956,10 @@
         {
           "player": "Trevon Brazile",
           "salary": 1357763
+        },
+        {
+          "player": "Alpha Diallo",
+          "salary": 1357763
         }
       ],
       "deadMoney": [
@@ -965,13 +969,13 @@
         }
       ],
       "deadMoneyTotal": 2000000,
-      "totalPayroll": 207653328,
-      "totalSalaries": 209653328,
+      "totalPayroll": 209011091,
+      "totalSalaries": 211011091,
       "luxuryTaxThreshold": 200428000,
-      "luxuryTaxSpace": -9225328,
+      "luxuryTaxSpace": -11674749,
       "repeater": true,
-      "firstApronSpace": -6255828,
-      "secondApronSpace": 6415172,
+      "firstApronSpace": -8705249,
+      "secondApronSpace": 3965751,
       "capHolds": [
         {
           "player": "Peyton Watson",
@@ -2243,7 +2247,8 @@
         },
         {
           "player": "Trey Lyles",
-          "salary": 2449421
+          "salary": 2449421,
+          "note": "non-guaranteed"
         },
         {
           "player": "Isaiah Evans",

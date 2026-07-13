@@ -411,15 +411,31 @@ async function main() {
       if (team.totalSalaries < MIN_PLAUSIBLE_PAYROLL || team.totalSalaries > MAX_PLAUSIBLE_PAYROLL) {
         throw new Error(`implausible totalSalaries ${team.totalSalaries}`);
       }
+      // Structural row checks — these catch actual parser bugs (draft-pick
+      // year rows or dollar-less rows leaking into the roster) and stay fatal.
+      const NBA_MIN_PLAUSIBLE_SALARY = 500_000; // well below any real minimum
+      for (const p of team.activeRoster) {
+        if (/^(19|20)\d{2}$/.test(p.player) || p.player.toLowerCase() === "own") {
+          throw new Error(`non-player row leaked into roster: "${p.player}"`);
+        }
+        if (p.salary < NBA_MIN_PLAUSIBLE_SALARY) {
+          throw new Error(`implausible salary for ${p.player}: ${p.salary}`);
+        }
+      }
       // Cross-check the parsed roster against the page's own header counts,
       // e.g. "(11/15 + 1/3)" -> 11 active players signed, 1 two-way signed.
+      // The header sometimes lags the table when the maintainer is mid-update
+      // (seen live 2026-07-13: Denver showed 12 salary rows — Alpha Diallo
+      // signed that day — while the header still said 11/15). The table is
+      // the source of truth, so mismatches WARN rather than fail; the
+      // structural checks above are what guard against parser bugs.
       const headerMatch = team.rosterHeader.match(/^(\d+)\/\d+\s*\+\s*(\d+)\/\d+/);
       if (headerMatch) {
         const expectedActive = parseInt(headerMatch[1], 10);
         const expectedTwoWay = parseInt(headerMatch[2], 10);
         if (team.activeRoster.length !== expectedActive) {
-          throw new Error(
-            `parsed ${team.activeRoster.length} active players but page header says ${expectedActive} ("${team.rosterHeader}")`
+          console.warn(
+            `  ! ${meta.abbr}: parsed ${team.activeRoster.length} active players but page header says ${expectedActive} ("${team.rosterHeader}") — keeping the table`
           );
         }
         // The header's two-way count sometimes lags the two-way list itself

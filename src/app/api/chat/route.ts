@@ -1,7 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { searchCBAWithMeta, searchPlayers, searchTeams, findPlayerNamesInQuery } from "@/lib/cba-search";
-import { fetchPlayerContract, formatNotteContract } from "@/lib/notte";
 import {
   getCachedResponse,
   incrementDailyLimit,
@@ -17,7 +16,6 @@ import {
   MAX_SOURCES,
   MESSAGE_HISTORY_TURNS,
   MODEL_ID,
-  NOTTE_PLAYER_LOOKUP_CAP,
   RATE_LIMIT,
   RATE_WINDOW_MS,
   RESPONSE_CACHE_TTL_MS,
@@ -194,7 +192,7 @@ function getRetrievalProfile(query: string): RetrievalProfile {
   return rule.profile;
 }
 
-// ---- Context retrieval (CBA text, player data, team cap data, Notte) ----
+// ---- Context retrieval (CBA text, player data, team cap data) ----
 
 const SALARY_QUERY_RE = /\b(salary|salaries|contract|cap hit|cap space|money|earn|paid|worth|extension|opt[- ]?in|opt[- ]?out|re-?sign|buyout|deal|offer|max contract|supermax|bird rights|guaranteed)\b/i;
 
@@ -202,33 +200,10 @@ interface RetrievalContext {
   cbaContext: string;
   playerContext: string;
   teamContext: string;
-  notteContext: string;
   sources: string[];
 }
 
 async function gatherRetrievalContext(query: string, retrievalProfile: RetrievalProfile): Promise<RetrievalContext> {
-  // Detect salary/contract questions and fetch real-time data from Spotrac via Notte
-  const isSalaryQuery = SALARY_QUERY_RE.test(query);
-  let notteContext = "";
-  let notteAttempted = false;
-
-  if (isSalaryQuery && process.env.NOTTE_API_KEY) {
-    const playerNames = findPlayerNamesInQuery(query);
-    if (playerNames.length > 0) {
-      notteAttempted = true;
-      const notteResults = await Promise.all(
-        playerNames.slice(0, NOTTE_PLAYER_LOOKUP_CAP).map((name) => fetchPlayerContract(name))
-      );
-      const formatted = notteResults
-        .filter((r): r is NonNullable<typeof r> => r !== null)
-        .map(formatNotteContract)
-        .filter(Boolean);
-      if (formatted.length > 0) {
-        notteContext = "\n\n--- REAL-TIME CONTRACT DATA (Spotrac via Notte) ---\n\n" + formatted.join("\n\n");
-      }
-    }
-  }
-
   // Search the CBA for relevant content and player data
   const cbaResult = searchCBAWithMeta(query, {
     maxChars: retrievalProfile.maxChars,
@@ -238,18 +213,19 @@ async function gatherRetrievalContext(query: string, retrievalProfile: Retrieval
   });
   const cbaContext = cbaResult.context;
 
-  // On salary queries where Notte failed, force a player lookup so the cached
-  // Capsheets salary data is always present as fallback
+  // Salary/contract data comes from the Capsheets-sourced snapshot (the same
+  // source of truth as the team pages). On salary queries, force a
+  // player-name lookup so salary context is present even when the general
+  // search misses.
   const playerContext =
     searchPlayers(query) ||
-    (notteAttempted && !notteContext ? searchPlayers(findPlayerNamesInQuery(query).join(" ")) : "");
+    (SALARY_QUERY_RE.test(query) ? searchPlayers(findPlayerNamesInQuery(query).join(" ")) : "");
   const teamContext = searchTeams(query);
 
   const sources = [
     ...cbaResult.sources,
     "CBA Guide (https://cbaguide.com/#top)",
     "Official 2023 CBA (https://nbpa.com/cba)",
-    ...(notteContext ? ["Contract data: Spotrac (real-time)"] : []),
     ...(playerContext
       ? [
           "Player salaries: Capsheets (2026-27 cap sheets)",
@@ -259,13 +235,13 @@ async function gatherRetrievalContext(query: string, retrievalProfile: Retrieval
     ...(teamContext ? ["Team cap data: Capsheets (2026-27 snapshot)"] : []),
   ];
 
-  return { cbaContext, playerContext, teamContext, notteContext, sources };
+  return { cbaContext, playerContext, teamContext, sources };
 }
 
 function buildAugmentedMessages(
   messages: ChatMessage[],
   currentDateContext: string,
-  context: Pick<RetrievalContext, "cbaContext" | "playerContext" | "teamContext" | "notteContext">
+  context: Pick<RetrievalContext, "cbaContext" | "playerContext" | "teamContext">
 ): Array<{ role: "user" | "assistant"; content: string }> {
   // Keep only the most recent turns to reduce token usage.
   const trimmedMessages = messages.slice(-MESSAGE_HISTORY_TURNS);
@@ -273,7 +249,7 @@ function buildAugmentedMessages(
     if (i === trimmedMessages.length - 1 && m.role === "user") {
       return {
         role: "user" as const,
-        content: `${m.content}\n\n---\n\nCurrent date context: ${currentDateContext}\nCurrent NBA cap year in this app: 2026-27 (player stats are from the completed 2025-26 season)\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${context.cbaContext}${context.notteContext}${context.playerContext}${context.teamContext}`,
+        content: `${m.content}\n\n---\n\nCurrent date context: ${currentDateContext}\nCurrent NBA cap year in this app: 2026-27 (player stats are from the completed 2025-26 season)\n\nRELEVANT CBA SECTIONS FOR THIS QUESTION:\n${context.cbaContext}${context.playerContext}${context.teamContext}`,
       };
     }
     return { role: m.role, content: m.content };
@@ -392,7 +368,6 @@ async function streamChatCompletion(params: {
         const finalSources = Array.from(new Set(sources)).slice(0, MAX_SOURCES);
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ sources: finalSources })}\n\n`));
 
-        // Don't cache responses that include real-time Notte data
         if (shouldCache) {
           const cachedPayload = { text: fullResponseText, sources: finalSources, createdAt: Date.now() };
           responseCache.set(cacheKey, cachedPayload);
@@ -482,7 +457,7 @@ export async function POST(req: NextRequest) {
     }
 
     const retrievalProfile = getRetrievalProfile(latestUserMessage.content);
-    const { cbaContext, playerContext, teamContext, notteContext, sources } = await gatherRetrievalContext(
+    const { cbaContext, playerContext, teamContext, sources } = await gatherRetrievalContext(
       latestUserMessage.content,
       retrievalProfile
     );
@@ -491,7 +466,6 @@ export async function POST(req: NextRequest) {
       cbaContext,
       playerContext,
       teamContext,
-      notteContext,
     });
 
     return await streamChatCompletion({
@@ -499,7 +473,7 @@ export async function POST(req: NextRequest) {
       maxOutputTokens: retrievalProfile.maxOutputTokens,
       sources,
       cacheKey,
-      shouldCache: !notteContext,
+      shouldCache: true,
     });
   } catch (error) {
     console.error("Chat API error:", error);

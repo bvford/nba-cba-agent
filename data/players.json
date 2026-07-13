@@ -12637,6 +12637,27 @@
       }
     },
     {
+      "name": "Alpha Diallo",
+      "position": "",
+      "age": 0,
+      "games": 0,
+      "gamesStarted": 0,
+      "points": 0,
+      "rebounds": 0,
+      "assists": 0,
+      "steals": 0,
+      "blocks": 0,
+      "turnovers": 0,
+      "fieldPercent": 0,
+      "threePercent": 0,
+      "ftPercent": 0,
+      "minutesPerGame": 0,
+      "team": "DEN",
+      "salaries": {
+        "2026-27": "$1,357,763"
+      }
+    },
+    {
       "name": "Ebuka Okorie",
       "position": "",
       "age": 0,
@@ -13124,7 +13145,7 @@
       "minutesPerGame": 0,
       "team": "MIN",
       "salaries": {
-        "2026-27": "$2,449,421"
+        "2026-27": "$2,449,421 (Non-guaranteed)"
       }
     },
     {
