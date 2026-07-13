@@ -30,11 +30,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run player data fetch
+      # fetch-capsheets must run first: fetch-players reads the roster and
+      # salary data it writes to data/teams.json.
+      - name: Run team cap data fetch (capsheets.com)
+        id: teams
+        continue-on-error: true
+        run: npx tsx scripts/fetch-capsheets.ts
+
+      - name: Keep last good team data if refresh failed
+        if: steps.teams.outcome == 'failure'
+        run: |
+          echo "::warning::Team cap refresh failed; keeping the existing committed data/teams.json"
+          git restore data/teams.json
+
+      - name: Run player data fetch (capsheets rosters + nbaapi stats)
         id: players
         continue-on-error: true
-        env:
-          BALLDONTLIE_API_KEY: ${{ secrets.BALLDONTLIE_API_KEY }}
         run: npx tsx scripts/fetch-players.ts
 
       - name: Keep last good player data if refresh failed
@@ -42,17 +53,6 @@ jobs:
         run: |
           echo "::warning::Player data refresh failed; keeping the existing committed data/players.json"
           git restore data/players.json
-
-      - name: Run team cap data fetch
-        id: teams
-        continue-on-error: true
-        run: npx tsx scripts/fetch-teams.ts
-
-      - name: Keep last good team data if refresh failed
-        if: steps.teams.outcome == 'failure'
-        run: |
-          echo "::warning::Team cap refresh failed; keeping the existing committed data/teams.json"
-          git restore data/teams.json
 
       - name: Validate data files
         run: npm run validate-data
