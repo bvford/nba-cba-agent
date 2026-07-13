@@ -58,21 +58,21 @@ Live site: chatcba.vercel.app · Repo: github.com/bvford/nba-cba-agent · Deploy
 
 Direction: **"Front Office" — broadcast-bold meets editorial craft.** Dark courtside base (deep ink, not pure black), one hot accent (basketball orange), condensed display type for numbers/headlines (scoreboard DNA) + clean humanist body, real data-table styling like broadcast lower-thirds, subtle texture/grain. Kill the AI-clipart logo → clean wordmark + simple mark. Motion polish using apple-design principles (emilkowalski/skills — the one you bookmarked).
 
-- [ ] Design tokens in globals.css (type scale, spacing, colors) — rebuilt from scratch
-- [ ] New landing: real hook (live thresholds strip, sample Q→A demo), no clipart
-- [ ] Chat redesign: message hierarchy, source chips, thinking state, composer
-- [ ] Team pages designed as broadcast-style cap sheets (the "wow" screens)
-- [ ] Sidebar/history redesign
-- [ ] Fix wide-viewport layout bug (content pinned left with dead space)
-- [ ] Responsive: mobile-first pass on every screen
-- [ ] Meta: OG images, favicon, title/description for sharing
+- [x] Design tokens in globals.css (type scale, spacing, colors) — rebuilt from scratch
+- [x] New landing: real hook (live thresholds strip, sample Q→A demo), no clipart
+- [x] Chat redesign: message hierarchy, source chips, thinking state, composer
+- [x] Team pages designed as broadcast-style cap sheets (the "wow" screens)
+- [x] Sidebar/history redesign
+- [x] Fix wide-viewport layout bug (content pinned left with dead space)
+- [x] Responsive: mobile-first pass on every screen
+- [x] Meta: OG images, favicon, title/description for sharing
 
 ## Phase 4 — Verify & ship
 
-- [ ] Build + lint + validate-data
-- [ ] Browser E2E: desktop + mobile viewports, screenshots shared in chat
-- [ ] Logical commits (plain-language messages), push, confirm Vercel deploy healthy
-- [ ] Post-deploy smoke test on chatcba.vercel.app
+- [x] Build + lint + validate-data
+- [x] Browser E2E: desktop + mobile viewports, screenshots shared in chat
+- [x] Logical commits (plain-language messages), push, confirm Vercel deploy healthy
+- [x] Post-deploy smoke test on chatcba.vercel.app
 
 ## Execution notes
 
@@ -86,5 +86,23 @@ Direction: **"Front Office" — broadcast-bold meets editorial craft.** Dark cou
 **Phase 2, same run:** Did the quick items directly (model default → `claude-sonnet-5`, cache-version bump, a markdown-table formatting instruction in the system prompt, refreshed one stale example question). Delegated the big item — the `/teams` index + `/teams/[abbr]` detail pages, the shared `teams-meta.ts` refactor, and both directions of chat↔teams cross-linking — to a Sonnet subagent with a detailed spec; reviewed its diff, verified the `searchTeams()` refactor was byte-identical (so chat answers didn't silently change), and drove the whole feature live in the browser: `/teams` index renders all 30 teams with color-coded apron badges, a team detail page shows a real threshold meter + payroll table, the "Ask about this team" link correctly auto-sends a question in chat, and the reply came back with a markdown table matching the team page's numbers plus a working "View cap sheet" chip back to `/teams/BOS`. Also caught and fixed a real, previously-invisible bug along the way: 121 instances of broken Tailwind `bg-[--color-x]` bracket syntax (produces invalid CSS, silently drops the color) across 14 files, repo-wide — see `tasks/lessons.md` for how this was verified (compiled CSS output, not just a screenshot) and fixed. All of Phase 2 is now checked off. Two real, pre-existing data-quality bugs were found but deliberately **not** fixed here (out of scope, needs its own careful pass) — spawned as a background task: `players.json` mislabels real Pelicans players as Brooklyn Nets and has some duplicate Hornets rows, traced to `scripts/fetch-players.ts`'s source-merge logic.
 
 **Handoff for next run:** Phase 1 and Phase 2 are both committed and pushed to main (verified: `npm run build` clean, full live browser pass on both). Phase 3 (full redesign, "Front Office" direction) has not been started. Next run should begin Phase 3 starting with design tokens in `globals.css`.
+
+**2026-07-13 (automated resume run, later same night): Phase 3 + Phase 4 complete.** Built the "Front Office" redesign end to end and shipped it in 9 incremental, individually-verified commits:
+
+- **Design tokens** (`globals.css`, `layout.tsx`): deep-ink surface palette + basketball-orange accent replacing the old navy/gold theme; added Bebas Neue (scoreboard display type) and Barlow Condensed (headings) alongside the existing Plus Jakarta Sans body font.
+- **Logo**: replaced the AI-clipart PNG with a hand-built vector wordmark + basketball-line-icon mark (`src/components/Logo.tsx`) — no image asset needed.
+- **Mechanical cleanup**: swapped the repeated hardcoded gold-gradient CTA style (6 files) for the new accent token, and swept every leftover hardcoded navy/gold `rgba(...)` literal (8 files) left over from the old theme.
+- **Wide-viewport layout bug fixed**: the sidebar was `position:fixed` to the true browser edge while content centered only in the leftover space, so wide monitors looked shoved left with a big dead gap on the right. Sidebar is now a normal flex sibling on desktop (still a slide-in drawer on mobile) inside a `max-w-[1600px] mx-auto` shell, so extra space splits evenly.
+- **Landing page real hook**: added `ThresholdsTicker` — a live broadcast-scoreboard strip of this season's actual cap floor/salary cap/aprons pulled from `teams.json`, replacing generic marketing copy as the first thing a visitor sees.
+- **Chat interface**: answer tables now get a broadcast lower-third treatment (uppercase condensed headers, orange underline, tabular-nums numbers) — the most common place the assistant shows real data. Swapped the plain blinking-cursor "Thinking" state for a three-dot accent pulse.
+- **Team pages** (the "wow" screens per plan): team names and key stat callouts (total cap allocations, distance to each apron, the floating marker on the threshold bar) now use the scoreboard display font at real size; payroll table shares the same lower-third header treatment as chat tables so both surfaces read as one product.
+- **Meta**: generated a real favicon and a 1200×630 share-preview image (both via `next/og` `ImageResponse`, no external asset), added Open Graph/Twitter card metadata and a page-title template.
+- **Caught and fixed one self-inflicted regression before it shipped broken further**: the new title template doubled team-page titles ("... — ChatCBA — ChatCBA") because those pages already had their own manual suffix from before this session — caught by checking the *live* deployed HTML with `curl` after pushing, not just the local build, and shipped a follow-up fix in the same run.
+
+**Verification methodology this run:** every commit was checked with `npx tsc --noEmit` + `npm run build` before committing, and every visual change was driven live in the sandboxed Browser pane at desktop (2560px and 1280px), tablet, and mobile (375px) viewports — including sending real chat messages and confirming streamed markdown tables render correctly. Also ran `npm run lint` and `npm run validate-data` (both clean) as part of Phase 4. Post-deploy, confirmed the live site at chatcba.vercel.app via `curl` (the Browser pane couldn't reach the external production URL unattended — its per-origin approval gate needs a human click that isn't available in a scheduled run — so HTTP/HTML checks were used instead) and confirmed the title-doubling fix went live.
+
+**One non-blocking note:** while testing chat live, one query returned only a `sources` SSE event with zero text content (Anthropic API returned an empty completion) before a retry on a fresh query worked normally. Traced it as far as confirming it wasn't caused by anything touched this session (no route.ts/config.ts/cba-search.ts changes) and didn't reproduce again — treating as a one-off API hiccup, not a regression, but flagging in case it recurs.
+
+**All Phase 1–4 items are now checked off.** This was the last planned phase in this file — the scheduled task should be disabled/paused after this run.
 
 ---
