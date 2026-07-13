@@ -96,13 +96,13 @@ export function ChatInput({
             onClick={handleSubmit}
             disabled={disabled || !value.trim()}
             aria-label={disabled ? "Sending message" : "Send message"}
-            className="rounded-xl bg-[linear-gradient(135deg,#c8a24a,#d4b15e)] px-4 py-2.5 font-medium text-[#0d1117] text-sm
-            transition-all duration-150 shadow-[0_6px_14px_rgba(200,162,74,0.2)] hover:brightness-105
+            className="rounded-xl bg-[linear-gradient(135deg,var(--color-accent),var(--color-accent-light))] px-4 py-2.5 font-medium text-(--color-accent-ink) text-sm
+            transition-all duration-150 shadow-[0_6px_14px_rgba(255,106,31,0.2)] hover:brightness-105
             disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2
             focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-surface-raised)"
           >
           {disabled ? (
-            <span className="inline-block w-4 h-4 border-2 border-[#0d1117]/40 border-t-[#0d1117] rounded-full animate-spin" aria-hidden="true" />
+            <span className="inline-block w-4 h-4 border-2 border-(--color-accent-ink)/40 border-t-(--color-accent-ink) rounded-full animate-spin" aria-hidden="true" />
           ) : (
             <svg
               width="18"

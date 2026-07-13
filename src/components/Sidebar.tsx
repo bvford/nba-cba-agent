@@ -70,8 +70,8 @@ export function Sidebar({
             onClick={onNewChat}
             aria-label="Start a new chat"
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg
-              bg-[linear-gradient(135deg,#c8a24a,#d4b15e)] text-[#0d1117] text-sm font-semibold
-              transition-all duration-150 shadow-[0_6px_16px_rgba(200,162,74,0.2)] hover:brightness-105
+              bg-[linear-gradient(135deg,var(--color-accent),var(--color-accent-light))] text-(--color-accent-ink) text-sm font-semibold
+              transition-all duration-150 shadow-[0_6px_16px_rgba(255,106,31,0.2)] hover:brightness-105
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent)"
             title="New chat (Cmd/Ctrl+Shift+K)"
           >
@@ -133,7 +133,7 @@ export function Sidebar({
                   }}
                   aria-label={`Delete chat: ${chat.title}`}
                   className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-(--color-surface)/50
-                    [@media(pointer:coarse)]:opacity-60 text-(--color-text-muted) hover:text-(--color-nba-red)
+                    [@media(pointer:coarse)]:opacity-60 text-(--color-text-muted) hover:text-(--color-danger)
                     transition-all duration-100 shrink-0 ml-1 focus-visible:opacity-100 focus-visible:outline-none
                     focus-visible:ring-2 focus-visible:ring-(--color-accent)"
                   title="Delete chat"

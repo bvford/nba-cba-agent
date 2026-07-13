@@ -6,7 +6,7 @@ const STATUS_STYLES: Record<CapStatusTier, string> = {
   "under-cap": "border-emerald-500/40 bg-emerald-500/10 text-emerald-400",
   "over-cap": "border-(--color-accent)/50 bg-(--color-accent)/10 text-(--color-accent)",
   "over-first-apron": "border-orange-500/45 bg-orange-500/10 text-orange-400",
-  "over-second-apron": "border-(--color-nba-red)/50 bg-(--color-nba-red)/15 text-(--color-nba-red)",
+  "over-second-apron": "border-(--color-danger)/50 bg-(--color-danger)/15 text-(--color-danger)",
 };
 
 interface CapStatusBadgeProps {

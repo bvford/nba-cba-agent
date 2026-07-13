@@ -1,20 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  --color-nba-blue: #1e4ea6;
-  --color-nba-blue-light: #2c5fc8;
-  --color-nba-blue-dark: #163a80;
-  --color-nba-red: #c0203c;
-  --color-surface: #0d1117;
-  --color-surface-raised: #161c29;
-  --color-surface-hover: #1d2538;
-  --color-border: #1e2840;
-  --color-border-light: #2e3f60;
-  --color-text-primary: #e8eef8;
-  --color-text-secondary: #7e96bb;
-  --color-text-muted: #4a5e7a;
-  --color-accent: #c8a24a;
-  --color-accent-glow: rgba(200, 162, 74, 0.15);
+  /* "Front Office" — deep ink base, basketball-orange accent */
+  --color-ember: #d9581f;
+  --color-ember-light: #ff8140;
+  --color-ember-dark: #b8431a;
+  --color-danger: #e1273f;
+  --color-surface: #0a0c10;
+  --color-surface-raised: #14171d;
+  --color-surface-hover: #1b1f27;
+  --color-border: #22262f;
+  --color-border-light: #343a46;
+  --color-text-primary: #f4f5f7;
+  --color-text-secondary: #9199a8;
+  --color-text-muted: #565d6c;
+  --color-accent: #ff6a1f;
+  --color-accent-light: #ff8a4d;
+  --color-accent-ink: #1a0d05;
+  --color-accent-glow: rgba(255, 106, 31, 0.18);
+
+  --font-display: "Bebas Neue", "Barlow Condensed", system-ui, sans-serif;
+  --font-condensed: "Barlow Condensed", system-ui, sans-serif;
+  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
 html,
@@ -59,7 +66,7 @@ body {
 
 .bg-gradient-page {
   background:
-    radial-gradient(ellipse 90% 55% at 50% -5%, rgba(30, 78, 166, 0.1) 0%, transparent 65%),
+    radial-gradient(ellipse 90% 55% at 50% -5%, rgba(255, 106, 31, 0.08) 0%, transparent 65%),
     var(--color-surface);
 }
 
@@ -78,8 +85,14 @@ body {
 }
 
 h1, h2, h3 {
-  font-family: "Sora", system-ui, sans-serif;
+  font-family: var(--font-condensed);
+  font-weight: 600;
   letter-spacing: -0.01em;
+}
+
+.font-scoreboard {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
 }
 
 button, input, textarea {

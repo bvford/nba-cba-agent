@@ -4,14 +4,14 @@ const FILL_COLORS: Record<CapStatusTier, string> = {
   "under-cap": "bg-emerald-500",
   "over-cap": "bg-(--color-accent)",
   "over-first-apron": "bg-orange-500",
-  "over-second-apron": "bg-(--color-nba-red)",
+  "over-second-apron": "bg-(--color-danger)",
 };
 
 const TICK_DOT_COLORS: Record<string, string> = {
   "Cap Floor": "bg-(--color-text-muted)",
   "Salary Cap": "bg-(--color-text-secondary)",
   "1st Apron": "bg-orange-400",
-  "2nd Apron": "bg-(--color-nba-red)",
+  "2nd Apron": "bg-(--color-danger)",
 };
 
 function fmtCompact(n: number): string {

@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { Mark, Wordmark } from "@/components/Logo";
 
 interface AppHeaderProps {
   sidebarOpen: boolean;
@@ -43,16 +43,10 @@ export function AppHeader({
           className={`flex items-center gap-2.5 hover:opacity-85 transition-opacity ${focusRing}`}
           title="Home (new chat)"
         >
-          <Image
-            src="/chatcba-logo.png"
-            alt="ChatCBA logo"
-            width={40}
-            height={40}
-            className="rounded-full border border-(--color-border-light) shadow-[0_4px_14px_rgba(8,10,15,0.4)]"
-          />
+          <Mark className="w-9 h-9" />
           <div className="text-left">
-            <h1 className="text-lg sm:text-xl font-semibold tracking-[0.06em] text-(--color-text-primary) leading-tight">
-              ChatCBA
+            <h1 className="leading-tight">
+              <Wordmark className="text-lg sm:text-xl" />
             </h1>
           </div>
         </button>

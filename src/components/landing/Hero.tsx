@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { Mark } from "@/components/Logo";
 
 interface HeroProps {
   onStartChat: () => void;
@@ -11,19 +11,9 @@ export function Hero({ onStartChat }: HeroProps) {
         Basketball Operations Assistant
       </p>
       <div className="mb-5">
-        <Image
-          src="/chatcba-logo.png"
-          alt="ChatCBA logo"
-          width={220}
-          height={220}
-          className="w-40 h-40 md:w-48 md:h-48 rounded-full mx-auto drop-shadow-[0_22px_42px_rgba(8,10,15,0.6)]"
-          priority
-        />
+        <Mark className="w-16 h-16 md:w-20 md:h-20 mx-auto" />
       </div>
-      <h2
-        className="text-4xl md:text-5xl font-bold tracking-tight text-(--color-text-primary) mb-3"
-        style={{ fontFamily: "'Sora', system-ui, sans-serif" }}
-      >
+      <h2 className="font-scoreboard text-5xl md:text-6xl tracking-wide text-(--color-text-primary) mb-3">
         Your AI Salary Cap Expert
       </h2>
       <p className="text-(--color-text-secondary) max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
@@ -33,7 +23,7 @@ export function Hero({ onStartChat }: HeroProps) {
       <div className="mt-6 pb-8 flex flex-wrap items-center justify-center gap-2.5">
         <button
           onClick={onStartChat}
-          className="text-sm px-5 py-2.5 rounded-full bg-[linear-gradient(135deg,#c8a24a,#d4b15e)] text-[#0d1117] font-semibold shadow-[0_8px_20px_rgba(200,162,74,0.25)] hover:-translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-surface)"
+          className="text-sm px-5 py-2.5 rounded-full bg-[linear-gradient(135deg,var(--color-accent),var(--color-accent-light))] text-(--color-accent-ink) font-semibold shadow-[0_8px_20px_rgba(255,106,31,0.25)] hover:-translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-surface)"
         >
           Start Chatting
         </button>

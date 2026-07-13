@@ -77,7 +77,7 @@ export function ConfirmDialog({ title, description, onCancel, onConfirm }: Confi
           </button>
           <button
             onClick={onConfirm}
-            className="rounded-lg bg-[linear-gradient(135deg,#c8a24a,#d4b15e)] px-3 py-2 text-sm font-semibold text-[#0d1117] hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-surface-raised)"
+            className="rounded-lg bg-[linear-gradient(135deg,var(--color-accent),var(--color-accent-light))] px-3 py-2 text-sm font-semibold text-(--color-accent-ink) hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-surface-raised)"
           >
             Delete Chat
           </button>

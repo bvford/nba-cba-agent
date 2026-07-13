@@ -253,7 +253,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ abb
 
         <a
           href={`/?ask=${abbr}`}
-          className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#c8a24a,#d4b15e)] px-5 py-2.5 text-sm font-semibold text-[#0d1117] shadow-[0_6px_16px_rgba(200,162,74,0.2)] hover:brightness-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent)"
+          className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,var(--color-accent),var(--color-accent-light))] px-5 py-2.5 text-sm font-semibold text-(--color-accent-ink) shadow-[0_6px_16px_rgba(255,106,31,0.2)] hover:brightness-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent)"
         >
           Ask about the {fullName}
         </a>

@@ -72,7 +72,7 @@ export function ChatMessage({
         <div
           className={`rounded-2xl px-4 py-3 ${
             isUser
-              ? "bg-[linear-gradient(145deg,var(--color-nba-blue),var(--color-nba-blue-light))] text-white rounded-br-md"
+              ? "bg-[linear-gradient(145deg,var(--color-ember),var(--color-ember-light))] text-white rounded-br-md"
               : isError
                 ? "bg-[rgba(127,29,29,0.12)] text-(--color-text-primary) border border-red-500/35 rounded-bl-md shadow-sm"
                 : "bg-(--color-surface-raised) text-(--color-text-primary) border border-(--color-border) rounded-bl-md shadow-sm"
@@ -171,7 +171,7 @@ export function ChatMessage({
                   <button
                     onClick={() => onFeedback("down")}
                     aria-label="Mark response as not helpful"
-                    className={`text-[10px] px-1.5 py-0.5 rounded hover:bg-(--color-surface-hover) ${actionFocus} ${feedback === "down" ? "text-(--color-nba-red)" : "text-(--color-text-muted)"}`}
+                    className={`text-[10px] px-1.5 py-0.5 rounded hover:bg-(--color-surface-hover) ${actionFocus} ${feedback === "down" ? "text-(--color-danger)" : "text-(--color-text-muted)"}`}
                   >
                     Not helpful
                   </button>
@@ -223,7 +223,7 @@ const markdownComponents = {
     </pre>
   ),
   blockquote: ({ children }: React.ComponentPropsWithoutRef<"blockquote">) => (
-    <blockquote className="my-2 border-l-[3px] border-(--color-nba-blue) pl-3 text-(--color-text-secondary)">
+    <blockquote className="my-2 border-l-[3px] border-(--color-ember) pl-3 text-(--color-text-secondary)">
       {children}
     </blockquote>
   ),
