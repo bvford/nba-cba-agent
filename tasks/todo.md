@@ -108,3 +108,5 @@ Direction: **"Front Office" — broadcast-bold meets editorial craft.** Dark cou
 **All Phase 1–4 items are now checked off.** This was the last planned phase in this file — the scheduled task should be disabled/paused after this run.
 
 ---
+
+**2026-07-13 (evening):** Retired the live-Spotrac (Notte) chat lookup — chat, team pages, and ticker now all answer from the same Capsheets snapshot, and salary answers are cacheable. Tested the monthly refresh workflow end-to-end on GitHub's runners: first run failed correctly-but-too-strictly (Capsheets had just added Alpha Diallo to Denver and the page header lagged its own table), so header mismatches are now warnings while real parser-bug signatures (non-player rows, implausible salaries) stay fatal. Re-run: SUCCESS. Production verified serving Diallo-era data ($211.0M Denver). NOTTE_API_KEY is no longer used (Michael to remove from .env.local / Vercel at leisure). Aug 1 auto-refresh is confirmed working.
