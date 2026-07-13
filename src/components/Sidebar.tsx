@@ -57,12 +57,15 @@ export function Sidebar({
         />
       )}
 
-      {/* Sidebar panel */}
+      {/* Sidebar panel — fixed drawer on mobile, a normal flex sibling on
+          desktop so the whole app shell (sidebar + content) can be centered
+          as one unit instead of the sidebar pinning to the true viewport
+          edge and leaving dead space on wide screens. */}
       <aside
         className={`fixed top-0 left-0 h-full w-72 bg-[linear-gradient(180deg,rgba(17,26,43,0.95),rgba(10,16,28,0.95))] backdrop-blur-xl border-r border-(--color-border)
-          z-40 flex flex-col transition-transform duration-200 ease-out shadow-2xl lg:shadow-none
+          z-40 flex flex-col transition-transform duration-200 ease-out shadow-2xl
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0`}
+          lg:static lg:z-auto lg:flex-shrink-0 lg:translate-x-0 lg:shadow-none`}
       >
         {/* Sidebar header */}
         <div className="p-3 border-b border-(--color-border) flex items-center gap-2">

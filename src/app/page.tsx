@@ -56,6 +56,7 @@ function HomeInner() {
 
   return (
     <div className="relative isolate flex h-screen w-full overflow-x-hidden bg-gradient-page">
+      <div className="flex h-screen w-full max-w-[1600px] mx-auto">
       <Sidebar
         chats={chats}
         activeChatId={activeChatId}
@@ -66,7 +67,7 @@ function HomeInner() {
         onDeleteChat={requestDeleteChat}
       />
 
-      <div className="flex-1 flex flex-col min-w-0 w-full lg:pl-72">
+      <div className="flex-1 flex flex-col min-w-0 w-full">
         <AppHeader
           sidebarOpen={sidebarOpen}
           hasMessages={messages.length > 0}
@@ -114,6 +115,7 @@ function HomeInner() {
           onRegenerate={regenerateLast}
           canRegenerate={canRegenerate}
         />
+      </div>
       </div>
 
       {chatPendingDelete && (
