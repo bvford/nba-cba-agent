@@ -44,6 +44,14 @@ export async function incrementDailyLimit(
   if (!isConfigured()) return null;
 
   const count = Number(await command(["INCR", key]));
+  if (Number.isNaN(count)) {
+    // Upstash returned something we couldn't parse as a count. Fail open
+    // (allow the request) rather than silently blocking every request for
+    // the rest of the window — a malformed response here should never be
+    // able to take down the whole app.
+    console.warn(`Upstash INCR returned a non-numeric result for key "${key}"; failing open.`);
+    return { allowed: true, count: 0 };
+  }
   if (count === 1) {
     // Keep key for ~2 days so prior day keys expire naturally.
     await command(["EXPIRE", key, 172800]);

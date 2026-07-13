@@ -1,33 +1,51 @@
 "use client";
 
-import { useState } from "react";
-
-type FeedbackValue = "up" | "down";
+import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import type { FeedbackValue } from "@/lib/chat-types";
+import { normalizeSource } from "@/lib/sources";
 
 interface ChatMessageProps {
   role: "user" | "assistant";
   content: string;
   sources?: string[];
   feedback?: FeedbackValue;
+  isError?: boolean;
   onFeedback?: (value: FeedbackValue) => void;
   onEditResend?: () => void;
+  onRetry?: () => void;
 }
+
+const actionFocus =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]";
 
 export function ChatMessage({
   role,
   content,
   sources,
   feedback,
+  isError = false,
   onFeedback,
   onEditResend,
+  onRetry,
 }: ChatMessageProps) {
   const isUser = role === "user";
   const [copied, setCopied] = useState(false);
+  const copyTimeoutRef = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (copyTimeoutRef.current !== null) window.clearTimeout(copyTimeoutRef.current);
+    },
+    []
+  );
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(content);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (copyTimeoutRef.current !== null) window.clearTimeout(copyTimeoutRef.current);
+    copyTimeoutRef.current = window.setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -42,20 +60,29 @@ export function ChatMessage({
           className={`rounded-2xl px-4 py-3 ${
             isUser
               ? "bg-[linear-gradient(145deg,var(--color-nba-blue),var(--color-nba-blue-light))] text-white rounded-br-md"
-              : "bg-[--color-surface-raised] text-[--color-text-primary] border border-[--color-border] rounded-bl-md shadow-sm"
+              : isError
+                ? "bg-[rgba(127,29,29,0.12)] text-[--color-text-primary] border border-red-500/35 rounded-bl-md shadow-sm"
+                : "bg-[--color-surface-raised] text-[--color-text-primary] border border-[--color-border] rounded-bl-md shadow-sm"
           }`}
         >
           {isUser ? (
             <p className="whitespace-pre-wrap text-sm">{content}</p>
           ) : content === "" ? (
-            <span className="cursor-blink text-sm text-[--color-text-muted]">
-              Thinking
-            </span>
+            <span className="cursor-blink text-sm text-[--color-text-muted]">Thinking</span>
           ) : (
-            <div
-              className="text-sm leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: formatMarkdown(content) }}
-            />
+            <div className="text-sm leading-relaxed">
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                {content}
+              </ReactMarkdown>
+              {isError && onRetry && (
+                <button
+                  onClick={onRetry}
+                  className={`mt-3 rounded-lg border border-red-400/30 px-3 py-1.5 text-xs font-medium text-[--color-text-primary] hover:bg-red-500/10 ${actionFocus}`}
+                >
+                  Retry
+                </button>
+              )}
+            </div>
           )}
         </div>
 
@@ -63,17 +90,17 @@ export function ChatMessage({
           <div className="mt-2 ml-1">
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-[10px] text-[--color-text-secondary]">Sources:</span>
-              {sources.map((rawSource, idx) => {
+              {sources.map((rawSource, index) => {
                 const source = normalizeSource(rawSource);
-                const key = `${source.label}-${idx}`;
+                const key = `${source.label}-${index}`;
                 if (source.href) {
                   return (
                     <a
                       key={key}
                       href={source.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-[10px] px-2 py-0.5 rounded-full border border-[--color-border] bg-[--color-surface]/65 text-[--color-text-secondary] hover:text-[--color-text-primary] hover:border-[--color-border-light] hover:bg-[--color-surface-hover] transition-colors"
+                      target={source.href.startsWith("http") ? "_blank" : undefined}
+                      rel={source.href.startsWith("http") ? "noreferrer" : undefined}
+                      className="text-[10px] px-2 py-0.5 rounded-full border border-[--color-border] bg-[--color-surface]/65 text-[--color-text-secondary] hover:text-[--color-text-primary] hover:border-[--color-border-light] hover:bg-[--color-surface-hover] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
                       title={rawSource}
                     >
                       {source.label}
@@ -95,12 +122,13 @@ export function ChatMessage({
           </div>
         )}
 
-        <div className="flex mt-1 ml-1 opacity-30 group-hover:opacity-100 transition-opacity duration-150 gap-1.5">
-          {!isUser && content && (
+        <div className="flex mt-1 ml-1 opacity-30 group-hover:opacity-100 [@media(pointer:coarse)]:opacity-60 transition-opacity duration-150 gap-1.5">
+          {!isUser && content && !isError && (
             <>
               <button
                 onClick={handleCopy}
-                className="flex items-center gap-1 text-[10px] text-[--color-text-muted] hover:text-[--color-text-secondary] transition-colors px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover]"
+                aria-label="Copy assistant response"
+                className={`flex items-center gap-1 text-[10px] text-[--color-text-muted] hover:text-[--color-text-secondary] transition-colors px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover] ${actionFocus}`}
               >
                 {copied ? "Copied" : "Copy"}
               </button>
@@ -108,13 +136,15 @@ export function ChatMessage({
                 <>
                   <button
                     onClick={() => onFeedback("up")}
-                    className={`text-[10px] px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover] ${feedback === "up" ? "text-[--color-accent]" : "text-[--color-text-muted]"}`}
+                    aria-label="Mark response as helpful"
+                    className={`text-[10px] px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover] ${actionFocus} ${feedback === "up" ? "text-[--color-accent]" : "text-[--color-text-muted]"}`}
                   >
                     Helpful
                   </button>
                   <button
                     onClick={() => onFeedback("down")}
-                    className={`text-[10px] px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover] ${feedback === "down" ? "text-[--color-nba-red]" : "text-[--color-text-muted]"}`}
+                    aria-label="Mark response as not helpful"
+                    className={`text-[10px] px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover] ${actionFocus} ${feedback === "down" ? "text-[--color-nba-red]" : "text-[--color-text-muted]"}`}
                   >
                     Not helpful
                   </button>
@@ -126,9 +156,10 @@ export function ChatMessage({
           {isUser && onEditResend && (
             <button
               onClick={onEditResend}
-              className="text-[10px] px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover] text-[--color-text-muted] hover:text-[--color-text-secondary]"
+              aria-label="Edit and resend this message"
+              className={`text-[10px] px-1.5 py-0.5 rounded hover:bg-[--color-surface-hover] text-[--color-text-muted] hover:text-[--color-text-secondary] ${actionFocus}`}
             >
-              Edit & resend
+              Edit &amp; resend
             </button>
           )}
         </div>
@@ -137,125 +168,73 @@ export function ChatMessage({
   );
 }
 
-function formatMarkdown(text: string): string {
-  let html = text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    // Headers
-    .replace(
-      /^### (.+)$/gm,
-      '<h3 style="font-size:0.9rem;font-weight:600;color:var(--color-text-primary);margin:1rem 0 0.25rem;">$1</h3>'
-    )
-    .replace(
-      /^## (.+)$/gm,
-      '<h2 style="font-size:1rem;font-weight:600;color:var(--color-text-primary);margin:1.25rem 0 0.25rem;">$1</h2>'
-    )
-    .replace(
-      /^# (.+)$/gm,
-      '<h1 style="font-size:1.1rem;font-weight:700;color:var(--color-text-primary);margin:1.25rem 0 0.25rem;">$1</h1>'
-    )
-    // Bold and italic
-    .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
-    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--color-accent)">$1</strong>')
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    // Inline code
-    .replace(
-      /`([^`]+)`/g,
-      '<code style="background:rgba(74,142,255,0.1);color:var(--color-accent);padding:0.1rem 0.35rem;border-radius:4px;font-size:0.85em;">$1</code>'
-    )
-    // Blockquotes
-    .replace(
-      /^&gt; (.+)$/gm,
-      '<blockquote style="border-left:3px solid var(--color-nba-blue);padding-left:0.75rem;color:var(--color-text-secondary);margin:0.5rem 0;">$1</blockquote>'
-    )
-    // Bullet lists
-    .replace(
-      /^[-•] (.+)$/gm,
-      '<li data-list="ul" style="margin-bottom:0.2rem;color:var(--color-text-secondary);">$1</li>'
-    )
-    // Numbered lists
-    .replace(
-      /^\d+\. (.+)$/gm,
-      '<li data-list="ol" style="margin-bottom:0.2rem;color:var(--color-text-secondary);">$1</li>'
-    )
-    // Wrap adjacent list items so numbering/bullets render correctly per message
-    .replace(
-      /((?:<li data-list="ol"[^>]*>[\s\S]*?<\/li>\s*)+)/g,
-      '<ol style="margin:0.35rem 0 0.45rem 1.25rem;list-style-type:decimal;">$1</ol>'
-    )
-    .replace(
-      /((?:<li data-list="ul"[^>]*>[\s\S]*?<\/li>\s*)+)/g,
-      '<ul style="margin:0.35rem 0 0.45rem 1.25rem;list-style-type:disc;">$1</ul>'
-    )
-    .replace(/\sdata-list="(?:ol|ul)"/g, "")
-    // Paragraphs
-    .replace(/\n\n/g, '</p><p style="margin:0.5rem 0;">')
-    .replace(/\n/g, "<br>");
-
-  return `<p style="margin:0;">${html}</p>`;
-}
-
-function normalizeSource(source: string): { label: string; href?: string } {
-  const lower = source.toLowerCase();
-
-  if (lower.includes("cbaguide.com") || lower.startsWith("cba guide")) {
-    return {
-      label: "CBA Guide",
-      href: "https://cbaguide.com/#top",
-    };
-  }
-
-  if (lower.includes("nbpa.com/cba") || lower.startsWith("2023 cba")) {
-    const section = source.replace(/^2023 CBA:\s*/i, "").trim();
-    return {
-      label: section ? `CBA: ${truncate(section, 26)}` : "2023 CBA",
-      href: "https://nbpa.com/cba",
-    };
-  }
-
-  if (lower.startsWith("cba 101 faq:")) {
-    const section = source.replace(/^CBA 101 FAQ:\s*/i, "").trim();
-    return {
-      label: section ? `CBA 101: ${truncate(section, 22)}` : "CBA 101 FAQ",
-      href: "/about",
-    };
-  }
-
-  if (lower.includes("capsheets")) {
-    return {
-      label: "Capsheets",
-      href: "https://www.capsheets.com/",
-    };
-  }
-
-  if (lower.includes("hoopshype")) {
-    return {
-      label: "HoopsHype Salaries",
-      href: "https://hoopshype.com/salaries/players/",
-    };
-  }
-
-  if (lower.includes("nba stats") || lower.includes("nba.com/stats") || lower.includes("stats feed")) {
-    return {
-      label: "NBA Stats",
-      href: "https://www.nba.com/stats/players/traditional",
-    };
-  }
-
-  const directUrl = source.match(/https?:\/\/[^\s)]+/i)?.[0];
-  if (directUrl) {
-    const clean = source.replace(/\s*\(https?:\/\/[^\s)]+\)\s*/i, "").trim();
-    return {
-      label: truncate(clean || directUrl.replace(/^https?:\/\//, ""), 28),
-      href: directUrl,
-    };
-  }
-
-  return { label: truncate(source, 28) };
-}
-
-function truncate(value: string, max: number): string {
-  if (value.length <= max) return value;
-  return `${value.slice(0, max - 1)}…`;
-}
+const markdownComponents = {
+  h1: ({ children }: React.ComponentPropsWithoutRef<"h1">) => (
+    <h1 className="text-[1.1rem] font-bold text-[--color-text-primary] mt-5 mb-1 first:mt-0">{children}</h1>
+  ),
+  h2: ({ children }: React.ComponentPropsWithoutRef<"h2">) => (
+    <h2 className="text-base font-semibold text-[--color-text-primary] mt-5 mb-1 first:mt-0">{children}</h2>
+  ),
+  h3: ({ children }: React.ComponentPropsWithoutRef<"h3">) => (
+    <h3 className="text-[0.9rem] font-semibold text-[--color-text-primary] mt-4 mb-1 first:mt-0">{children}</h3>
+  ),
+  p: ({ children }: React.ComponentPropsWithoutRef<"p">) => (
+    <p className="my-2 first:mt-0 last:mb-0">{children}</p>
+  ),
+  strong: ({ children }: React.ComponentPropsWithoutRef<"strong">) => (
+    <strong className="font-bold text-[--color-accent]">{children}</strong>
+  ),
+  em: ({ children }: React.ComponentPropsWithoutRef<"em">) => <em>{children}</em>,
+  code: ({ children }: React.ComponentPropsWithoutRef<"code">) => (
+    <code className="rounded bg-[rgba(74,142,255,0.1)] px-[0.35rem] py-[0.1rem] text-[0.85em] text-[--color-accent]">
+      {children}
+    </code>
+  ),
+  pre: ({ children }: React.ComponentPropsWithoutRef<"pre">) => (
+    <pre className="my-2 overflow-x-auto rounded-lg border border-[--color-border] bg-[--color-surface] p-3">
+      {children}
+    </pre>
+  ),
+  blockquote: ({ children }: React.ComponentPropsWithoutRef<"blockquote">) => (
+    <blockquote className="my-2 border-l-[3px] border-[--color-nba-blue] pl-3 text-[--color-text-secondary]">
+      {children}
+    </blockquote>
+  ),
+  ul: ({ children }: React.ComponentPropsWithoutRef<"ul">) => (
+    <ul className="my-1.5 ml-5 list-disc text-[--color-text-secondary]">{children}</ul>
+  ),
+  ol: ({ children }: React.ComponentPropsWithoutRef<"ol">) => (
+    <ol className="my-1.5 ml-5 list-decimal text-[--color-text-secondary]">{children}</ol>
+  ),
+  li: ({ children }: React.ComponentPropsWithoutRef<"li">) => <li className="mb-0.5">{children}</li>,
+  a: ({ children, href }: React.ComponentPropsWithoutRef<"a">) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="text-[--color-accent] underline decoration-[--color-accent]/50 underline-offset-2 hover:decoration-[--color-accent] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
+    >
+      {children}
+    </a>
+  ),
+  table: ({ children }: React.ComponentPropsWithoutRef<"table">) => (
+    <div className="my-3 max-w-full overflow-x-auto rounded-lg border border-[--color-border]">
+      <table className="w-full min-w-max border-collapse text-left text-xs">{children}</table>
+    </div>
+  ),
+  thead: ({ children }: React.ComponentPropsWithoutRef<"thead">) => (
+    <thead className="bg-[--color-surface] text-[--color-text-primary]">{children}</thead>
+  ),
+  tbody: ({ children }: React.ComponentPropsWithoutRef<"tbody">) => <tbody>{children}</tbody>,
+  tr: ({ children }: React.ComponentPropsWithoutRef<"tr">) => (
+    <tr className="border-b border-[--color-border] last:border-b-0">{children}</tr>
+  ),
+  th: ({ children }: React.ComponentPropsWithoutRef<"th">) => (
+    <th className="border-r border-[--color-border] px-3 py-2 font-semibold last:border-r-0">{children}</th>
+  ),
+  td: ({ children }: React.ComponentPropsWithoutRef<"td">) => (
+    <td className="border-r border-[--color-border] px-3 py-2 text-[--color-text-secondary] last:border-r-0">
+      {children}
+    </td>
+  ),
+};

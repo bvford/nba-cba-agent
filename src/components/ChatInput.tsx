@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import { formattedTeamsFetchedAt } from "@/lib/data-meta";
 
 interface ChatInputProps {
   value: string;
@@ -55,7 +56,7 @@ export function ChatInput({
             <button
               onClick={onRegenerate}
               disabled={disabled}
-              className="text-[11px] px-2 py-1 rounded-md border border-[--color-border] text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors disabled:opacity-40"
+              className="text-[11px] px-2 py-1 rounded-md border border-[--color-border] text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
             >
               Regenerate
             </button>
@@ -64,7 +65,7 @@ export function ChatInput({
             <button
               onClick={onCancelEdit}
               disabled={disabled}
-              className="text-[11px] px-2 py-1 rounded-md border border-[--color-border] text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors disabled:opacity-40"
+              className="text-[11px] px-2 py-1 rounded-md border border-[--color-border] text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
             >
               Cancel Edit
             </button>
@@ -81,6 +82,7 @@ export function ChatInput({
           value={value}
           onChange={(e) => onValueChange(e.target.value)}
           onKeyDown={handleKeyDown}
+          aria-label="Chat message"
           placeholder="Ask about the NBA CBA, a player, or a trade..."
           disabled={disabled}
           rows={1}
@@ -93,12 +95,14 @@ export function ChatInput({
           <button
             onClick={handleSubmit}
             disabled={disabled || !value.trim()}
+            aria-label={disabled ? "Sending message" : "Send message"}
             className="rounded-xl bg-[linear-gradient(135deg,#c8a24a,#d4b15e)] px-4 py-2.5 font-medium text-[#0d1117] text-sm
             transition-all duration-150 shadow-[0_6px_14px_rgba(200,162,74,0.2)] hover:brightness-105
-            disabled:opacity-40 disabled:cursor-not-allowed"
+            disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2
+            focus-visible:ring-[--color-accent] focus-visible:ring-offset-2 focus-visible:ring-offset-[--color-surface-raised]"
           >
           {disabled ? (
-            <span className="inline-block w-4 h-4 border-2 border-[#0d1117]/40 border-t-[#0d1117] rounded-full animate-spin" />
+            <span className="inline-block w-4 h-4 border-2 border-[#0d1117]/40 border-t-[#0d1117] rounded-full animate-spin" aria-hidden="true" />
           ) : (
             <svg
               width="18"
@@ -109,6 +113,7 @@ export function ChatInput({
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <line x1="22" y1="2" x2="11" y2="13" />
               <polygon points="22 2 15 22 11 13 2 9 22 2" />
@@ -120,7 +125,7 @@ export function ChatInput({
         Enter to send &middot; Shift+Enter for new line &middot; Cmd/Ctrl+Shift+K for new chat
       </p>
       <p className="text-center text-[10px] text-[--color-text-muted] mt-1">
-        2023 NBA CBA &middot; Not legal or financial advice &middot; Player data last updated Feb 17, 2026
+        2023 NBA CBA &middot; Not legal or financial advice &middot; Player &amp; cap data updated {formattedTeamsFetchedAt}
       </p>
     </div>
   );

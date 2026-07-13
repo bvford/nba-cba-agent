@@ -3,6 +3,12 @@ import cbaGuide from "../../data/cba-guide.json";
 import cba101Data from "../../data/cba101.json";
 import playerData from "../../data/players.json";
 import teamsData from "../../data/teams.json";
+import {
+  CBA101_SECTION_CAP,
+  PLAYER_NAME_MATCH_CAP,
+  PLAYER_SEARCH_RESULT_CAP,
+  TEAM_ROSTER_PLAYER_CAP,
+} from "@/lib/config";
 
 export interface CBAArticle {
   id: string;
@@ -44,20 +50,24 @@ interface PlayerData {
 
 const players: PlayerData[] = playerData as PlayerData[];
 
+interface SectionEntry {
+  heading: string;
+  text: string;
+}
+
+interface IndexedDoc extends CBAArticle {
+  sections: SectionEntry[];
+}
+
 interface ScoredArticle extends CBAArticle {
   score: number;
   relevantSections: string[];
 }
 
-const articles: CBAArticle[] = cbaArticles as CBAArticle[];
-const guideSections: CBAArticle[] = cbaGuide as CBAArticle[];
-const cba101Sections: CBAArticle[] = cba101Data as CBAArticle[];
-
-
 // Break each article into sections (split on ## headings)
-function getSections(article: CBAArticle): { heading: string; text: string }[] {
+function computeSections(article: CBAArticle): SectionEntry[] {
   const parts = article.content.split(/^(#{1,3}\s+.+)$/m);
-  const sections: { heading: string; text: string }[] = [];
+  const sections: SectionEntry[] = [];
   let currentHeading = article.title;
   let currentText = "";
 
@@ -77,6 +87,16 @@ function getSections(article: CBAArticle): { heading: string; text: string }[] {
   }
   return sections;
 }
+
+// Sections are split once at module load rather than on every query — the
+// underlying JSON is static for the lifetime of the process.
+function indexDocs(docs: CBAArticle[]): IndexedDoc[] {
+  return docs.map((doc) => ({ ...doc, sections: computeSections(doc) }));
+}
+
+const articles: IndexedDoc[] = indexDocs(cbaArticles as CBAArticle[]);
+const guideSections: IndexedDoc[] = indexDocs(cbaGuide as CBAArticle[]);
+const cba101Sections: IndexedDoc[] = indexDocs(cba101Data as CBAArticle[]);
 
 // Simple keyword-based search scoring
 function tokenize(text: string): string[] {
@@ -123,31 +143,45 @@ const TOPIC_MAP: Record<string, string[]> = {
   "second apron": ["apron", "second apron", "salary cap"],
 };
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+interface TokenRegex {
+  token: string;
+  regex: RegExp;
+}
+
+// Compile each query token into a regex once per query, rather than once per
+// (token, section) pair — searchCBAWithMeta scans every section of every
+// scored document with the same token set.
+function buildTokenRegexes(tokens: string[]): TokenRegex[] {
+  return tokens.map((token) => ({ token, regex: new RegExp(escapeRegExp(token), "gi") }));
+}
+
 // Score a single document (article or guide section) against the query
 function scoreDocument(
-  doc: CBAArticle,
-  queryTokens: string[],
+  doc: IndexedDoc,
+  tokenRegexes: TokenRegex[],
   queryLower: string,
   boostedTerms: string[]
 ): ScoredArticle {
   let score = 0;
-  const sections = getSections(doc);
   const relevantSections: string[] = [];
 
   const titleLower = doc.title.toLowerCase();
-  for (const token of queryTokens) {
+  for (const { token } of tokenRegexes) {
     if (titleLower.includes(token)) score += 10;
   }
   for (const term of boostedTerms) {
     if (titleLower.includes(term)) score += 15;
   }
 
-  for (const section of sections) {
+  for (const section of doc.sections) {
     const sectionLower = (section.heading + " " + section.text).toLowerCase();
     let sectionScore = 0;
 
-    for (const token of queryTokens) {
-      const regex = new RegExp(token, "gi");
+    for (const { regex } of tokenRegexes) {
       const matches = sectionLower.match(regex);
       if (matches) sectionScore += matches.length;
     }
@@ -163,7 +197,7 @@ function scoreDocument(
     }
   }
 
-  return { ...doc, score, relevantSections };
+  return { id: doc.id, title: doc.title, content: doc.content, score, relevantSections };
 }
 
 export function searchCBAWithMeta(
@@ -176,6 +210,7 @@ export function searchCBAWithMeta(
   const maxSectionsPerArticle = options.maxSectionsPerArticle ?? 3;
   const queryTokens = tokenize(query).filter((t) => !STOP_WORDS.has(t));
   const queryLower = query.toLowerCase();
+  const tokenRegexes = buildTokenRegexes(queryTokens);
 
   // Check topic map for boosted terms
   const boostedTerms: string[] = [];
@@ -194,19 +229,19 @@ export function searchCBAWithMeta(
 
   // Score the plain-English guide sections (prioritized - these explain things clearly)
   const scoredGuide = guideSections
-    .map((s) => ({ ...scoreDocument(s, queryTokens, queryLower, boostedTerms), source: "guide" as const }))
+    .map((s) => ({ ...scoreDocument(s, tokenRegexes, queryLower, boostedTerms), source: "guide" as const }))
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score);
 
   // Score the CBA 101 sections (practical examples with real transactions)
   const scored101 = cba101Sections
-    .map((s) => ({ ...scoreDocument(s, queryTokens, queryLower, boostedTerms), source: "cba101" as const }))
+    .map((s) => ({ ...scoreDocument(s, tokenRegexes, queryLower, boostedTerms), source: "cba101" as const }))
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score);
 
   // Score the raw CBA articles
   const scoredCBA = articles
-    .map((a) => ({ ...scoreDocument(a, queryTokens, queryLower, boostedTerms), source: "cba" as const }))
+    .map((a) => ({ ...scoreDocument(a, tokenRegexes, queryLower, boostedTerms), source: "cba" as const }))
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score);
 
@@ -228,7 +263,7 @@ export function searchCBAWithMeta(
   // Add CBA 101 sections (up to 30% of budget — practical examples with real deals)
   const cba101Budget = maxChars * 0.3;
   let cba101Used = 0;
-  for (const section of scored101.slice(0, 3)) {
+  for (const section of scored101.slice(0, CBA101_SECTION_CAP)) {
     const trimmedContent = section.content.length > 3500
       ? `${section.content.slice(0, 3500)}\n\n[truncated for efficiency]`
       : section.content;
@@ -255,19 +290,21 @@ export function searchCBAWithMeta(
     sources.push(`2023 CBA: ${article.title}`);
   }
 
+  // Note: sources are not truncated here — the caller (route.ts) combines
+  // these with additional non-CBA sources (player/team data, static links)
+  // and applies the final MAX_SOURCES cap once, on the combined list.
   return {
     context: context || "No relevant CBA sections found for this query.",
-    sources: Array.from(new Set(sources)).slice(0, 4),
+    sources: Array.from(new Set(sources)),
   };
-}
-
-export function searchCBA(query: string, maxChars: number = 80000): string {
-  return searchCBAWithMeta(query, { maxChars }).context;
 }
 
 // ---- Player search ----
 
-// NBA team full names for matching
+// NBA team full names for matching. Data sources are inconsistent about the
+// Suns' abbreviation (players.json has both "PHX" and "PHO"; teams.json only
+// has "PHX") — normalizeTeamAbbr() below is the single place that reconciles
+// this rather than each caller doing its own ad hoc .replace().
 const TEAM_NAMES: Record<string, string[]> = {
   ATL: ["hawks", "atlanta"], BOS: ["celtics", "boston"], BKN: ["nets", "brooklyn"],
   CHA: ["hornets", "charlotte"], CHI: ["bulls", "chicago"], CLE: ["cavaliers", "cavs", "cleveland"],
@@ -278,10 +315,19 @@ const TEAM_NAMES: Record<string, string[]> = {
   MIN: ["timberwolves", "wolves", "minnesota"], NOP: ["pelicans", "new orleans"],
   NYK: ["knicks", "new york"], OKC: ["thunder", "oklahoma city"],
   ORL: ["magic", "orlando"], PHI: ["76ers", "sixers", "philadelphia"],
-  PHX: ["suns", "phoenix"], PHO: ["suns", "phoenix"], POR: ["trail blazers", "blazers", "portland"],
+  PHX: ["suns", "phoenix"], POR: ["trail blazers", "blazers", "portland"],
   SAC: ["kings", "sacramento"], SAS: ["spurs", "san antonio"], TOR: ["raptors", "toronto"],
   UTA: ["jazz", "utah"], WAS: ["wizards", "washington"],
 };
+
+// Aliases for team abbreviations that appear inconsistently across data
+// sources. Both sides of a comparison should be run through
+// normalizeTeamAbbr() so it doesn't matter which variant either side uses.
+const TEAM_ABBR_ALIASES: Record<string, string> = { PHO: "PHX" };
+
+function normalizeTeamAbbr(abbr: string): string {
+  return TEAM_ABBR_ALIASES[abbr] ?? abbr;
+}
 
 function formatPlayerInfo(p: PlayerData): string {
   const team = p.team;
@@ -310,15 +356,24 @@ function formatPlayerInfo(p: PlayerData): string {
   return info;
 }
 
-export function searchPlayers(query: string): string {
+interface PlayerMatch {
+  player: PlayerData;
+  score: number;
+}
+
+// Shared player-name scoring algorithm used by both searchPlayers() (which
+// needs the full ranked list to build a context block) and
+// findPlayerNamesInQuery() (which just needs the top few names for Notte
+// lookups). Full-name matches are strongly preferred; single-word queries
+// only match on last name to avoid "Williams" matching every Williams.
+function scorePlayerNameMatches(query: string): PlayerMatch[] {
   const queryLower = query.toLowerCase();
   const queryWords = queryLower
     .replace(/[^a-z0-9\s'-]/g, " ")
     .split(/\s+/)
     .filter(Boolean);
-  const matched: { player: PlayerData; score: number }[] = [];
+  const matched: PlayerMatch[] = [];
 
-  // Score specific player matches. Full-name matches are strongly preferred.
   for (const p of players) {
     const nameLower = p.name.toLowerCase();
     const nameParts = nameLower.split(" ");
@@ -354,6 +409,12 @@ export function searchPlayers(query: string): string {
     }
   }
 
+  return matched;
+}
+
+export function searchPlayers(query: string): string {
+  const queryLower = query.toLowerCase();
+  const matched = scorePlayerNameMatches(query);
   matched.sort((a, b) => b.score - a.score || b.player.points - a.player.points);
 
   // Check for team mentions (e.g., "Lakers roster", "what can the Celtics do")
@@ -362,12 +423,9 @@ export function searchPlayers(query: string): string {
     for (const name of names) {
       if (queryLower.includes(name)) {
         const teamPlayers = players
-          .filter((p) => {
-            const effectiveTeam = p.team;
-            return effectiveTeam === abbr || effectiveTeam === abbr.replace("PHX", "PHO");
-          })
+          .filter((p) => normalizeTeamAbbr(p.team) === normalizeTeamAbbr(abbr))
           .sort((a, b) => b.points - a.points)
-          .slice(0, 8); // Top 8 by points
+          .slice(0, TEAM_ROSTER_PLAYER_CAP);
         teamMatches.push(...teamPlayers);
         break;
       }
@@ -387,7 +445,7 @@ export function searchPlayers(query: string): string {
   if (results.length === 0) return "";
 
   let context = "\n\n--- PLAYER DATA (2025-26 snapshot — HoopsHype salaries, NBA stats feed) ---\n\n";
-  for (const p of results.slice(0, 15)) {
+  for (const p of results.slice(0, PLAYER_SEARCH_RESULT_CAP)) {
     context += formatPlayerInfo(p) + "\n";
   }
   return context;
@@ -395,27 +453,9 @@ export function searchPlayers(query: string): string {
 
 // Return the full names of players mentioned in a query (for Notte salary lookups)
 export function findPlayerNamesInQuery(query: string): string[] {
-  const queryLower = query.toLowerCase();
-  const queryWords = queryLower.replace(/[^a-z0-9\s'-]/g, " ").split(/\s+/).filter(Boolean);
-  const matched: { player: PlayerData; score: number }[] = [];
-
-  for (const p of players) {
-    const nameLower = p.name.toLowerCase();
-    const nameParts = nameLower.split(" ");
-    const firstName = nameParts[0];
-    const lastName = nameParts[nameParts.length - 1];
-    let score = 0;
-
-    if (queryLower.includes(nameLower)) score += 100;
-    if (queryWords.length >= 2 && queryWords.includes(firstName) && queryWords.includes(lastName)) score += 70;
-    if (queryWords.length === 1 && lastName.length > 3 && queryWords[0] === lastName) score += 30;
-
-    if (score > 0) matched.push({ player: p, score });
-  }
-
-  return matched
+  return scorePlayerNameMatches(query)
     .sort((a, b) => b.score - a.score || b.player.points - a.player.points)
-    .slice(0, 3)
+    .slice(0, PLAYER_NAME_MATCH_CAP)
     .map((m) => m.player.name);
 }
 
@@ -461,7 +501,7 @@ export function searchTeams(query: string): string {
   ];
 
   for (const abbr of matchedAbbrs) {
-    const t = teams.teams.find((x) => x.abbr === abbr || x.abbr === abbr.replace("PHO", "PHX"));
+    const t = teams.teams.find((x) => normalizeTeamAbbr(x.abbr) === normalizeTeamAbbr(abbr));
     if (!t) continue;
 
     const { capAllocations, capSpace } = t;
@@ -513,11 +553,4 @@ export function searchTeams(query: string): string {
   lines.push(`- The luxury tax line is NOT shown here — use general knowledge or note it's typically ~$30–35M above the salary cap`);
 
   return lines.join("\n");
-}
-
-// Get a table of contents for the system prompt
-export function getCBAToc(): string {
-  return articles
-    .map((a) => `- ${a.id}: ${a.title}`)
-    .join("\n");
 }

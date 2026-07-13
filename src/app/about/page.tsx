@@ -1,20 +1,23 @@
+import Link from "next/link";
+import { ABOUT_SOURCES } from "@/lib/sources";
+
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-gradient-page">
       <div className="max-w-3xl mx-auto px-4 py-10">
         <nav className="mb-5 inline-flex items-center gap-1 rounded-full border border-[--color-border] bg-[--color-surface]/45 px-1.5 py-1">
-          <a
+          <Link
             href="/"
-            className="text-xs px-3 py-1.5 rounded-full text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors"
+            className="text-xs px-3 py-1.5 rounded-full text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
           >
             Home
-          </a>
-          <a
+          </Link>
+          <Link
             href="/#chat"
-            className="text-xs px-3 py-1.5 rounded-full text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors"
+            className="text-xs px-3 py-1.5 rounded-full text-[--color-text-secondary] hover:text-[--color-text-primary] hover:bg-[--color-surface-hover] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
           >
             Chat
-          </a>
+          </Link>
         </nav>
 
         <h1 className="text-2xl font-semibold text-[--color-text-primary] tracking-tight mb-2">
@@ -40,10 +43,18 @@ export default function AboutPage() {
         <section className="mb-6">
           <h2 className="text-lg font-medium text-[--color-text-primary] mb-2">Sources</h2>
           <ul className="text-sm text-[--color-text-secondary] space-y-1">
-            <li><a className="hover:text-[--color-text-primary]" href="https://nbpa.com/cba" target="_blank" rel="noreferrer">Official 2023 CBA (NBPA)</a></li>
-            <li><a className="hover:text-[--color-text-primary]" href="https://cbaguide.com/#top" target="_blank" rel="noreferrer">CBA Guide</a></li>
-            <li><a className="hover:text-[--color-text-primary]" href="https://www.capsheets.com/" target="_blank" rel="noreferrer">Capsheets</a></li>
-            <li><a className="hover:text-[--color-text-primary]" href="https://www.nba.com/stats/players/traditional" target="_blank" rel="noreferrer">NBA Stats</a></li>
+            {ABOUT_SOURCES.map((source) => (
+              <li key={source.url}>
+                <a
+                  className="hover:text-[--color-text-primary] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
+                  href={source.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {source.label}
+                </a>
+              </li>
+            ))}
           </ul>
         </section>
 
@@ -59,14 +70,14 @@ export default function AboutPage() {
           <p className="text-sm text-[--color-text-secondary] leading-relaxed">
             Contact the creator of this website by{" "}
             <a
-              className="font-semibold hover:text-[--color-text-primary]"
+              className="font-semibold hover:text-[--color-text-primary] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
               href="mailto:mikehmargolis@gmail.com"
             >
               e-mail
             </a>
             , or{" "}
             <a
-              className="font-semibold hover:text-[--color-text-primary]"
+              className="font-semibold hover:text-[--color-text-primary] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
               href="https://www.linkedin.com/in/margolismichael/"
               target="_blank"
               rel="noreferrer"

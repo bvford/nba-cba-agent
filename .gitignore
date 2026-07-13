@@ -18,3 +18,7 @@ npm-debug.log*
 .DS_Store
 *.pem
 .vercel
+tsconfig.tsbuildinfo
+
+# claude
+.claude/worktrees/

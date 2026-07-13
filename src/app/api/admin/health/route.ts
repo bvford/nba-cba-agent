@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { upstashEnabled } from "@/lib/upstash";
+import { RATE_LIMIT, RESPONSE_CACHE_TTL_SECONDS } from "@/lib/config";
 
 async function pingUpstash(): Promise<boolean> {
   const url = process.env.UPSTASH_REDIS_REST_URL;
@@ -34,11 +35,11 @@ export async function GET() {
       service: "chatcba",
       timestamp: new Date().toISOString(),
       limits: {
-        per_day: 20,
+        per_day: RATE_LIMIT,
         strategy: upstashConfigured ? "upstash+inmemory-fallback" : "inmemory-fallback-only",
       },
       cache: {
-        ttl_seconds: 21600,
+        ttl_seconds: RESPONSE_CACHE_TTL_SECONDS,
         strategy: upstashConfigured ? "upstash+inmemory-fallback" : "inmemory-fallback-only",
       },
       upstash: {

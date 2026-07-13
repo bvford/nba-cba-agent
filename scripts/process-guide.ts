@@ -8,10 +8,16 @@ interface GuideSection {
 }
 
 function processGuide() {
-  const raw = readFileSync(
-    "/Users/michaelmargolis/Downloads/cbaguide.com.md",
-    "utf-8"
-  );
+  const inputPath = process.argv[2];
+  if (!inputPath) {
+    console.error(
+      "Usage: npx tsx scripts/process-guide.ts <path-to-cbaguide-markdown-file>\n" +
+        "  Provide the path to the downloaded cbaguide.com markdown export as the first argument."
+    );
+    process.exit(1);
+  }
+
+  const raw = readFileSync(inputPath, "utf-8");
 
   // Remove YAML front matter
   const text = raw.replace(/^---[\s\S]*?---\n*/m, "");

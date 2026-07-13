@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import { Chat } from "@/lib/chat-store";
+import { SIDEBAR_SOURCES } from "@/lib/sources";
 
 interface SidebarProps {
   chats: Chat[];
@@ -11,34 +13,6 @@ interface SidebarProps {
   onNewChat: () => void;
   onDeleteChat: (id: string) => void;
 }
-
-const SOURCE_LINKS = [
-  {
-    label: "CBA Guide (Plain English)",
-    href: "https://cbaguide.com/#top",
-    note: "Quick rule explanations",
-  },
-  {
-    label: "Official 2023 CBA (NBPA)",
-    href: "https://nbpa.com/cba",
-    note: "Primary agreement text",
-  },
-  {
-    label: "Capsheets",
-    href: "https://www.capsheets.com/",
-    note: "Team cap and salary reference",
-  },
-  {
-    label: "NBA Stats",
-    href: "https://www.nba.com/stats/players/traditional",
-    note: "Official player stat tables",
-  },
-  {
-    label: "About & Method",
-    href: "/about",
-    note: "How this app works",
-  },
-];
 
 function timeAgo(timestamp: number): string {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -64,6 +38,15 @@ export function Sidebar({
   onNewChat,
   onDeleteChat,
 }: SidebarProps) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [isOpen, onClose]);
+
   return (
     <>
       {/* Backdrop (mobile) */}
@@ -85,9 +68,11 @@ export function Sidebar({
         <div className="p-3 border-b border-[--color-border] flex items-center gap-2">
           <button
             onClick={onNewChat}
+            aria-label="Start a new chat"
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg
               bg-[linear-gradient(135deg,#c8a24a,#d4b15e)] text-[#0d1117] text-sm font-semibold
-              transition-all duration-150 shadow-[0_6px_16px_rgba(200,162,74,0.2)] hover:brightness-105"
+              transition-all duration-150 shadow-[0_6px_16px_rgba(200,162,74,0.2)] hover:brightness-105
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
             title="New chat (Cmd/Ctrl+Shift+K)"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -97,7 +82,8 @@ export function Sidebar({
           </button>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[--color-surface-hover] text-[--color-text-muted] lg:hidden transition-colors"
+            aria-label="Close chat history"
+            className="p-2 rounded-lg hover:bg-[--color-surface-hover] text-[--color-text-muted] lg:hidden transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -145,8 +131,11 @@ export function Sidebar({
                     e.stopPropagation();
                     onDeleteChat(chat.id);
                   }}
+                  aria-label={`Delete chat: ${chat.title}`}
                   className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-[--color-surface]/50
-                    text-[--color-text-muted] hover:text-[--color-nba-red] transition-all duration-100 shrink-0 ml-1"
+                    [@media(pointer:coarse)]:opacity-60 text-[--color-text-muted] hover:text-[--color-nba-red]
+                    transition-all duration-100 shrink-0 ml-1 focus-visible:opacity-100 focus-visible:outline-none
+                    focus-visible:ring-2 focus-visible:ring-[--color-accent]"
                   title="Delete chat"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -164,16 +153,16 @@ export function Sidebar({
             Sources
           </p>
           <div className="space-y-1.5">
-            {SOURCE_LINKS.map((link) => (
+            {SIDEBAR_SOURCES.map((link) => (
               <a
-                key={link.href}
-                href={link.href}
-                target={link.href.startsWith("http") ? "_blank" : undefined}
-                rel={link.href.startsWith("http") ? "noreferrer" : undefined}
-                className="block rounded-xl border border-[--color-border] hover:border-[--color-accent]/40 bg-[--color-surface]/45 hover:bg-[--color-surface-hover]/75 px-3 py-2.5 transition-colors"
+                key={link.url}
+                href={link.url}
+                target={link.url.startsWith("http") ? "_blank" : undefined}
+                rel={link.url.startsWith("http") ? "noreferrer" : undefined}
+                className="block rounded-xl border border-[--color-border] hover:border-[--color-accent]/40 bg-[--color-surface]/45 hover:bg-[--color-surface-hover]/75 px-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
               >
                 <p className="text-[13px] text-[--color-text-primary] leading-tight font-medium">
-                  {link.label}
+                  {link.sidebarLabel ?? link.label}
                 </p>
                 <p className="text-xs text-[--color-text-muted] mt-1">
                   {link.note}
@@ -191,6 +180,22 @@ export function Sidebar({
           <p className="hidden sm:block text-[10px] text-[--color-text-muted] text-left mt-1">
             Cmd/Ctrl + Shift + K for New Chat
           </p>
+          <nav className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-[--color-text-muted]">
+            {[
+              ["Home", "/"],
+              ["About", "/about"],
+              ["Privacy", "/privacy"],
+              ["Terms", "/terms"],
+            ].map(([label, href]) => (
+              <a
+                key={href}
+                href={href}
+                className="hover:text-[--color-text-secondary] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]"
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
         </div>
       </aside>
     </>
