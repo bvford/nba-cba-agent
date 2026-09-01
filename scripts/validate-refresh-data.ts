@@ -14,6 +14,9 @@ const MIN_ROSTER_SIZE = 12; // active + two-way, per team
 const MAX_ROSTER_SIZE = 24; // offseason rosters can exceed the in-season limit
 const MIN_PLAUSIBLE_PAYROLL = 100_000_000;
 const MAX_PLAUSIBLE_PAYROLL = 300_000_000;
+// The refresh workflow keeps the last good data when a scrape fails, which is
+// silent by design for a one-off blip. This makes two consecutive misses loud.
+const MAX_DATA_AGE_DAYS = 70;
 
 const CANONICAL_ABBRS = new Set([
   "ATL", "BKN", "BOS", "CHA", "CHI", "CLE", "DAL", "DEN", "DET", "GSW",
@@ -122,6 +125,16 @@ for (const player of players) {
 
 const teams = readJson<TeamsJson>(teamsPath);
 if (teams.source !== "capsheets.com") fail(`teams.json source is "${teams.source}" (expected capsheets.com)`);
+
+const fetchedAt = teams.fetchedAt ? Date.parse(teams.fetchedAt) : NaN;
+if (Number.isNaN(fetchedAt)) {
+  fail(`teams.json has an unreadable fetchedAt ("${teams.fetchedAt}")`);
+} else {
+  const ageDays = Math.floor((Date.now() - fetchedAt) / 86_400_000);
+  if (ageDays > MAX_DATA_AGE_DAYS) {
+    fail(`teams.json was last refreshed ${ageDays} days ago (max ${MAX_DATA_AGE_DAYS}) — the capsheets scrape has been failing`);
+  }
+}
 
 const teamRows = teams.teams || [];
 if (teamRows.length !== TEAM_COUNT) fail(`teams.json has ${teamRows.length} teams (expected exactly ${TEAM_COUNT})`);
