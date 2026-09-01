@@ -2533,23 +2533,7 @@
       ],
       "capHoldsTotal": 6819653,
       "twoWay": [],
-      "exceptions": [
-        {
-          "type": "Taxpayer Mid-Level",
-          "amount": 6064000,
-          "expiry": "4/11/27"
-        },
-        {
-          "type": "TPE (Dalen Terry)",
-          "amount": 899118,
-          "expiry": "2/5/27"
-        },
-        {
-          "type": "TPE (Guerschon Yabusele)",
-          "amount": 100882,
-          "expiry": "2/5/27"
-        }
-      ]
+      "exceptions": []
     },
     {
       "abbr": "OKC",

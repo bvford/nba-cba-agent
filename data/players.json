@@ -13399,6 +13399,28 @@
       }
     },
     {
+      "name": "Jaron Pierre Jr.",
+      "position": "",
+      "age": 0,
+      "games": 0,
+      "gamesStarted": 0,
+      "points": 0,
+      "rebounds": 0,
+      "assists": 0,
+      "steals": 0,
+      "blocks": 0,
+      "turnovers": 0,
+      "fieldPercent": 0,
+      "threePercent": 0,
+      "ftPercent": 0,
+      "minutesPerGame": 0,
+      "team": "NOP",
+      "twoWay": true,
+      "salaries": {
+        "2026-27": "Two-Way"
+      }
+    },
+    {
       "name": "Aday Mara",
       "position": "",
       "age": 0,
