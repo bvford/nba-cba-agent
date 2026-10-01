@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-01",
+  "fetchedAt": "2026-10-01",
   "players": [
     {
       "name": "Luka Dončić",
@@ -313,7 +313,7 @@
       "minutesPerGame": 34.8,
       "team": "CLE",
       "salaries": {
-        "2026-27": "$30,647,664 (Estimate)"
+        "2026-27": "$30,647,619"
       }
     },
     {
@@ -1864,7 +1864,7 @@
       "minutesPerGame": 30,
       "team": "NOP",
       "salaries": {
-        "2026-27": "$8,000,000 (Estimate)"
+        "2026-27": "$7,500,000"
       }
     },
     {
@@ -4946,7 +4946,7 @@
       "minutesPerGame": 13.9,
       "team": "DET",
       "salaries": {
-        "2026-27": "$5,602,689 (Non-guaranteed)"
+        "2026-27": "$5,602,689"
       }
     },
     {
@@ -5637,10 +5637,9 @@
       "threePercent": 0.316,
       "ftPercent": 0.745,
       "minutesPerGame": 14.9,
-      "team": "CHI",
-      "salaries": {
-        "2026-27": "$6,889,320"
-      }
+      "team": null,
+      "notOnRoster": true,
+      "salaries": {}
     },
     {
       "name": "Drake Powell",
@@ -5742,9 +5741,10 @@
       "threePercent": 0.356,
       "ftPercent": 0.806,
       "minutesPerGame": 19.5,
-      "team": "ATL",
+      "team": "DEN",
+      "twoWay": true,
       "salaries": {
-        "2026-27": "$2,150,917"
+        "2026-27": "Two-Way"
       }
     },
     {
@@ -5827,7 +5827,7 @@
       "threePercent": 0.349,
       "ftPercent": 0.811,
       "minutesPerGame": 16.1,
-      "team": "ATL",
+      "team": "CHI",
       "salaries": {
         "2026-27": "$9,658,536"
       }
@@ -6464,27 +6464,6 @@
       }
     },
     {
-      "name": "Devin Carter",
-      "position": "PG",
-      "age": 23,
-      "games": 38,
-      "gamesStarted": 12,
-      "points": 339,
-      "rebounds": 125,
-      "assists": 101,
-      "steals": 34,
-      "blocks": 9,
-      "turnovers": 54,
-      "fieldPercent": 0.414,
-      "threePercent": 0.263,
-      "ftPercent": 0.713,
-      "minutesPerGame": 18.4,
-      "team": "ATL",
-      "salaries": {
-        "2026-27": "$5,158,080"
-      }
-    },
-    {
       "name": "Jevon Carter",
       "position": "PG",
       "age": 30,
@@ -6504,6 +6483,26 @@
       "salaries": {
         "2026-27": "$2,449,421"
       }
+    },
+    {
+      "name": "Devin Carter",
+      "position": "PG",
+      "age": 23,
+      "games": 38,
+      "gamesStarted": 12,
+      "points": 339,
+      "rebounds": 125,
+      "assists": 101,
+      "steals": 34,
+      "blocks": 9,
+      "turnovers": 54,
+      "fieldPercent": 0.414,
+      "threePercent": 0.263,
+      "ftPercent": 0.713,
+      "minutesPerGame": 18.4,
+      "team": null,
+      "notOnRoster": true,
+      "salaries": {}
     },
     {
       "name": "Jericho Sims",
@@ -7166,10 +7165,9 @@
       "threePercent": 0.295,
       "ftPercent": 0.717,
       "minutesPerGame": 19,
-      "team": "MEM",
-      "salaries": {
-        "2026-27": "$5,969,250"
-      }
+      "team": null,
+      "notOnRoster": true,
+      "salaries": {}
     },
     {
       "name": "Jamaree Bouyea",
@@ -7208,7 +7206,7 @@
       "threePercent": 0.259,
       "ftPercent": 0.759,
       "minutesPerGame": 15,
-      "team": "NOP",
+      "team": "MEM",
       "salaries": {
         "2026-27": "$2,150,917"
       }
@@ -7251,7 +7249,7 @@
       "threePercent": 0.348,
       "ftPercent": 0.852,
       "minutesPerGame": 13.6,
-      "team": "NOP",
+      "team": "MEM",
       "salaries": {
         "2026-27": "$7,021,895"
       }
@@ -7809,9 +7807,10 @@
       "threePercent": 0.286,
       "ftPercent": 0.696,
       "minutesPerGame": 14.3,
-      "team": null,
-      "notOnRoster": true,
-      "salaries": {}
+      "team": "DAL",
+      "salaries": {
+        "2026-27": "$2,449,421 (Non-guaranteed)"
+      }
     },
     {
       "name": "Tyus Jones",
@@ -7871,9 +7870,11 @@
       "threePercent": 0.286,
       "ftPercent": 0.742,
       "minutesPerGame": 16.9,
-      "team": null,
-      "notOnRoster": true,
-      "salaries": {}
+      "team": "DEN",
+      "twoWay": true,
+      "salaries": {
+        "2026-27": "Two-Way"
+      }
     },
     {
       "name": "Jahmai Mashack",
@@ -8369,7 +8370,7 @@
       "threePercent": 0.211,
       "ftPercent": 0.85,
       "minutesPerGame": 9.5,
-      "team": "MEM",
+      "team": "NOP",
       "salaries": {
         "2026-27": "$3,237,120"
       }
@@ -8494,9 +8495,11 @@
       "threePercent": 0,
       "ftPercent": 0.636,
       "minutesPerGame": 30.9,
-      "team": null,
-      "notOnRoster": true,
-      "salaries": {}
+      "team": "NOP",
+      "twoWay": true,
+      "salaries": {
+        "2026-27": "Two-Way"
+      }
     },
     {
       "name": "Zach Edey",
@@ -8847,10 +8850,9 @@
       "threePercent": 0.412,
       "ftPercent": 0.889,
       "minutesPerGame": 13.8,
-      "team": "DET",
-      "salaries": {
-        "2026-27": "$3,815,861"
-      }
+      "team": null,
+      "notOnRoster": true,
+      "salaries": {}
     },
     {
       "name": "Malaki Branham",
@@ -8908,9 +8910,32 @@
       "threePercent": 0.435,
       "ftPercent": 1,
       "minutesPerGame": 23.9,
-      "team": null,
-      "notOnRoster": true,
-      "salaries": {}
+      "team": "TOR",
+      "twoWay": true,
+      "salaries": {
+        "2026-27": "Two-Way"
+      }
+    },
+    {
+      "name": "Dorian Finney-Smith",
+      "position": "PF",
+      "age": 32,
+      "games": 37,
+      "gamesStarted": 1,
+      "points": 123,
+      "rebounds": 93,
+      "assists": 36,
+      "steals": 16,
+      "blocks": 6,
+      "turnovers": 22,
+      "fieldPercent": 0.333,
+      "threePercent": 0.27,
+      "ftPercent": 0.889,
+      "minutesPerGame": 16.8,
+      "team": "ATL",
+      "salaries": {
+        "2026-27": "$14,196,974"
+      }
     },
     {
       "name": "Ron Harper Jr.",
@@ -8931,27 +8956,6 @@
       "team": "BOS",
       "salaries": {
         "2026-27": "$3,150,752"
-      }
-    },
-    {
-      "name": "Dorian Finney-Smith",
-      "position": "PF",
-      "age": 32,
-      "games": 37,
-      "gamesStarted": 1,
-      "points": 123,
-      "rebounds": 93,
-      "assists": 36,
-      "steals": 16,
-      "blocks": 6,
-      "turnovers": 22,
-      "fieldPercent": 0.333,
-      "threePercent": 0.27,
-      "ftPercent": 0.889,
-      "minutesPerGame": 16.8,
-      "team": "CHA",
-      "salaries": {
-        "2026-27": "$14,196,974"
       }
     },
     {
@@ -9381,11 +9385,9 @@
       "threePercent": 0.3,
       "ftPercent": 0.611,
       "minutesPerGame": 12.9,
-      "team": "DEN",
-      "twoWay": true,
-      "salaries": {
-        "2026-27": "Two-Way"
-      }
+      "team": null,
+      "notOnRoster": true,
+      "salaries": {}
     },
     {
       "name": "Jordan McLaughlin",
@@ -10024,9 +10026,11 @@
       "threePercent": 0.333,
       "ftPercent": 0.4,
       "minutesPerGame": 7.4,
-      "team": null,
-      "notOnRoster": true,
-      "salaries": {}
+      "team": "NYK",
+      "twoWay": true,
+      "salaries": {
+        "2026-27": "Two-Way"
+      }
     },
     {
       "name": "Bradley Beal",
@@ -10461,27 +10465,6 @@
       "salaries": {}
     },
     {
-      "name": "Taj Gibson",
-      "position": "C",
-      "age": 40,
-      "games": 10,
-      "gamesStarted": 1,
-      "points": 34,
-      "rebounds": 27,
-      "assists": 6,
-      "steals": 2,
-      "blocks": 1,
-      "turnovers": 1,
-      "fieldPercent": 0.462,
-      "threePercent": 0.5,
-      "ftPercent": 0.875,
-      "minutesPerGame": 9.7,
-      "team": "MEM",
-      "salaries": {
-        "2026-27": "$3,815,861 (Non-guaranteed)"
-      }
-    },
-    {
       "name": "Omer Yurtseven",
       "position": "C",
       "age": 27,
@@ -10497,6 +10480,26 @@
       "threePercent": 0,
       "ftPercent": 0.667,
       "minutesPerGame": 11.6,
+      "team": null,
+      "notOnRoster": true,
+      "salaries": {}
+    },
+    {
+      "name": "Taj Gibson",
+      "position": "C",
+      "age": 40,
+      "games": 10,
+      "gamesStarted": 1,
+      "points": 34,
+      "rebounds": 27,
+      "assists": 6,
+      "steals": 2,
+      "blocks": 1,
+      "turnovers": 1,
+      "fieldPercent": 0.462,
+      "threePercent": 0.5,
+      "ftPercent": 0.875,
+      "minutesPerGame": 9.7,
       "team": null,
       "notOnRoster": true,
       "salaries": {}
@@ -11030,26 +11033,6 @@
       }
     },
     {
-      "name": "Garrett Temple",
-      "position": "SG",
-      "age": 39,
-      "games": 22,
-      "gamesStarted": 0,
-      "points": 17,
-      "rebounds": 9,
-      "assists": 9,
-      "steals": 4,
-      "blocks": 2,
-      "turnovers": 7,
-      "fieldPercent": 0.267,
-      "threePercent": 0.25,
-      "ftPercent": 0.667,
-      "minutesPerGame": 3.3,
-      "team": null,
-      "notOnRoster": true,
-      "salaries": {}
-    },
-    {
       "name": "Grant Nelson",
       "position": "PF",
       "age": 23,
@@ -11065,6 +11048,28 @@
       "threePercent": 0,
       "ftPercent": 0.7,
       "minutesPerGame": 8.8,
+      "team": "BKN",
+      "twoWay": true,
+      "salaries": {
+        "2026-27": "Two-Way"
+      }
+    },
+    {
+      "name": "Garrett Temple",
+      "position": "SG",
+      "age": 39,
+      "games": 22,
+      "gamesStarted": 0,
+      "points": 17,
+      "rebounds": 9,
+      "assists": 9,
+      "steals": 4,
+      "blocks": 2,
+      "turnovers": 7,
+      "fieldPercent": 0.267,
+      "threePercent": 0.25,
+      "ftPercent": 0.667,
+      "minutesPerGame": 3.3,
       "team": null,
       "notOnRoster": true,
       "salaries": {}
@@ -11442,27 +11447,6 @@
       "salaries": {}
     },
     {
-      "name": "Johni Broome",
-      "position": "C",
-      "age": 23,
-      "games": 11,
-      "gamesStarted": 0,
-      "points": 10,
-      "rebounds": 16,
-      "assists": 4,
-      "steals": 3,
-      "blocks": 2,
-      "turnovers": 3,
-      "fieldPercent": 0.167,
-      "threePercent": 0,
-      "ftPercent": 0.333,
-      "minutesPerGame": 5,
-      "team": "LAC",
-      "salaries": {
-        "2026-27": "$2,150,917"
-      }
-    },
-    {
       "name": "Jayson Kent",
       "position": "SF",
       "age": 23,
@@ -11541,6 +11525,26 @@
       "threePercent": 0,
       "ftPercent": 1,
       "minutesPerGame": 10,
+      "team": null,
+      "notOnRoster": true,
+      "salaries": {}
+    },
+    {
+      "name": "Johni Broome",
+      "position": "C",
+      "age": 23,
+      "games": 11,
+      "gamesStarted": 0,
+      "points": 10,
+      "rebounds": 16,
+      "assists": 4,
+      "steals": 3,
+      "blocks": 2,
+      "turnovers": 3,
+      "fieldPercent": 0.167,
+      "threePercent": 0,
+      "ftPercent": 0.333,
+      "minutesPerGame": 5,
       "team": null,
       "notOnRoster": true,
       "salaries": {}
@@ -12519,11 +12523,11 @@
       "minutesPerGame": 0,
       "team": "CLE",
       "salaries": {
-        "2026-27": "$2,449,421"
+        "2026-27": "$2,449,421 (Non-guaranteed)"
       }
     },
     {
-      "name": "Meleek Thomas",
+      "name": "Khalifa Diop",
       "position": "",
       "age": 0,
       "games": 0,
@@ -12544,7 +12548,7 @@
       }
     },
     {
-      "name": "Draft Rights Rookie",
+      "name": "Meleek Thomas",
       "position": "",
       "age": 0,
       "games": 0,
@@ -12842,6 +12846,28 @@
       }
     },
     {
+      "name": "Graham Ike",
+      "position": "",
+      "age": 0,
+      "games": 0,
+      "gamesStarted": 0,
+      "points": 0,
+      "rebounds": 0,
+      "assists": 0,
+      "steals": 0,
+      "blocks": 0,
+      "turnovers": 0,
+      "fieldPercent": 0,
+      "threePercent": 0,
+      "ftPercent": 0,
+      "minutesPerGame": 0,
+      "team": "GSW",
+      "twoWay": true,
+      "salaries": {
+        "2026-27": "Two-Way"
+      }
+    },
+    {
       "name": "Fred VanVleet",
       "position": "",
       "age": 0,
@@ -13014,28 +13040,6 @@
     },
     {
       "name": "Nick Martinelli",
-      "position": "",
-      "age": 0,
-      "games": 0,
-      "gamesStarted": 0,
-      "points": 0,
-      "rebounds": 0,
-      "assists": 0,
-      "steals": 0,
-      "blocks": 0,
-      "turnovers": 0,
-      "fieldPercent": 0,
-      "threePercent": 0,
-      "ftPercent": 0,
-      "minutesPerGame": 0,
-      "team": "LAC",
-      "twoWay": true,
-      "salaries": {
-        "2026-27": "Two-Way"
-      }
-    },
-    {
-      "name": "Jamarion Sharp",
       "position": "",
       "age": 0,
       "games": 0,
@@ -13421,6 +13425,50 @@
       }
     },
     {
+      "name": "Jaden Akins",
+      "position": "",
+      "age": 0,
+      "games": 0,
+      "gamesStarted": 0,
+      "points": 0,
+      "rebounds": 0,
+      "assists": 0,
+      "steals": 0,
+      "blocks": 0,
+      "turnovers": 0,
+      "fieldPercent": 0,
+      "threePercent": 0,
+      "ftPercent": 0,
+      "minutesPerGame": 0,
+      "team": "NYK",
+      "twoWay": true,
+      "salaries": {
+        "2026-27": "Two-Way"
+      }
+    },
+    {
+      "name": "Tyler Nickel",
+      "position": "",
+      "age": 0,
+      "games": 0,
+      "gamesStarted": 0,
+      "points": 0,
+      "rebounds": 0,
+      "assists": 0,
+      "steals": 0,
+      "blocks": 0,
+      "turnovers": 0,
+      "fieldPercent": 0,
+      "threePercent": 0,
+      "ftPercent": 0,
+      "minutesPerGame": 0,
+      "team": "NYK",
+      "twoWay": true,
+      "salaries": {
+        "2026-27": "Two-Way"
+      }
+    },
+    {
       "name": "Aday Mara",
       "position": "",
       "age": 0,
@@ -13697,6 +13745,27 @@
       }
     },
     {
+      "name": "Ben Simmons",
+      "position": "",
+      "age": 0,
+      "games": 0,
+      "gamesStarted": 0,
+      "points": 0,
+      "rebounds": 0,
+      "assists": 0,
+      "steals": 0,
+      "blocks": 0,
+      "turnovers": 0,
+      "fieldPercent": 0,
+      "threePercent": 0,
+      "ftPercent": 0,
+      "minutesPerGame": 0,
+      "team": "SAC",
+      "salaries": {
+        "2026-27": "$2,449,421 (Non-guaranteed)"
+      }
+    },
+    {
       "name": "Emanuel Sharp",
       "position": "",
       "age": 0,
@@ -13885,9 +13954,8 @@
       "ftPercent": 0,
       "minutesPerGame": 0,
       "team": "TOR",
-      "twoWay": true,
       "salaries": {
-        "2026-27": "Two-Way"
+        "2026-27": "$1,357,763"
       }
     },
     {
